@@ -29,15 +29,15 @@ void DivideByScalar3d(double* x, const double& a);				// x /= a
 
 
 // 2D version
-float NormSquared2f(const float* x);
-float Norm2f(const float* x);
+float NormSquared2f(const float* x);							// norm(x)^2
+float Norm2f(const float* x);									// norm(x)
 float Dot2f(const float* a, const float* b);					// c = a . b
 void AddVector2f(const float* a, const float* b, float* c);		// c = a + b
 void AddVector2f(float* a, const float* b);						// a += b
 void SubVector2f(double* a, const double* b);					// a -= b
 
-double NormSquared2d(const double* x);
-double Norm2d(const double* x);
+double NormSquared2d(const double* x);							// norm(x)^2
+double Norm2d(const double* x);									// norm(x)
 double Dot2d(const double* a, const double*b);					// c = a . b
 void AddVector2d(const double* a, const double* b, double* c);	// c = a + b
 void AddVector2d(double* a, const double* b);					// a += b
