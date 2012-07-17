@@ -214,7 +214,6 @@ void SubVector2f(float* a, const float* b)
 double Dot2d(const double* a, const double*b)
 {
 	return a[0]*b[0] + a[1]*b[1];
-
 }
 
 // c = a + b
@@ -222,7 +221,6 @@ void AddVector2d(const double* a, const double* b, double* c)
 {
 	c[0] = a[0] + b[0];
 	c[1] = a[1] + b[1];
-
 }
 
 // a -= b
@@ -251,4 +249,34 @@ float Norm2f( const float* x )
 double Norm2d( const double* x )
 {
 	return sqrt(NormSquared2d(x));
+}
+
+void Normalize3f( float* x )
+{
+	DivideByScalar3f(x, Norm3f(x));
+}
+
+void Normalize3d( double* x )
+{
+	DivideByScalar3d(x, Norm3d(x));
+}
+
+void Normalize2f( float* x )
+{
+	DivideByScalar2f(x, Norm2f(x));
+}
+
+void Normalize2d( double* x )
+{
+	DivideByScalar2d(x, Norm2d(x));
+}
+
+void DivideByScalar2f( float* x, const float& a )
+{
+	x[0] /= a;	x[1] /= a;
+}
+
+void DivideByScalar2d( double* x, const double& a )
+{
+	x[0] /= a;	x[1] /= a;
 }
