@@ -22,5 +22,14 @@ int main()
 	printf("v1 x v2 = (%lf, %lf, %lf)\n", v3[0], v3[1], v3[2]);
 	printf("v1 * v2 = %lf\n", dot_product);	
 	  
+	// 2D case example
+	double v4[2] = {0.5, -0.2};
+	double v5[2] = {1.2, 0.3};
+
+	double dot_product2d = Dot2d(v4, v5);
+	printf("v4 * v5 = %lf\n", dot_product2d);	
+
+	
+
 	return 0;
 }

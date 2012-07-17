@@ -32,4 +32,7 @@ void SubVector3d(double* a, const double* b);
 void MultiplyScalar3d(double* x, const double& a);
 void DivideByScalar3d(double* x, const double& a);
 
+// 2D version
+double Dot2d(const double* a, const double*b);
+
 #endif // VECTORALGEBRA_H
