@@ -177,13 +177,10 @@ void DivideByScalar3d(double* x, const double& a)
 }
 
 
-
-<<<<<<< .mine
-=======
 //////////////////////////////////////////////////////////////////////////
 // 2D version
 
->>>>>>> .r28
+
 float Dot2f(const float* a, const float* b)
 {
 	return a[0]*b[0] + a[1]*b[1];
