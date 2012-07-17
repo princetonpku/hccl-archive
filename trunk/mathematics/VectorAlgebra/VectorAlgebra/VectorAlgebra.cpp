@@ -84,12 +84,7 @@ void DivideByScalar3f(float* x, const float& a)
 }
 
 
-// c = a + b
-void AddVector2f(const float* a, const float* b, float* c)
-{
-	c[0] = a[0] + b[0];
-	c[1] = a[1] + b[1];
-}
+
 
 
 
@@ -193,7 +188,12 @@ void SubVector2f(float* a, const float* b)
 	a[1] -= b[1];
 }
 
-
+// c = a + b
+void AddVector2f(const float* a, const float* b, float* c)
+{
+	c[0] = a[0] + b[0];
+	c[1] = a[1] + b[1];
+}
 
 
 
