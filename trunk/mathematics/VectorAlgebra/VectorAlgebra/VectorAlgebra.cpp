@@ -194,13 +194,6 @@ float Dot2f(const float* a, const float* b)
 	return a[0]*b[0] + a[1]*b[1];
 }
 
-// a -= b
-void SubVector2f(float* a, const float* b)
-{
-	a[0] -= b[0];
-	a[1] -= b[1];
-}
-
 // c = a + b
 void AddVector2f(const float* a, const float* b, float* c)
 {
@@ -208,6 +201,12 @@ void AddVector2f(const float* a, const float* b, float* c)
 	c[1] = a[1] + b[1];
 }
 
+// a -= b
+void SubVector2f(float* a, const float* b)
+{
+	a[0] -= b[0];
+	a[1] -= b[1];
+}
 
 
 
@@ -217,7 +216,6 @@ double Dot2d(const double* a, const double*b)
 	return a[0]*b[0] + a[1]*b[1];
 
 }
-
 
 // c = a + b
 void AddVector2d(const double* a, const double* b, double* c)
