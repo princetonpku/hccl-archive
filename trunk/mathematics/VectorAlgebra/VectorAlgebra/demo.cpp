@@ -21,6 +21,6 @@ int main()
 	printf("v2 = (%lf, %lf, %lf)\n", v2[0], v2[1], v2[2]);
 	printf("v1 x v2 = (%lf, %lf, %lf)\n", v3[0], v3[1], v3[2]);
 	printf("v1 * v2 = %lf\n", dot_product);	
-
+	  
 	return 0;
 }
