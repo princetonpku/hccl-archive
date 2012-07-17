@@ -34,5 +34,6 @@ void DivideByScalar3d(double* x, const double& a);
 
 // 2D version
 double Dot2d(const double* a, const double*b);
+void SubVector2d(double* a, const double* b);
 
 #endif // VECTORALGEBRA_H
