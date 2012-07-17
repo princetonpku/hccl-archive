@@ -14,16 +14,13 @@ int main()
 	vector<double> v3(3);	
 	Cross3d(v1, &v2[0], &v3[0]);
 
-
 	// Dot product of two vectors v1 and v2
 	double dot_product = Dot3d(v1, v2.data());
 
 	printf("v1 = (%lf, %lf, %lf)\n", v1[0], v1[1], v1[2]);
 	printf("v2 = (%lf, %lf, %lf)\n", v2[0], v2[1], v2[2]);
 	printf("v1 x v2 = (%lf, %lf, %lf)\n", v3[0], v3[1], v3[2]);
-	printf("v1 * v2 = %lf\n", dot_product);
-
-	
+	printf("v1 * v2 = %lf\n", dot_product);	
 
 	return 0;
 }
