@@ -29,8 +29,5 @@ int main()
 	double dot_product2d = Dot2d(v4, v5);
 	printf("v4 * v5 = %lf\n", dot_product2d);	
 
-	printf("¿”¡§»∆ πŸ∫∏\n");
-	
-
 	return 0;
 }
