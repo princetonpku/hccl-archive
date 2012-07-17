@@ -33,6 +33,8 @@ void MultiplyScalar3d(double* x, const double& a);
 void DivideByScalar3d(double* x, const double& a);
 
 // 2D version
+void SubVector2f(double* a, const double* b);
+
 double Dot2d(const double* a, const double*b);
 void SubVector2d(double* a, const double* b);
 

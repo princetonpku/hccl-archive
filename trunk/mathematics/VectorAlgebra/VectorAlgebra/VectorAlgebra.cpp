@@ -169,7 +169,29 @@ void DivideByScalar3d(double* x, const double& a)
 	x[0] /= a;	x[1] /= a;	x[2] /= a;
 }
 
+
+
+
+// a -= b
+void SubVector2f(float* a, const float* b)
+{
+	a[0] -= b[0];
+	a[1] -= b[1];
+}
+
+
+
+
+
+
 double Dot2d(const double* a, const double*b)
 {
 	return a[0]*b[0] + a[1]*b[1];
+}
+
+// a -= b
+void SubVector2d(double* a, const double* b)
+{
+	a[0] -= b[0];
+	a[1] -= b[1];
 }
