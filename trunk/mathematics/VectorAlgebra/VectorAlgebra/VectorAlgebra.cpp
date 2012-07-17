@@ -84,6 +84,13 @@ void DivideByScalar3f(float* x, const float& a)
 }
 
 
+// c = a + b
+void AddVector2f(const float* a, const float* b, float* c)
+{
+	c[0] = a[0] + b[0];
+	c[1] = a[1] + b[1];
+}
+
 
 
 
@@ -171,9 +178,12 @@ void DivideByScalar3d(double* x, const double& a)
 
 
 
+<<<<<<< .mine
+=======
 //////////////////////////////////////////////////////////////////////////
 // 2D version
 
+>>>>>>> .r28
 float Dot2f(const float* a, const float* b)
 {
 	return a[0]*b[0] + a[1]*b[1];
@@ -191,9 +201,20 @@ void SubVector2f(float* a, const float* b)
 
 
 
+
 double Dot2d(const double* a, const double*b)
 {
 	return a[0]*b[0] + a[1]*b[1];
+
+}
+
+
+// c = a + b
+void AddVector2d(const double* a, const double* b, double* c)
+{
+	c[0] = a[0] + b[0];
+	c[1] = a[1] + b[1];
+
 }
 
 // a -= b
@@ -201,4 +222,5 @@ void SubVector2d(double* a, const double* b)
 {
 	a[0] -= b[0];
 	a[1] -= b[1];
+
 }
