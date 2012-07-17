@@ -80,7 +80,8 @@ void MultiplyScalar3f(float* x, const float& a)
 // x /= a
 void DivideByScalar3f(float* x, const float& a)
 {
-	x[0] /= a;	x[1] /= a;	x[2] /= a;
+	x[0] /= a;	x[1] /= a;	
+	x[2] /= a;
 }
 
 
