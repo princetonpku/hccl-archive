@@ -52,5 +52,10 @@ void AddVector2d(const double* a, const double* b, double* c);
 
 void SubVector2d(double* a, const double* b);
 
+void AddVector2d(double* a, const double* b); // neorig
+void AddVector2f(float* a, const float* b); // neorig
+
+
+
 
 #endif // VECTORALGEBRA_H

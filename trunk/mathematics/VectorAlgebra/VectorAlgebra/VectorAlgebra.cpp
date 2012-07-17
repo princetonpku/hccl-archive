@@ -80,11 +80,23 @@ void MultiplyScalar3f(float* x, const float& a)
 // x /= a
 void DivideByScalar3f(float* x, const float& a)
 {
-	x[0] /= a;	x[1] /= a;	
-	x[2] /= a;
+	x[0] /= a;	x[1] /= a;	x[2] /= a;
 }
 
 
+// a += b
+void AddVector2d(double* a, const double* b)
+{
+	a[0] += b[0];
+	a[1] += b[1];
+}
+
+// a += b
+void AddVector2f(float* a, const float* b)
+{
+	a[0] += b[0];
+	a[1] += b[1];
+}
 
 
 
