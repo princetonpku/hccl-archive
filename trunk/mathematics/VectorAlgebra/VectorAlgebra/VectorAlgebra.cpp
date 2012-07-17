@@ -232,3 +232,23 @@ void SubVector2d(double* a, const double* b)
 	a[1] -= b[1];
 
 }
+
+float NormSquared2f( const float* x )
+{
+	return Dot2f(x, x);
+}
+
+double NormSquared2d( const double* x )
+{
+	return Dot2d(x, x);
+}
+
+float Norm2f( const float* x )
+{
+	return sqrt(NormSquared2f(x));
+}
+
+double Norm2d( const double* x )
+{
+	return sqrt(NormSquared2d(x));
+}
