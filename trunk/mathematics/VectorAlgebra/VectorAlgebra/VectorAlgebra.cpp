@@ -277,6 +277,28 @@ void Normalize2d( double* x )
 	DivideByScalar2d(x, Norm2d(x));
 }
 
+void Assign2d(double* a, const double* b)
+{
+	memcpy(a, b, sizeof(double)*2);
+}
+
+void Assign2d(double* a, const double b)
+{
+	a[0] = b;
+	a[1] = b;
+}
+
+void Assign2f(float* a, const float* b)
+{
+	memcpy(a, b, sizeof(float)*2);
+}
+
+void Assign2f(float* a, const float b)
+{
+	a[0] = b;
+	a[1] = b;
+}
+
 void DivideByScalar2f( float* x, const float& a )
 {
 	x[0] /= a;	x[1] /= a;
