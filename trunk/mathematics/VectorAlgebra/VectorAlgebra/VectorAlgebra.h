@@ -46,6 +46,7 @@ void Normalize2d(double* x);									// x /= norm(x)
 double Dot2d(const double* a, const double*b);					// c = a . b
 void AddVector2d(const double* a, const double* b, double* c);	// c = a + b
 void AddVector2d(double* a, const double* b);					// a += b
+void SubVector2d(const double* a, const double* b, double* c);  // c = a - b
 void SubVector2d(double* a, const double* b);					// a -= b
 void DivideByScalar2d(double* x, const double& a);				// x /= a
 

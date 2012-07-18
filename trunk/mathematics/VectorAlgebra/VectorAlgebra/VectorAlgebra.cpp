@@ -231,6 +231,12 @@ void SubVector2d(double* a, const double* b)
 
 }
 
+void SubVector2d(const double* a, const double* b, double* c)
+{
+	c[0] = a[0] - b[0];
+	c[1] = a[1] - b[1];
+}
+
 float NormSquared2f( const float* x )
 {
 	return Dot2f(x, x);
