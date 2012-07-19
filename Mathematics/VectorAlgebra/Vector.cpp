@@ -1,9 +1,24 @@
 #include "Vector.h"
+#include <typeinfo.h>
 
 Vector3d::Vector3d(void)
 {
 }
 
+Vector3d::Vector3d(double x, double y, double z)							// (x, y, z)
+{
+	val[0] = x;	val[1] = y;	val[2] = z;
+}
+
+Vector3d::Vector3d(double* xyz)											// (xyz[0], xyz[1], xyz[2])
+{
+	memcpy(val, xyz, sizeof(double)*3);
+}
+
+Vector3d::Vector3d(const Vector3d& v)									// copy constructor
+{
+	memcpy(this->val, v.val, sizeof(double)*3);
+}
 
 Vector3d::~Vector3d(void)
 {
