@@ -33,32 +33,27 @@ public:
 
 // Methods (Geometry)
 public:
-	Vector3d Rotate(const double rad, const Vector3d& axis);
-	Vector3d Rotate(const double* R);
+	Vector3d Rotate(const double rad, const Vector3d& axis);		// rotate this vector by given angle(rad) along the axis(must be unit)
+	Vector3d Rotate(const double* R);								// rotate this vector by multiplying the rotation matrix R (column-stacked)
 	//Vector3d Rotate(const Quaterniond& q);
 	Vector3d Translate(const Vector3d& dx);							// this += dx
 	Vector3d Translate(const double mag, const Vector3d& dir);		// this += mag*dir
 
 // Operators
 public:
-	Vector3d operator=(const Vector3d& v);
+	Vector3d operator=(const Vector3d& v);							// assign operator
 
-	bool operator==(const Vector3d& v);
-	bool operator!=(const Vector3d& v);
+	bool operator==(const Vector3d& v);								// compare operator
+	bool operator!=(const Vector3d& v);								// negative compare operator
 
-	Vector3d operator+=(const Vector3d& v);
-	Vector3d operator-=(const Vector3d& v);
-	Vector3d operator*=(const Vector3d& v);
-	Vector3d operator*=(const double& k);
-	Vector3d operator/=(const Vector3d& v);
-	Vector3d operator/=(const double& v);
+	Vector3d operator+=(const Vector3d& v);							// unary addition operator
+	Vector3d operator-=(const Vector3d& v);							// unary subtraction operator
+	Vector3d operator*=(const Vector3d& v);							// unary multiplication operator (element-wise)
+	Vector3d operator*=(const double& k);							// unary scalar multiplication operator
+	Vector3d operator/=(const Vector3d& v);							// unary division operator (element-wise)
+	Vector3d operator/=(const double& v);							// unary scalar division operator
 
-	Vector3d operator-();											// negation operator
-
-	Vector3d operator+(const Vector3d& v);
-	Vector3d operator-(const Vector3d& v);
-	Vector3d operator*(const Vector3d& v);
-	Vector3d operator/(const Vector3d& v);
+	Vector3d operator-();											// unary negation operator
 
 
 // Accessors
@@ -68,15 +63,19 @@ public:
 	double Y(){ return val[0]; }
 	double Z(){ return val[0]; }
 
+	void SetX(double nx) { val[0] = nx; }
+	void SetY(double nx) { val[0] = nx; }
+	void SetZ(double nx) { val[0] = nx; }
+
 protected:
 	double val[3];
 };
 
-Vector3d& operator+(const Vector3d& a, const Vector3d& b);
-Vector3d& operator-(const Vector3d& a, const Vector3d& b);
-Vector3d& operator*(const Vector3d& a, const Vector3d& b);
-Vector3d& operator*(const Vector3d& v, const double& k);
-Vector3d& operator*(const double& k, const Vector3d& v);
-Vector3d& operator/(const Vector3d& a, const Vector3d& b);
-Vector3d& operator/(const Vector3d& v, const double& k);
-Vector3d& operator/(const double& k, const Vector3d& v);
+Vector3d& operator+(const Vector3d& a, const Vector3d& b);			// binary addition operator
+Vector3d& operator-(const Vector3d& a, const Vector3d& b);			// binary subtraction operator
+Vector3d& operator*(const Vector3d& a, const Vector3d& b);			// binary multiplication operator (element-wise)
+Vector3d& operator*(const Vector3d& v, const double& k);			// binary scalar multiplication operator
+Vector3d& operator*(const double& k, const Vector3d& v);			// binary scalar multiplication operator
+Vector3d& operator/(const Vector3d& a, const Vector3d& b);			// binary division operator (element-wise)
+Vector3d& operator/(const Vector3d& v, const double& k);			// binary scalar division operator
+Vector3d& operator/(const double& k, const Vector3d& v);			// binary scalar division operator
