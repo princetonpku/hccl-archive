@@ -77,11 +77,11 @@ public:
 	double val[3];
 };
 
-Vector3d& operator+(const Vector3d& a, const Vector3d& b);			// binary addition operator
-Vector3d& operator-(const Vector3d& a, const Vector3d& b);			// binary subtraction operator
-Vector3d& operator*(const Vector3d& a, const Vector3d& b);			// binary multiplication operator (element-wise)
-Vector3d& operator*(const Vector3d& v, const double& k);			// binary scalar multiplication operator
-Vector3d& operator*(const double& k, const Vector3d& v);			// binary scalar multiplication operator
-Vector3d& operator/(const Vector3d& a, const Vector3d& b);			// binary division operator (element-wise)
-Vector3d& operator/(const Vector3d& v, const double& k);			// binary scalar division operator
-Vector3d& operator/(const double& k, const Vector3d& v);			// binary scalar division operator
+Vector3d operator+(const Vector3d& a, const Vector3d& b);			// binary addition operator
+Vector3d operator-(const Vector3d& a, const Vector3d& b);			// binary subtraction operator
+Vector3d operator*(const Vector3d& a, const Vector3d& b);			// binary multiplication operator (element-wise)
+Vector3d operator*(const Vector3d& v, const double& k);			// binary scalar multiplication operator
+Vector3d operator*(const double& k, const Vector3d& v);			// binary scalar multiplication operator
+Vector3d operator/(const Vector3d& a, const Vector3d& b);			// binary division operator (element-wise)
+Vector3d operator/(const Vector3d& v, const double& k);			// binary scalar division operator
+Vector3d operator/(const double& k, const Vector3d& v);			// binary scalar division operator
