@@ -3,36 +3,36 @@
 
 // 3D version
 float vDot3f(const float* a, const float* b);				// c = a . b
-void vCross3f(const float* a, const float* b, float* c);	// c = a x b
+float* vCross3f(const float* a, const float* b, float* c);	// c = a x b
 float vNormSquared3f(const float* x);						// norm(x)^2
 float vNorm3f(const float* x);								// norm(x)
-void vNormalize3f(float* x);								// x /= norm(x)
-void vCopy3f(float* a, const float* b);						// a = b
-void vAssign3f(float* a, const float b);					// a = (b, b, b)
-void vAdd3f(const float* a, const float* b, float* c);		// c = a + b
-void vAdd3f(float* a, const float* b);						// a += b
-void vSub3f(const float* a, const float* b, float* c);		// c = a - b
-void vSub3f(float* a, const float* b);						// a -= b
-void vMul3f(double* a, const double* b);					// a *= b (element-wise multiplication)
-void vMul3f(const double* a, const double* b, double* c);	// c = a * b (element-wise multiplication)
-void vMulScalar3f(float* x, const float& a);				// x *= a
-void vDivScalar3f(float* x, const float& a);				// x /= a
+float* vNormalize3f(float* x);								// x /= norm(x)
+float* vCopy3f(float* a, const float* b);						// a = b
+float* vAssign3f(float* a, const float b);					// a = (b, b, b)
+float* vAdd3f(const float* a, const float* b, float* c);		// c = a + b
+float* vAdd3f(float* a, const float* b);						// a += b
+float* vSub3f(const float* a, const float* b, float* c);		// c = a - b
+float* vSub3f(float* a, const float* b);						// a -= b
+float* vMul3f(double* a, const double* b);					// a *= b (element-wise multiplication)
+float* vMul3f(const double* a, const double* b, double* c);	// c = a * b (element-wise multiplication)
+float* vMulScalar3f(float* x, const float& a);				// x *= a
+float* vDivScalar3f(float* x, const float& a);				// x /= a
 
 double vDot3d(const double* a, const double* b);			// c = a . b
-void vCross3d(const double* a, const double* b, double* c);	// c = a x b
+double* vCross3d(const double* a, const double* b, double* c);	// c = a x b
 double vNormSquared3d(const double* x);						// norm(x)^2
 double vNorm3d(const double* x);							// norm(x)
-void vNormalize3d(double* x);								// x /= norm(x)
-void vCopy3d(double* a, const double* b);					// a = b
-void vAssign3d(double* a, const double b);					// a = (b, b, b)
-void vAdd3d(const double* a, const double* b, double* c);	// c = a + b
-void vAdd3d(double* a, const double* b);					// a += b
-void vSub3d(const double* a, const double* b, double* c);	// c = a - b
-void vSub3d(double* a, const double* b);					// a -= b
-void vMul3d(double* a, const double* b);					// a *= b (element-wise multiplication)
-void vMul3d(const double* a, const double* b, double* c);	// c = a * b (element-wise multiplication)
-void vMulScalar3d(double* x, const double& a);				// x *= a
-void vDivScalar3d(double* x, const double& a);				// x /= a
+double* vNormalize3d(double* x);								// x /= norm(x)
+double* vCopy3d(double* a, const double* b);					// a = b
+double* vAssign3d(double* a, const double b);					// a = (b, b, b)
+double* vAdd3d(const double* a, const double* b, double* c);	// c = a + b
+double* vAdd3d(double* a, const double* b);					// a += b
+double* vSub3d(const double* a, const double* b, double* c);	// c = a - b
+double* vSub3d(double* a, const double* b);					// a -= b
+double* vMul3d(double* a, const double* b);					// a *= b (element-wise multiplication)
+double* vMul3d(const double* a, const double* b, double* c);	// c = a * b (element-wise multiplication)
+double* vMulScalar3d(double* x, const double& a);				// x *= a
+double* vDivScalar3d(double* x, const double& a);				// x /= a
 
 
 // 2D version
