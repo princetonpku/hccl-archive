@@ -1,4 +1,5 @@
 #pragma once
+#include "VectorAlgebra.h"
 
 class Vector3d
 {
@@ -6,11 +7,12 @@ public:
 	Vector3d(void);													// zero vector
 	Vector3d(double x, double y, double z);							// (x, y, z)
 	Vector3d(double* xyz);											// (xyz[0], xyz[1], xyz[2])
-	Vector3d(const double& v);										// copy constructor
+	Vector3d(const Vector3d& v);									// copy constructor
 	~Vector3d(void);
 
 // Methods (Algebra)
 public:
+	// TODO: Normalize
 	static double Dot(const Vector3d& a, const Vector3d& b);		// a . b
 	double Dot(const Vector3d& v);									// this . v
 	static Vector3d Cross(const Vector3d& a, const Vector3d& b);	// a x b
@@ -30,6 +32,7 @@ public:
 	Vector3d Div(const Vector3d& v);								// this /= v (element-wise)
 	static Vector3d Div(const Vector3d& a, const double& k);		// a / k
 	Vector3d Div(const double& k);									// this /= k
+
 
 // Methods (Geometry)
 public:
@@ -51,21 +54,21 @@ public:
 	Vector3d operator*=(const Vector3d& v);							// unary multiplication operator (element-wise)
 	Vector3d operator*=(const double& k);							// unary scalar multiplication operator
 	Vector3d operator/=(const Vector3d& v);							// unary division operator (element-wise)
-	Vector3d operator/=(const double& v);							// unary scalar division operator
+	Vector3d operator/=(const double& k);							// unary scalar division operator
 
 	Vector3d operator-();											// unary negation operator
 
 
 // Accessors
 public:
-	double& operator[](int i){ return val[i]; }
-	double X(){ return val[0]; }
-	double Y(){ return val[0]; }
-	double Z(){ return val[0]; }
+	double& operator[](int i);
+	double X();
+	double Y();
+	double Z();
 
-	void SetX(double nx) { val[0] = nx; }
-	void SetY(double nx) { val[0] = nx; }
-	void SetZ(double nx) { val[0] = nx; }
+	void SetX(double nx);
+	void SetY(double nx);
+	void SetZ(double nx);
 
 protected:
 	double val[3];
