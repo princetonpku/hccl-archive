@@ -308,3 +308,8 @@ void DivideByScalar2d( double* x, const double& a )
 {
 	x[0] /= a;	x[1] /= a;
 }
+
+void MultiplyScalar2d( double* x, const double& a )
+{
+  x[0] *= a;	x[1] *= a;
+}
