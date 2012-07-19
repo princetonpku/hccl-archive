@@ -14,15 +14,17 @@
 #endif
 
 
-void qIdentityd(double* q)
+double* qIdentityd(double* q)
 {
 	q[0] = 1.0;
 	q[1] = q[2] = q[3] = 0.0;
+	return q;
 }
 
-void qCopyd(double* dst, const double* src)
+double* qCopyd(double* dst, const double* src)
 {
 	memcpy(dst, src, sizeof(double)*4);
+	return dst;
 }
 
 // |q|^2
@@ -38,15 +40,15 @@ double qNormd(const double* q)
 }
 
 // q = q / |q|
-void qNormalize(double* q)
+double* qNormalize(double* q)
 {
-	qDivScalard(q, qNormd(q));
+	return qDivScalard(q, qNormd(q));
 }
 
 // q2 = q1 / |q1|
-void qNormalize(const double* q1, double* q2)
+double* qNormalize(const double* q1, double* q2)
 {
-	qDivScalard(q2, q1, qNormd(q1));
+	return qDivScalard(q2, q1, qNormd(q1));
 }
 
 bool qIsEquald(const double* q1, const double* q2)
@@ -55,63 +57,75 @@ bool qIsEquald(const double* q1, const double* q2)
 }
 
 // q = q^(-1)
-void qInvert(double* q)
+double* qInvert(double* q)
 {
 	double n = qNormSquaredd(q);
 	q[0] = q[0]/n;
 	q[1] = -q[1]/n;
 	q[2] = -q[2]/n;
 	q[3] = -q[3]/n;
+
+	return q;
 }
 
 // q2 = q1^(-1)
-void qInvert(const double* q1, double* q2)
+double* qInvert(const double* q1, double* q2)
 {
 	double n = qNormSquaredd(q1);
 	q2[0] = q1[0]/n;
 	q2[1] = -q1[1]/n;
 	q2[2] = -q1[2]/n;
 	q2[3] = -q1[3]/n;
+
+	return q2;
 }
 
 // q1 += q2
-void qAddd(double* q1, const double* q2)
+double* qAddd(double* q1, const double* q2)
 {
 	q1[0] += q2[0];
 	q1[1] += q2[1];
 	q1[2] += q2[2];
 	q1[3] += q2[3];
+
+	return q1;
 }
 
 // q1 = q2 + q3
-void qAddd(double* q1, const double* q2, const double* q3)
+double* qAddd(double* q1, const double* q2, const double* q3)
 {
 	q1[0] = q2[0] + q3[0];
 	q1[1] = q2[1] + q3[1];
 	q1[2] = q2[2] + q3[2];
 	q1[3] = q2[3] + q3[3];
+
+	return q1;
 }
 
 // q1 -= q2
-void qSubd(double* q1, const double* q2)
+double* qSubd(double* q1, const double* q2)
 {
 	q1[0] -= q2[0];
 	q1[1] -= q2[1];
 	q1[2] -= q2[2];
 	q1[3] -= q2[3];
+	
+	return q1;
 }
 
 // q1 = q2 - q3
-void qSubd(double* q1, const double* q2, const double* q3)
+double* qSubd(double* q1, const double* q2, const double* q3)
 {
 	q1[0] = q2[0] - q3[0];
 	q1[1] = q2[1] - q3[1];
 	q1[2] = q2[2] - q3[2];
 	q1[3] = q2[3] - q3[3];
+
+	return q1;
 }
 
 // q1 *= q2
-void qMuld(double* q1, const double* q2)
+double* qMuld(double* q1, const double* q2)
 {
 	double qtemp[4];
 	memcpy(qtemp, q1, sizeof(double)*4);
@@ -120,15 +134,19 @@ void qMuld(double* q1, const double* q2)
 	q1[1] = qtemp[1]*q2[0] + qtemp[0]*q2[1] - qtemp[3]*q2[2] + qtemp[2]*q2[3];
 	q1[2] = qtemp[2]*q2[0] + qtemp[3]*q2[1] + qtemp[0]*q2[2] - qtemp[1]*q2[3];
 	q1[3] = qtemp[3]*q2[0] - qtemp[2]*q2[1] + qtemp[1]*q2[2] + qtemp[0]*q2[3];
+
+	return q1;
 }
 
 // q1 = q2 * q3
-void qMuld(double* q1, const double* q2, const double* q3)
+double* qMuld(double* q1, const double* q2, const double* q3)
 {
 	q1[0] = q2[0]*q3[0] - q2[1]*q3[1] - q2[2]*q3[2] - q2[3]*q3[3];
 	q1[1] = q2[1]*q3[0] + q2[0]*q3[1] - q2[3]*q3[2] + q2[2]*q3[3];
 	q1[2] = q2[2]*q3[0] + q2[3]*q3[1] + q2[0]*q3[2] - q2[1]*q3[3];
 	q1[3] = q2[3]*q3[0] - q2[2]*q3[1] + q2[1]*q3[2] + q2[0]*q3[3];
+
+	return q1;
 }
 
 
@@ -137,97 +155,101 @@ void qMuld(double* q1, const double* q2, const double* q3)
 // // 	return q*Q(0,v.x,v.y,v.z);
 // // }
 // // q *= v
-// void qMulVectord(double* q, const double* v)
+// double* qMulVectord(double* q, const double* v)
 // {
 // 
 // }
 // 
 // // q1 = q2 * v
-// void qMulVectord(double* q1, const double* q2, const double* v)
+// double* qMulVectord(double* q1, const double* q2, const double* v)
 // {
 // 
 // }
 
 // q *= k
-void qMulScalard(double* q, const double k)
+double* qMulScalard(double* q, const double k)
 {
 	q[0] *= k;
 	q[1] *= k;
 	q[2] *= k;
 	q[3] *= k;
+
+	return q;
 }
 
 // q1 = q2 * k
-void qMulScalard(double* q1, const double* q2, const double k)
+double* qMulScalard(double* q1, const double* q2, const double k)
 {
 	q1[0] = q2[0]*k;
 	q1[1] = q2[1]*k;
 	q1[2] = q2[2]*k;
 	q1[3] = q2[3]*k;
+
+	return q1;
 }
 
 // q1 = k * q2
-void qMulScalard(double* q1, const double k, const double* q2)
+double* qMulScalard(double* q1, const double k, const double* q2)
 {
-	qMulScalard(q1, q2, k);
+	return qMulScalard(q1, q2, k);
 }
 
 // q1 /= q2
-void qDivd(double* q1, const double* q2)
+double* qDivd(double* q1, const double* q2)
 {
 	double q2inv[4];
 	qInvert(q2, q2inv);
-	qMuld(q1, q2inv);
+	return qMuld(q1, q2inv);
 }
 
 // q1 = q2 / q3
-void qDivd(double* q1, const double* q2, const double* q3)
+double* qDivd(double* q1, const double* q2, const double* q3)
 {
 	double q3inv[4];
 	qInvert(q3, q3inv);
-	qMuld(q1, q2, q3inv);
+	return qMuld(q1, q2, q3inv);
 }
 
 // // q /= v
-// void qDivVectord(double* q, const double* v)
+// double* qDivVectord(double* q, const double* v)
 // {
 // 
 // }
 // 
 // // q1 = q2 / v
-// void qDivVectord(double* q1, const double* q2, const double* v)
+// double* qDivVectord(double* q1, const double* q2, const double* v)
 // {
 // 
 // }
 // 
 // // q1 = v / q2
-// void qDivVectord(double* q1, const double* v, const double* q2)
+// double* qDivVectord(double* q1, const double* v, const double* q2)
 // {
 // 
 // }
 
 // q /= k
-void qDivScalard(double* q, const double k)
+double* qDivScalard(double* q, const double k)
 {
-	qMulScalard(q, 1.0/k);
+	return qMulScalard(q, 1.0/k);
 }
 
 // q1 = q2 / k
-void qDivScalard(double* q1, const double* q2, const double k)
+double* qDivScalard(double* q1, const double* q2, const double k)
 {
-	qMulScalard(q1, q2, 1.0/k);
+	return qMulScalard(q1, q2, 1.0/k);
 }
 
 // q1 = k / q2
-void qDivScalard(double* q1, const double k, const double* q2)
+double* qDivScalard(double* q1, const double k, const double* q2)
 {
 	double q2inv[4];
 	qInvert(q2, q2inv);
-	qMulScalard(q1, k, q2inv);
+	return qMulScalard(q1, k, q2inv);
 }
 
 // convert axis-angle representation to quaternion (Map from so(3) --> SO(3))
-void qExpd(const double* a, double* q)
+double* qExpd(const double* a, double* q)
 {
 	double m = a[1]*a[1] + a[2]*a[2] + a[3]*a[3];
 
@@ -244,10 +266,12 @@ void qExpd(const double* a, double* q)
 
 		qNormalize(q);				// Do I have to normalize q here?
 	}
+
+	return q;
 }
 
 // convert quaternion to axis-angle representation (Map from SO(3) --> so(3))
-void qLogd(const double* q, double* a)
+double* qLogd(const double* q, double* a)
 {
 	double qq[4];	// normalized q
 	qNormalize(q, qq);
@@ -274,11 +298,13 @@ void qLogd(const double* q, double* a)
 		a[2] = qq[2]/v;
 		a[3] = qq[3]/v;
 	}
+
+	return a;
 }
 
 // Convert rotation matrix to a quaternion form.
 // R is 3x3 matrix, in stacked-column form. i.e. R_(i,j) = R[3*j + i]
-void qFromMatrixd(double* q, const double* R)
+double* qFromMatrixd(double* q, const double* R)
 {
 	double tr = R[0] + R[4] + R[8];
 	if( tr > 0 )
@@ -316,17 +342,19 @@ void qFromMatrixd(double* q, const double* R)
 			q[3] = 0.25f / s;
 		}
 	}
+
+	return q;
 }
 
 // Convert axis-angle rotation to a quaternion form.
 // Angle is in radian.
-void qFromAxisAngled(double* q, const double angle, const double* axis)
+double* qFromAxisAngled(double* q, const double angle, const double* axis)
 {
 	double a[4] = {angle, axis[0], axis[1], axis[2]};
-	qExpd(a, q);
+	return qExpd(a, q);
 }
 
-void qFromEuler(double* q, const double a, const double b, const double c, const char* order)
+double* qFromEuler(double* q, const double a, const double b, const double c, const char* order)
 {
 	double ang[3] = {a, b, c};
 	double qtemp[4];
@@ -348,11 +376,13 @@ void qFromEuler(double* q, const double a, const double b, const double c, const
 		else
 			qMuld(q, qtemp);
 	}
+
+	return q;
 }
 
 // Convert quaternion to a rotation matrix
 // R is 3x3 matrix, in stacked-column form. i.e. R_(i,j) = R[3*j + i]
-void qToMatrix(const double* q, double* R)
+double* qToMatrix(const double* q, double* R)
 {
 	R[0] = q[0]*q[0] + q[1]*q[1] - q[2]*q[2] - q[3]*q[3];
 	R[4] = q[0]*q[0] - q[1]*q[1] + q[2]*q[2] - q[3]*q[3];
@@ -366,4 +396,6 @@ void qToMatrix(const double* q, double* R)
 
 	R[7] = 2*q[2]*q[3] - 2*q[0]*q[1];
 	R[5] = 2*q[2]*q[3] + 2*q[0]*q[1];
+
+	return R;
 }
