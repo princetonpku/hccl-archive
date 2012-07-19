@@ -1,5 +1,7 @@
 #include "Vector.h"
-#include <typeinfo.h>
+#include <memory>
+#include <math.h>
+#include <algorithm>
 
 Vector3d::Vector3d(void)
 {
@@ -148,6 +150,13 @@ Vector3d Vector3d::Rotate(const double rad, const Vector3d& axis)		// rotate thi
 	return *this;
 }
 
+Vector3d Vector3d::Rotate( const Vector3d& axis )						// rotate this vector by given angle(norm of axis) along the axis
+{
+	// TODO: implement rotation here
+
+	return *this;
+}
+
 Vector3d Vector3d::Rotate(const double* R)								// rotate this vector by multiplying the rotation matrix R (column-stacked)
 {
 	Vector3d temp(*this);
@@ -158,6 +167,7 @@ Vector3d Vector3d::Rotate(const double* R)								// rotate this vector by multi
 }
 
 //Vector3d Vector3d::Rotate(const Quaterniond& q);
+
 Vector3d Vector3d::Translate(const Vector3d& dx)							// this += dx
 {
 	vAdd3d(this->val, dx.val);
@@ -170,6 +180,22 @@ Vector3d Vector3d::Translate(const double mag, const Vector3d& dir)			// this +=
 	vAdd3d(this->val, vMulScalar3d(dval, dir.val, mag));
 	return *this;
 }
+
+double Vector3d::Angle( const Vector3d& a, const Vector3d& b )		// get angle between two vectors
+{
+	double cosangle = Dot(a,b)/(Norm(a)*Norm(b));
+	cosangle = std::min(1.0, std::max(-1.0 , cosangle));
+	return acos(cosangle);
+}
+
+double Vector3d::Angle( const Vector3d& a )							// get angle between this and a
+{
+	double cosangle = Dot(a)/(Norm()*Norm(a));
+	cosangle = std::min(1.0, std::max(-1.0 , cosangle));
+	return acos(cosangle);
+}
+
+
 
 // Operators
 Vector3d Vector3d::operator=(const Vector3d& v)								// assign operator

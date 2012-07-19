@@ -40,10 +40,14 @@ public:
 	// Methods (Geometry)
 public:
 	Vector3d Rotate(const double rad, const Vector3d& axis);		// rotate this vector by given angle(rad) along the axis(must be unit)
+	Vector3d Rotate(const Vector3d& axis);							// rotate this vector by given angle(norm of axis) along the axis
 	Vector3d Rotate(const double* R);								// rotate this vector by multiplying the rotation matrix R (column-stacked)
 	//Vector3d Rotate(const Quaterniond& q);
 	Vector3d Translate(const Vector3d& dx);							// this += dx
 	Vector3d Translate(const double mag, const Vector3d& dir);		// this += mag*dir
+
+	static double Angle(const Vector3d& a, const Vector3d& b);		// get angle between two vectors
+	double Angle(const Vector3d& a);								// get angle between this and a
 
 	// Operators
 public:
