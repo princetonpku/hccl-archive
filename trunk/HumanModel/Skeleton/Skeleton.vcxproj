@@ -10,6 +10,14 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\ModelGenerator\ModelGenerator\Joint.cpp" />
+    <ClCompile Include="..\..\ModelGenerator\ModelGenerator\Skeleton.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\ModelGenerator\ModelGenerator\Joint.h" />
+    <ClInclude Include="..\..\ModelGenerator\ModelGenerator\Skeleton.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{AD23372F-2186-452F-9FF2-185503FBE6E3}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -73,8 +81,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
