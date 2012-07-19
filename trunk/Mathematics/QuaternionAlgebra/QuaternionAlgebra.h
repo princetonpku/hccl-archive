@@ -1,6 +1,7 @@
 #ifndef QUATERNIONALGEBRA_H
 #define QUATERNIONALGEBRA_H
-
+// a == b
+bool qIsEquald(const double* a, const double* b);
 double* qIdentityd(double* q);
 double* qCopyd(double* dst, const double* src);
 // |q|^2
@@ -80,10 +81,10 @@ double* qFromMatrixd(double* q, const double* R);
 // Angle is in radian.
 double* qFromAxisAngled(double* q, const double angle, const double* axis);
 
-double* qFromEuler(double* q, const double a, const double b, const double c, const char* order);
+double* qFromEulerd(double* q, const double a, const double b, const double c, const char* order);
 
 // Convert quaternion to a rotation matrix
 // R is 3x3 matrix, in stacked-column form. i.e. R_(i,j) = R[3*j + i]
-double* qToMatrix(const double* q, double* R);
+double* qToMatrixd(const double* q, double* R);
 
 #endif // QUATERNIONALGEBRA_H

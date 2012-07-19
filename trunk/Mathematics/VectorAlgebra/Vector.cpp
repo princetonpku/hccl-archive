@@ -111,9 +111,9 @@ Vector3d Vector3d::operator-()												// unary negation operator
 // Accessors
 double& Vector3d::operator[](int i){ return val[i]; }
 double Vector3d::X(){ return val[0]; }
-double Vector3d::Y(){ return val[0]; }
-double Vector3d::Z(){ return val[0]; }
+double Vector3d::Y(){ return val[1]; }
+double Vector3d::Z(){ return val[2]; }
 
 void Vector3d::SetX(double nx) { val[0] = nx; }
-void Vector3d::SetY(double nx) { val[0] = nx; }
-void Vector3d::SetZ(double nx) { val[0] = nx; }
+void Vector3d::SetY(double ny) { val[1] = ny; }
+void Vector3d::SetZ(double nz) { val[2] = nz; }
