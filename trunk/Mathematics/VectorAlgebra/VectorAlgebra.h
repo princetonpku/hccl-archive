@@ -13,6 +13,8 @@ void vAdd3f(const float* a, const float* b, float* c);		// c = a + b
 void vAdd3f(float* a, const float* b);						// a += b
 void vSub3f(const float* a, const float* b, float* c);		// c = a - b
 void vSub3f(float* a, const float* b);						// a -= b
+void vMul3f(double* a, const double* b);					// a *= b (element-wise multiplication)
+void vMul3f(const double* a, const double* b, double* c);	// c = a * b (element-wise multiplication)
 void vMulScalar3f(float* x, const float& a);				// x *= a
 void vDivScalar3f(float* x, const float& a);				// x /= a
 
@@ -27,6 +29,8 @@ void vAdd3d(const double* a, const double* b, double* c);	// c = a + b
 void vAdd3d(double* a, const double* b);					// a += b
 void vSub3d(const double* a, const double* b, double* c);	// c = a - b
 void vSub3d(double* a, const double* b);					// a -= b
+void vMul3d(double* a, const double* b);					// a *= b (element-wise multiplication)
+void vMul3d(const double* a, const double* b, double* c);	// c = a * b (element-wise multiplication)
 void vMulScalar3d(double* x, const double& a);				// x *= a
 void vDivScalar3d(double* x, const double& a);				// x /= a
 

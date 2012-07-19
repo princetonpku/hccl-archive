@@ -75,6 +75,22 @@ void vSub3f(float* a, const float* b)
 	a[2] -= b[2];
 }
 
+// a *= b (element-wise multiplication)
+void vMul3f(float* a, const float* b)
+{
+	a[0] *= b[0];
+	a[1] *= b[1];
+	a[2] *= b[2];
+}
+
+// c = a * b (element-wise multiplication)
+void vMul3f(const float* a, const float* b, float* c)
+{
+	c[0] = a[0] * b[0];
+	c[1] = a[1] * b[1];
+	c[2] = a[2] * b[2];
+}
+
 // x *= a
 void vMulScalar3f(float* x, const float& a)
 {
@@ -179,6 +195,22 @@ void vSub3d(double* a, const double* b)
 	a[0] -= b[0];
 	a[1] -= b[1];
 	a[2] -= b[2];
+}
+
+// a *= b (element-wise multiplication)
+void vMul3d(double* a, const double* b)
+{
+	a[0] *= b[0];
+	a[1] *= b[1];
+	a[2] *= b[2];
+}
+
+// c = a * b (element-wise multiplication)
+void vMul3d(const double* a, const double* b, double* c)
+{
+	c[0] = a[0] * b[0];
+	c[1] = a[1] * b[1];
+	c[2] = a[2] * b[2];
 }
 
 // x *= a
