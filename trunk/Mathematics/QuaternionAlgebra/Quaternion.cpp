@@ -53,10 +53,38 @@ Quaterniond Quaterniond::FromEulerAngle(const double a, const double b, const do
 	return *this;
 }
 
-// Methods (Algebra)
-double Quaterniond::NormSquared(const Quaterniond& v)					// |q|^2
+Quaterniond Log(const Quaterniond& q)
 {
-	return qNormSquaredd(v.val);
+	Quaterniond a;
+	qLogd(q.val, a.val);
+	return a;
+}
+
+Quaterniond Quaterniond::Log(void)
+{
+	Quaterniond a;
+	qLogd(this->val, a.val);
+	return a;
+}
+
+Quaterniond Exp(const Quaterniond& a)
+{
+	Quaterniond q;
+	qExpd(a.val, q.val);
+	return q;
+}
+
+Quaterniond Quaterniond::Exp(void)
+{
+	Quaterniond q;
+	qExpd(this->val, q.val);
+	return q;
+}
+
+// Methods (Algebra)
+double Quaterniond::NormSquared(const Quaterniond& q)					// |q|^2
+{
+	return qNormSquaredd(q.val);
 }
 
 double Quaterniond::NormSquared()												// |this|^2
@@ -64,14 +92,26 @@ double Quaterniond::NormSquared()												// |this|^2
 	return qNormSquaredd(this->val);
 }
 
-double Quaterniond::Norm(const Quaterniond& v)							// |q|
+double Quaterniond::Norm(const Quaterniond& q)							// |q|
 {
-	return qNormd(v.val);
+	return qNormd(q.val);
 }
 
 double Quaterniond::Norm()														// |this|
 {
 	return qNormd(this->val);
+}
+
+Quaterniond Quaterniond::Normalize(Quaterniond& q)						// q / |q|
+{
+	qNormalized(q.val);
+	return q;
+}
+
+Quaterniond Quaterniond::Normalize(void)										// this /= |this|
+{
+	qNormalized(this->val);
+	return *this;
 }
 
 Quaterniond Quaterniond::Add(const Quaterniond& a, const Quaterniond& b)	// a + b

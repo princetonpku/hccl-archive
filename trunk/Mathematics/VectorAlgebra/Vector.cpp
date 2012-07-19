@@ -62,6 +62,18 @@ double Vector3d::Norm()
 	return vNorm3d(this->val);
 }
 
+Vector3d Vector3d::Normalize(Vector3d& v)
+{
+	vNormalize3d(v.val);
+	return v;
+}
+
+Vector3d Vector3d::Normalize(void)
+{
+	vNormalize3d(this->val);
+	return *this;
+}
+
 Vector3d Vector3d::Add(const Vector3d& a, const Vector3d& b)
 {
 	double c[3];

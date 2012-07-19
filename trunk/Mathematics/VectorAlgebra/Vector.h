@@ -20,6 +20,9 @@ public:
 	double NormSquared();											// |this|^2
 	static double Norm(const Vector3d& v);							// |v|
 	double Norm();													// |this|
+	static Vector3d Normalize(Vector3d& v);					// v / |v|
+	Vector3d Normalize(void);										// this /= |this|
+
 	static Vector3d Add(const Vector3d& a, const Vector3d& b);		// a + b
 	Vector3d Add(const Vector3d& v);								// this += v
 	static Vector3d Sub(const Vector3d& a, const Vector3d& b);		// a - b
