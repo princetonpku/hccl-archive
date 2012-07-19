@@ -13,11 +13,12 @@ public:
 	// TODO: Euler angle constructor
 	~Quaterniond(void);
 
-// Conversion
+	// Conversion
 public:
-	Quaterniond FromAxisAngle(const double rad, const double axis_x, const double axis_y, const double axis_z);
-	Quaterniond FromMatrix(const double* R);
-	Quaterniond FromEulerAngle(const double a, const double b, const double c, const char* order);
+	static Quaterniond FromAxisAngle(const double rad, const double axis_x, const double axis_y, const double axis_z);
+	static Quaterniond FromMatrix(const double* R);
+	static Quaterniond FromMatrix(const double R[3][3]);
+	static Quaterniond FromEulerAngle(const double a, const double b, const double c, const char* order);
 
 	static Quaterniond Log(const Quaterniond& q);
 	Quaterniond Log(void);

@@ -225,6 +225,58 @@ Vector3d Vector3d::operator-()												// unary negation operator
 	return temp;
 }
 
+Vector3d operator+(const Vector3d& a, const Vector3d& b)			// binary addition operator
+{
+	// 	Vector3d temp;
+	// 	vAdd3d(a.val, b.val, temp.val);
+	// 	return temp;
+	Vector3d temp(a);
+	return (temp+=b);
+}
+
+Vector3d operator-(const Vector3d& a, const Vector3d& b)			// binary subtraction operator
+{
+	Vector3d temp(a);
+	return (temp-=b);
+}
+
+Vector3d operator*(const Vector3d& a, const Vector3d& b)			// binary multiplication operator (element-wise)
+{
+	Vector3d temp(a);
+	return (temp*=b);
+}
+
+Vector3d operator*(const Vector3d& v, const double& k)			// binary scalar multiplication operator
+{
+	Vector3d temp(v);
+	return (temp*=k);
+}
+
+Vector3d operator*(const double& k, const Vector3d& v)			// binary scalar multiplication operator
+{
+	Vector3d temp(v);
+	return (temp*=k);
+}
+
+Vector3d operator/(const Vector3d& a, const Vector3d& b)			// binary division operator (element-wise)
+{
+	Vector3d temp(a);
+	return (temp/=b);
+}
+
+Vector3d operator/(const Vector3d& v, const double& k)			// binary scalar division operator
+{
+	Vector3d temp(v);
+	return (temp/=k);
+}
+
+Vector3d operator/(const double& k, const Vector3d& v)			// binary scalar division operator
+{
+	Vector3d temp(v);
+	return (temp/=k);
+}
+
+
 // Accessors
 double& Vector3d::operator[](int i){ return val[i]; }
 double Vector3d::X(){ return val[0]; }

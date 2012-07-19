@@ -36,21 +36,32 @@ Quaterniond::~Quaterniond(void)
 // Conversion
 Quaterniond Quaterniond::FromAxisAngle(const double rad, const double axis_x, const double axis_y, const double axis_z)
 {
+	Quaterniond q;
 	double axis[3] = {axis_x, axis_y, axis_z};
-	qFromAxisAngled(this->val, rad, axis);
-	return *this;
+	qFromAxisAngled(q.val, rad, axis);
+	return q;
 }
 
 Quaterniond Quaterniond::FromMatrix(const double* R)
 {
-	qFromMatrixd(this->val, R);
-	return *this;
+	Quaterniond q;
+	qFromMatrixd(q.val, R);
+	return q;
+}
+
+Quaterniond Quaterniond::FromMatrix(const double R[3][3])
+{
+	Quaterniond q;
+	double Rtemp[9] = {R[0][0], R[1][0], R[2][0], R[0][1], R[1][1], R[2][1], R[0][2], R[1][2], R[2][2]};
+	qFromMatrixd(q.val, Rtemp);
+	return q;
 }
 
 Quaterniond Quaterniond::FromEulerAngle(const double a, const double b, const double c, const char* order)
 {
-	qFromEulerd(this->val, a, b, c, order);
-	return *this;
+	Quaterniond q;
+	qFromEulerd(q.val, a, b, c, order);
+	return q;
 }
 
 Quaterniond Log(const Quaterniond& q)
