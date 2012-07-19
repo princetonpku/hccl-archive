@@ -19,13 +19,20 @@ public:
 	Quaterniond FromMatrix(const double* R);
 	Quaterniond FromEulerAngle(const double a, const double b, const double c, const char* order);
 
+	static Quaterniond Log(const Quaterniond& q);
+	Quaterniond Log(void);
+	static Quaterniond Exp(const Quaterniond& a);
+	Quaterniond Exp(void);
+
 
 	// Methods (Algebra)
 public:
-	static double NormSquared(const Quaterniond& v);					// |q|^2
+	static double NormSquared(const Quaterniond& q);					// |q|^2
 	double NormSquared();												// |this|^2
-	static double Norm(const Quaterniond& v);							// |q|
+	static double Norm(const Quaterniond& q);							// |q|
 	double Norm();														// |this|
+	static Quaterniond Normalize(Quaterniond& q);					// q / |q|
+	Quaterniond Normalize(void);										// this /= |this|
 	static Quaterniond Add(const Quaterniond& a, const Quaterniond& b);	// a + b
 	Quaterniond Add(const Quaterniond& q);								// this += q
 	static Quaterniond Sub(const Quaterniond& a, const Quaterniond& b);	// a - b
