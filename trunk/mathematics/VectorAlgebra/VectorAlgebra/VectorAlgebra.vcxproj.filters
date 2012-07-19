@@ -18,12 +18,18 @@
     <ClInclude Include="VectorAlgebra.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="QuaternionAlgebra.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VectorAlgebra.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="demo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="QuaternionAlgebra.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
