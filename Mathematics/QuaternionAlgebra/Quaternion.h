@@ -1,5 +1,4 @@
 #pragma once
-#include "../VectorAlgebra/Vector.h"
 #include "QuaternionAlgebra.h"
 
 class Quaterniond
@@ -13,8 +12,15 @@ public:
 	// TODO: rotation matrix constructor
 	// TODO: Euler angle constructor
 	~Quaterniond(void);
-	
-// Methods (Algebra)
+
+// Conversion
+public:
+	Quaterniond FromAxisAngle(const double rad, const double axis_x, const double axis_y, const double axis_z);
+	Quaterniond FromMatrix(const double* R);
+	Quaterniond FromEulerAngle(const double a, const double b, const double c, const char* order);
+
+
+	// Methods (Algebra)
 public:
 	static double NormSquared(const Quaterniond& v);					// |q|^2
 	double NormSquared();												// |this|^2
@@ -53,6 +59,7 @@ public:
 	// Accessors
 public:
 	double& operator[](int i);
+	double* GetData();
 	double W();
 	double X();
 	double Y();
@@ -63,16 +70,16 @@ public:
 	void SetY(double ny);
 	void SetZ(double nz);
 
-
-protected:
+public:
 	double val[4];
 };
 
-Quaterniond& operator+(const Quaterniond& a, const Quaterniond& b);		// binary addition operator
-Quaterniond& operator-(const Quaterniond& a, const Quaterniond& b);		// binary subtraction operator
-Quaterniond& operator*(const Quaterniond& a, const Quaterniond& b);		// binary multiplication operator (element-wise)
-Quaterniond& operator*(const Quaterniond& v, const double& k);			// binary scalar multiplication operator
-Quaterniond& operator*(const double& k, const Quaterniond& v);			// binary scalar multiplication operator
-Quaterniond& operator/(const Quaterniond& a, const Quaterniond& b);		// binary division operator (element-wise)
-Quaterniond& operator/(const Quaterniond& v, const double& k);			// binary scalar division operator
-Quaterniond& operator/(const double& k, const Quaterniond& v);			// binary scalar division operator
+Quaterniond operator+(const Quaterniond& a, const Quaterniond& b);		// binary addition operator
+Quaterniond operator-(const Quaterniond& a, const Quaterniond& b);		// binary subtraction operator
+Quaterniond operator*(const Quaterniond& a, const Quaterniond& b);		// binary multiplication operator (element-wise)
+Quaterniond operator*(const Quaterniond& q, const double& k);			// binary scalar multiplication operator
+Quaterniond operator*(const double& k, const Quaterniond& q);			// binary scalar multiplication operator
+Quaterniond operator/(const Quaterniond& a, const Quaterniond& b);		// binary division operator (element-wise)
+Quaterniond operator/(const Quaterniond& q, const double& k);			// binary scalar division operator
+Quaterniond operator/(const double& k, const Quaterniond& q);			// binary scalar division operator
+Quaterniond operator!(const Quaterniond& q);							// unary inversion operator

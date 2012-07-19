@@ -208,8 +208,9 @@ Vector3d Vector3d::operator/=(const double& k)								// unary scalar division o
 
 Vector3d Vector3d::operator-()												// unary negation operator
 {
-	vNegate3d(this->val);
-	return *this;
+	Vector3d temp(*this);
+	vNegate3d(temp.val);
+	return temp;
 }
 
 // Accessors

@@ -33,6 +33,26 @@ Quaterniond::~Quaterniond(void)
 {
 }
 
+// Conversion
+Quaterniond Quaterniond::FromAxisAngle(const double rad, const double axis_x, const double axis_y, const double axis_z)
+{
+	double axis[3] = {axis_x, axis_y, axis_z};
+	qFromAxisAngled(this->val, rad, axis);
+	return *this;
+}
+
+Quaterniond Quaterniond::FromMatrix(const double* R)
+{
+	qFromMatrixd(this->val, R);
+	return *this;
+}
+
+Quaterniond Quaterniond::FromEulerAngle(const double a, const double b, const double c, const char* order)
+{
+	qFromEulerd(this->val, a, b, c, order);
+	return *this;
+}
+
 // Methods (Algebra)
 double Quaterniond::NormSquared(const Quaterniond& v)					// |q|^2
 {
@@ -187,17 +207,73 @@ Quaterniond Quaterniond::operator/=(const double& k)							// unary scalar divis
 
 Quaterniond Quaterniond::operator-()											// unary negation operator
 {
-	val[0] = -val[0];
-	val[1] = -val[1];
-	val[2] = -val[2];
-	val[3] = -val[3];
-
-	return *this;
+	Quaterniond temp(*this);
+	qNegated(temp.val);
+	return temp;
 }
 
+Quaterniond operator+(const Quaterniond& a, const Quaterniond& b)		// binary addition operator
+{
+	Quaterniond qtemp;
+	qAddd(qtemp.val, a.val, b.val);
+	return qtemp;
+}
+
+Quaterniond operator-(const Quaterniond& a, const Quaterniond& b)		// binary subtraction operator
+{
+	Quaterniond qtemp;
+	qSubd(qtemp.val, a.val, b.val);
+	return qtemp;
+}
+
+Quaterniond operator*(const Quaterniond& a, const Quaterniond& b)		// binary multiplication operator (element-wise)
+{
+	Quaterniond qtemp;
+	qMuld(qtemp.val, a.val, b.val);
+	return qtemp;
+}
+
+Quaterniond operator*(const Quaterniond& q, const double& k)			// binary scalar multiplication operator
+{
+	Quaterniond qtemp(q);
+	return (qtemp*=k);
+}
+
+Quaterniond operator*(const double& k, const Quaterniond& q)			// binary scalar multiplication operator
+{
+	Quaterniond qtemp(q);
+	return (qtemp*=k);
+}
+
+Quaterniond operator/(const Quaterniond& a, const Quaterniond& b)		// binary division operator (element-wise)
+{
+	Quaterniond qtemp(a);
+	return (qtemp*=!b);
+}
+
+Quaterniond operator/(const Quaterniond& q, const double& k)			// binary scalar division operator
+{
+	Quaterniond qtemp(q);
+	return (qtemp/=k);
+}
+
+Quaterniond operator/(const double& k, const Quaterniond& q)			// binary scalar division operator
+{
+	Quaterniond qtemp(!q);
+	qMulScalard(qtemp.val, k);
+	return qtemp;
+}
+
+Quaterniond operator!(const Quaterniond& q)							// unary inversion operator
+{
+	Quaterniond qtemp;
+	qInvertd(q.val, qtemp.val);
+	return qtemp;
+}
 
 // Accessors
 double& Quaterniond::operator[](int i){ return val[i]; }
+double* Quaterniond::GetData(){ return val; }
 double Quaterniond::W(){ return val[0]; }
 double Quaterniond::X(){ return val[1]; }
 double Quaterniond::Y(){ return val[2]; }
