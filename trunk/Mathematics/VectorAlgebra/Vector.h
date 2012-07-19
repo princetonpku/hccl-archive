@@ -10,7 +10,7 @@ public:
 	Vector3d(const Vector3d& v);									// copy constructor
 	~Vector3d(void);
 
-// Methods (Algebra)
+	// Methods (Algebra)
 public:
 	// TODO: Normalize
 	static double Dot(const Vector3d& a, const Vector3d& b);		// a . b
@@ -34,7 +34,7 @@ public:
 	Vector3d Div(const double& k);									// this /= k
 
 
-// Methods (Geometry)
+	// Methods (Geometry)
 public:
 	Vector3d Rotate(const double rad, const Vector3d& axis);		// rotate this vector by given angle(rad) along the axis(must be unit)
 	Vector3d Rotate(const double* R);								// rotate this vector by multiplying the rotation matrix R (column-stacked)
@@ -42,7 +42,7 @@ public:
 	Vector3d Translate(const Vector3d& dx);							// this += dx
 	Vector3d Translate(const double mag, const Vector3d& dir);		// this += mag*dir
 
-// Operators
+	// Operators
 public:
 	Vector3d operator=(const Vector3d& v);							// assign operator
 
@@ -59,7 +59,7 @@ public:
 	Vector3d operator-();											// unary negation operator
 
 
-// Accessors
+	// Accessors
 public:
 	double& operator[](int i);
 	double X();
@@ -70,7 +70,7 @@ public:
 	void SetY(double nx);
 	void SetZ(double nx);
 
-protected:
+public:
 	double val[3];
 };
 

@@ -19,6 +19,23 @@ bool qIsEquald(const double* a, const double* b)
 	return (a[0] == b[0] && a[1] == b[1] && a[2] == b[2] && a[3] == b[3]);
 }
 
+double* qNegated(double* q)
+{
+	q[0] = -q[0];
+	q[1] = -q[1];
+	q[2] = -q[2];
+	q[3] = -q[3];
+	return q;
+}
+double* qNegated(double* q, const double* q0)
+{
+	q[0] = -q0[0];
+	q[1] = -q0[1];
+	q[2] = -q0[2];
+	q[3] = -q0[3];
+	return q;
+}
+
 double* qIdentityd(double* q)
 {
 	q[0] = 1.0;
@@ -45,20 +62,20 @@ double qNormd(const double* q)
 }
 
 // q = q / |q|
-double* qNormalize(double* q)
+double* qNormalized(double* q)
 {
 	return qDivScalard(q, qNormd(q));
 }
 
 // q2 = q1 / |q1|
-double* qNormalize(const double* q1, double* q2)
+double* qNormalized(const double* q1, double* q2)
 {
 	return qDivScalard(q2, q1, qNormd(q1));
 }
 
 
 // q = q^(-1)
-double* qInvert(double* q)
+double* qInvertd(double* q)
 {
 	double n = qNormSquaredd(q);
 	q[0] = q[0]/n;
@@ -70,7 +87,7 @@ double* qInvert(double* q)
 }
 
 // q2 = q1^(-1)
-double* qInvert(const double* q1, double* q2)
+double* qInvertd(const double* q1, double* q2)
 {
 	double n = qNormSquaredd(q1);
 	q2[0] = q1[0]/n;
@@ -199,7 +216,7 @@ double* qMulScalard(double* q1, const double k, const double* q2)
 double* qDivd(double* q1, const double* q2)
 {
 	double q2inv[4];
-	qInvert(q2, q2inv);
+	qInvertd(q2, q2inv);
 	return qMuld(q1, q2inv);
 }
 
@@ -207,7 +224,7 @@ double* qDivd(double* q1, const double* q2)
 double* qDivd(double* q1, const double* q2, const double* q3)
 {
 	double q3inv[4];
-	qInvert(q3, q3inv);
+	qInvertd(q3, q3inv);
 	return qMuld(q1, q2, q3inv);
 }
 
@@ -245,7 +262,7 @@ double* qDivScalard(double* q1, const double* q2, const double k)
 double* qDivScalard(double* q1, const double k, const double* q2)
 {
 	double q2inv[4];
-	qInvert(q2, q2inv);
+	qInvertd(q2, q2inv);
 	return qMulScalard(q1, k, q2inv);
 }
 
@@ -265,7 +282,7 @@ double* qExpd(const double* a, double* q)
 		q[2] = a[2]*sm;
 		q[3] = a[3]*sm;
 
-		qNormalize(q);				// Do I have to normalize q here?
+		qNormalized(q);				// Do I have to normalize q here?
 	}
 
 	return q;
@@ -275,7 +292,7 @@ double* qExpd(const double* a, double* q)
 double* qLogd(const double* q, double* a)
 {
 	double qq[4];	// normalized q
-	qNormalize(q, qq);
+	qNormalized(q, qq);
 
 	if( qq[0] == 0 )
 	{
