@@ -24,6 +24,110 @@ Vector3d::~Vector3d(void)
 {
 }
 
+// Methods (Algebra)
+
+double Vector3d::Dot( const Vector3d& a, const Vector3d& b )
+{
+	return vDot3d(a.val, b.val);
+}
+
+double Vector3d::Dot( const Vector3d& v )
+{
+	return vDot3d(this->val, v.val);
+}
+
+Vector3d Vector3d::Cross(const Vector3d& a, const Vector3d& b)
+{
+	double c[3];
+	return vCross3d(a.val, b.val, c);
+}
+
+double Vector3d::NormSquared(const Vector3d& v)
+{
+	return vNormSquared3d(v.val);
+}
+
+double Vector3d::NormSquared()
+{
+	return vNormSquared3d(this->val);
+}
+
+double Vector3d::Norm(const Vector3d& v)
+{
+	return vNorm3d(v.val);
+}
+
+double Vector3d::Norm()
+{
+	return vNorm3d(this->val);
+}
+
+Vector3d Vector3d::Add(const Vector3d& a, const Vector3d& b)
+{
+	double c[3];
+	return vAdd3d(a.val, b.val, c);
+}
+
+Vector3d Vector3d::Add(const Vector3d& v)
+{
+	return vAdd3d(this->val, v.val);
+}
+
+Vector3d Vector3d::Sub(const Vector3d& a, const Vector3d& b)
+{
+	double c[3];
+	return vSub3d(a.val, b.val, c);
+}
+
+Vector3d Vector3d::Sub(const Vector3d& v)
+{
+	return vSub3d(this->val, v.val);
+}
+
+Vector3d Vector3d::Mul(const Vector3d& a, const Vector3d& b)
+{
+	double c[3];
+	return vMul3d(a.val, b.val, c);
+}
+
+Vector3d Vector3d::Mul(const Vector3d& v)
+{
+	return vMul3d(this->val, v.val);
+}
+
+Vector3d Vector3d::Mul(const Vector3d& a, const double& k)
+{
+	double x[3];
+	return vMulScalar3d(x, a.val, k);
+}
+
+Vector3d Vector3d::Mul(const double& k)
+{
+	return vMulScalar3d(this->val, k);
+}
+
+Vector3d Vector3d::Div(const Vector3d& a, const Vector3d& b)
+{
+	double c[3];
+	return vDiv3d(a.val, b.val, c);
+}
+
+Vector3d Vector3d::Div(const Vector3d& v)
+{
+	return vDiv3d(this->val, v.val);
+}
+
+Vector3d Vector3d::Div(const Vector3d& a, const double& k)
+{
+	double x[3];
+	return vDivScalar3d(x, a.val, k);
+}
+
+Vector3d Vector3d::Div(const double& k)
+{
+	return vDivScalar3d(this->val, k);
+}
+
 // Methods (Geometry)
 Vector3d Vector3d::Rotate(const double rad, const Vector3d& axis)		// rotate this vector by given angle(rad) along the axis(must be unit)
 {
