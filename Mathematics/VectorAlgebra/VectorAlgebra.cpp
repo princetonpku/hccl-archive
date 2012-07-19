@@ -24,6 +24,11 @@ float Norm3f(const float* x)
 	return sqrt(NormSquared3f(x));
 }
 
+void Normalize3f( float* x )
+{
+	DivideByScalar3f(x, Norm3f(x));
+}
+
 // a = b
 void Assign3f(float* a, const float* b)
 {
@@ -125,6 +130,11 @@ double Norm3d(const double* x)
 	return sqrt(NormSquared3d(x));
 }
 
+void Normalize3d( double* x )
+{
+	DivideByScalar3d(x, Norm3d(x));
+}
+
 // a = b
 void Assign3d(double* a, const double* b)
 {
@@ -187,7 +197,20 @@ void DivideByScalar3d(double* x, const double& a)
 
 //////////////////////////////////////////////////////////////////////////
 // 2D version
+float Norm2f( const float* x )
+{
+	return sqrt(NormSquared2f(x));
+}
 
+float NormSquared2f( const float* x )
+{
+	return Dot2f(x, x);
+}
+
+void Normalize2f( float* x )
+{
+	DivideByScalar2f(x, Norm2f(x));
+}
 
 float Dot2f(const float* a, const float* b)
 {
@@ -208,8 +231,30 @@ void SubVector2f(float* a, const float* b)
 	a[1] -= b[1];
 }
 
+// x /= a
+void DivideByScalar2f( float* x, const float& a )
+{
+	x[0] /= a;	x[1] /= a;
+}
 
 
+
+
+
+double Norm2d( const double* x )
+{
+	return sqrt(NormSquared2d(x));
+}
+
+double NormSquared2d( const double* x )
+{
+	return Dot2d(x, x);
+}
+
+void Normalize2d( double* x )
+{
+	DivideByScalar2d(x, Norm2d(x));
+}
 
 double Dot2d(const double* a, const double*b)
 {
@@ -222,7 +267,6 @@ void AddVector2d(const double* a, const double* b, double* c)
 {
 	c[0] = a[0] + b[0];
 	c[1] = a[1] + b[1];
-
 }
 
 // a -= b
@@ -230,5 +274,11 @@ void SubVector2d(double* a, const double* b)
 {
 	a[0] -= b[0];
 	a[1] -= b[1];
-
 }
+
+// x /= a
+void DivideByScalar2d( double* x, const double& a )
+{
+	x[0] /= a;	x[1] /= a;
+}
+
