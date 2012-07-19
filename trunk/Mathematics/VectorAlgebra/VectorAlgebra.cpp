@@ -119,6 +119,11 @@ float* vDivScalar3f(float* x, const float& a)
 
 
 
+// a == b
+bool vIsEqual3d(const double* a, const double* b)
+{
+	return (a[0] == b[0] && a[1] == b[1] && a[2] == b[2]);
+}
 
 double vDot3d(const double* a, const double* b)
 {
@@ -164,6 +169,16 @@ double* vAssign3d(double* a, const double b)
 	a[2] = b;
 
 	return a;
+}
+
+// x = -x;
+double* vNegate3d(double* x)
+{
+	x[0] = -x[0];
+	x[1] = -x[1];
+	x[2] = -x[2];
+
+	return x;
 }
 
 // c = a + b
@@ -233,11 +248,48 @@ double* vMulScalar3d(double* x, const double& a)
 	return x;
 }
 
+// x = a*k
+double* vMulScalar3d(double* x, const double* a, const double& k)
+{
+	x[0] = a[0]*k;
+	x[1] = a[1]*k;
+	x[2] = a[2]*k;
+
+	return x;
+}
+
+// a /= b (element-wise division)
+double* vDiv3d(double* a, const double* b)
+{
+	a[0] /= b[0];
+	a[1] /= b[1];
+	a[2] /= b[2];
+	return a;
+}
+
+// c = a / b (element-wise division)
+double* vDiv3d(const double* a, const double* b, double* c)
+{
+	c[0] = a[0] / b[0];
+	c[1] = a[1] / b[1];
+	c[2] = a[2] / b[2];
+	return c;
+}
 
 // x /= a
 double* vDivScalar3d(double* x, const double& a)
 {
 	x[0] /= a;	x[1] /= a;	x[2] /= a;
+	return x;
+}
+
+// x = a/k
+double* vDivScalar3d(double* x, const double* a, const double& k)
+{
+	x[0] = a[0]/k;
+	x[1] = a[1]/k;
+	x[2] = a[2]/k;
+
 	return x;
 }
 
