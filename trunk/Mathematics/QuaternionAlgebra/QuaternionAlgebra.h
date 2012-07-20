@@ -101,4 +101,104 @@ double* qFromEulerd(double* q, const double a, const double b, const double c, c
 // R is 3x3 matrix, in stacked-column form. i.e. R_(i,j) = R[3*j + i]
 double* qToMatrixd(const double* q, double* R);
 
+
+//////////////////////////////////////////////////////////////////////////
+// float
+//////////////////////////////////////////////////////////////////////////
+
+
+// a == b
+bool qIsEqualf(const float* a, const float* b);
+float* qNegatef(float* q);
+float* qNegatef(float* q, const float* q0);
+float* qIdentityf(float* q);
+float* qCopyf(float* dst, const float* src);
+// |q|^2
+float qNormSquaredf(const float* q);
+// |q|
+float qNormf(const float* q);
+// q = q / |q|
+float* qNormalizef(float* q);
+// q2 = q1 / |q1|
+float* qNormalizef(const float* q1, float* q2);
+bool qIsEqualf(const float* q1, const float* q2);
+// q = q^(-1)
+float* qInvertf(float* q);
+// q2 = q1^(-1)
+float* qInvertf(const float* q1, float* q2);
+// q1 += q2
+float* qAddf(float* q1, const float* q2);
+// q1 = q2 + q3
+float* qAddf(float* q1, const float* q2, const float* q3);
+// q1 -= q2
+float* qSubf(float* q1, const float* q2);
+// q1 = q2 - q3
+float* qSubf(float* q1, const float* q2, const float* q3);
+// q1 *= q2
+float* qMulf(float* q1, const float* q2);
+// q1 = q2 * q3
+float* qMulf(float* q1, const float* q2, const float* q3);
+
+// // q *= v
+// void qMulVectorf(float* q, const float* v);
+// // q1 = q2 * v
+// void qMulVectorf(float* q1, const float* q2, const float* v);
+
+// q *= k
+float* qMulScalarf(float* q, const float k);
+
+// q1 = q2 * k
+float* qMulScalarf(float* q1, const float* q2, const float k);
+
+// q1 = k * q2
+float* qMulScalarf(float* q1, const float k, const float* q2);
+// q1 /= q2
+float* qDivf(float* q1, const float* q2);
+// q1 = q2 / q3
+float* qDivf(float* q1, const float* q2, const float* q3);
+
+// // q /= v
+// void qDivVectorf(float* q, const float* v);
+// 
+// // q1 = q2 / v
+// void qDivVectorf(float* q1, const float* q2, const float* v);
+// 
+// // q1 = v / q2
+// void qDivVectorf(float* q1, const float* v, const float* q2);
+
+
+// q /= k
+float* qDivScalarf(float* q, const float k);
+
+// q1 = q2 / k
+float* qDivScalarf(float* q1, const float* q2, const float k);
+
+// q1 = k / q2
+float* qDivScalarf(float* q1, const float k, const float* q2);
+
+// convert axis-angle representation to quaternion (Map from so(3) --> SO(3))
+float* qExpf(const float* a, float* q);
+
+// convert quaternion to axis-angle representation (Map from SO(3) --> so(3))
+float* qLogf(const float* q, float* a);
+
+// Convert rotation matrix to a quaternion form.
+// R is 3x3 matrix, in stacked-column form. i.e. R_(i,j) = R[3*j + i]
+float* qFromMatrixf(float* q, const float* R);
+
+// Convert axis-angle rotation to a quaternion form.
+// Angle is in radian.
+float* qFromAxisAnglef(float* q, const float angle, const float* axis);
+
+float* qFromEulerf(float* q, const float a, const float b, const float c, const char* order);
+
+// Convert quaternion to a rotation matrix
+// R is 3x3 matrix, in stacked-column form. i.e. R_(i,j) = R[3*j + i]
+float* qToMatrixf(const float* q, float* R);
+
+
+
+
+
+
 #endif // QUATERNIONALGEBRA_H

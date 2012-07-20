@@ -1,6 +1,6 @@
 #include "VectorAlgebra.h"
 #include <math.h>
-#include <typeinfo.h>
+#include <memory>
 
 float vDot3f(const float* a, const float* b)
 {
