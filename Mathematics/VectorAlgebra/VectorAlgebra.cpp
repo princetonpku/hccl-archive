@@ -2,6 +2,14 @@
 #include <math.h>
 #include <memory>
 
+
+// a == b
+bool vIsEqual3f(const float* a, const float* b)
+{
+	return (a[0] == b[0] && a[1] == b[1] && a[2] == b[2]);
+}
+
+
 float vDot3f(const float* a, const float* b)
 {
 	return a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
@@ -45,6 +53,16 @@ float* vAssign3f(float* a, const float b)
 	a[1] = b;
 	a[2] = b;
 	return a;
+}
+
+// x = -x;
+float* vNegate3f(float* x)
+{
+	x[0] = -x[0];
+	x[1] = -x[1];
+	x[2] = -x[2];
+
+	return x;
 }
 
 // c = a + b
@@ -108,11 +126,48 @@ float* vMulScalar3f(float* x, const float& a)
 	return x;
 }
 
+// x = a*k
+float* vMulScalar3f(float* x, const float* a, const float& k)
+{
+	x[0] = a[0]*k;
+	x[1] = a[1]*k;
+	x[2] = a[2]*k;
+
+	return x;
+}
+
+// a /= b (element-wise division)
+float* vDiv3f(float* a, const float* b)
+{
+	a[0] /= b[0];
+	a[1] /= b[1];
+	a[2] /= b[2];
+	return a;
+}
+
+// c = a / b (element-wise division)
+float* vDiv3f(const float* a, const float* b, float* c)
+{
+	c[0] = a[0] / b[0];
+	c[1] = a[1] / b[1];
+	c[2] = a[2] / b[2];
+	return c;
+}
 
 // x /= a
 float* vDivScalar3f(float* x, const float& a)
 {
 	x[0] /= a;	x[1] /= a;	x[2] /= a;
+	return x;
+}
+
+// x = a/k
+float* vDivScalar3f(float* x, const float* a, const float& k)
+{
+	x[0] = a[0]/k;
+	x[1] = a[1]/k;
+	x[2] = a[2]/k;
+
 	return x;
 }
 
@@ -296,6 +351,13 @@ double* vDivScalar3d(double* x, const double* a, const double& k)
 
 //////////////////////////////////////////////////////////////////////////
 // 2D version
+
+// a == b
+bool vIsEqual2f(const float* a, const float* b)
+{
+	return (a[0] == b[0] && a[1] == b[1]);
+}
+
 float vNorm2f( const float* x )
 {
 	return sqrt(vNormSquared2f(x));
@@ -306,9 +368,9 @@ float vNormSquared2f( const float* x )
 	return vDot2f(x, x);
 }
 
-void vNormalize2f( float* x )
+float* vNormalize2f( float* x )
 {
-	vDivScalar2f(x, vNorm2f(x));
+	return vDivScalar2f(x, vNorm2f(x));
 }
 
 float vDot2f(const float* a, const float* b)
@@ -316,44 +378,135 @@ float vDot2f(const float* a, const float* b)
 	return a[0]*b[0] + a[1]*b[1];
 }
 
+float* vCopy2f(float* a, const float* b)
+{
+	memcpy(a, b, sizeof(float)*2);
+	return a;
+}
+
+float* vAssign2f(float* a, const float b)
+{
+	a[0] = a[1] = b;
+	return a;
+}
+
+// x = -x;
+float* vNegate2f(float* x)
+{
+	x[0] = -x[0];
+	x[1] = -x[1];
+
+	return x;
+}
+
+// c = a x b
+float vCross2f(const float* a, const float* b)
+{
+	return a[0]*b[1] - a[1]*b[0];
+}
 
 // a += b
-void vAdd2f(float* a, const float* b)
+float* vAdd2f(float* a, const float* b)
 {
 	a[0] += b[0];
 	a[1] += b[1];
+	return a;
 }
 
 // c = a + b
-void vAdd2f(const float* a, const float* b, float* c)
+float* vAdd2f(const float* a, const float* b, float* c)
 {
 	c[0] = a[0] + b[0];
 	c[1] = a[1] + b[1];
+	return c;
 }
 
 // a -= b
-void vSub2f(float* a, const float* b)
+float* vSub2f(float* a, const float* b)
 {
 	a[0] -= b[0];
 	a[1] -= b[1];
+	return a;
+}
+
+// c = a - b
+float* vSub2f(const float* a, const float* b, float* c)
+{
+	c[0] = a[0] - b[0];
+	c[1] = a[1] - b[1];
+	return c;
+}
+
+// a *= b (element-wise multiplication)
+float* vMul2f(float* a, const float* b)
+{
+	a[0] *= b[0];
+	a[1] *= b[1];
+	return a;
+}
+
+// c = a * b (element-wise multiplication)
+float* vMul2f(const float* a, const float* b, float* c)
+{
+	c[0] = a[0] * b[0];
+	c[1] = a[1] * b[1];
+	return c;
+}
+
+// x *= a
+float* vMulScalar2f(float* x, const float& a)
+{
+	x[0] *= a;	x[1] *= a;
+	return x;
+}
+
+// x = a*k
+float* vMulScalar2f(float* x, const float* a, const float& k)
+{
+	x[0] = a[0]*k;
+	x[1] = a[1]*k;
+
+	return x;
+}
+
+// a /= b (element-wise division)
+float* vDiv2f(float* a, const float* b)
+{
+	a[0] /= b[0];
+	a[1] /= b[1];
+	return a;
+}
+
+// c = a / b (element-wise division)
+float* vDiv2f(const float* a, const float* b, float* c)
+{
+	c[0] = a[0] / b[0];
+	c[1] = a[1] / b[1];
+	return c;
 }
 
 // x /= a
-void vDivScalar2f( float* x, const float& a )
+float* vDivScalar2f( float* x, const float& a )
 {
-	x[0] /= a;	x[1] /= a;
+	x[0] /= a;
+	x[1] /= a;
+	return x;
+}
+
+// x = a/k
+float* vDivScalar2f(float* x, const float* a, const float& k)
+{
+	x[0] = a[0]/k;
+	x[1] = a[1]/k;
+	return x;
 }
 
 
 
-
-
-
-// a += b
-void vAdd2d(double* a, const double* b)
+// a == b
+bool vIsEqual2d(const double* a, const double* b)
 {
-	a[0] += b[0];
-	a[1] += b[1];
+	return (a[0] == b[0] && a[1] == b[1]);
 }
 
 double vNorm2d( const double* x )
@@ -366,9 +519,9 @@ double vNormSquared2d( const double* x )
 	return vDot2d(x, x);
 }
 
-void vNormalize2d( double* x )
+double* vNormalize2d( double* x )
 {
-	vDivScalar2d(x, vNorm2d(x));
+	return vDivScalar2d(x, vNorm2d(x));
 }
 
 double vDot2d(const double* a, const double*b)
@@ -377,23 +530,125 @@ double vDot2d(const double* a, const double*b)
 
 }
 
+// c = a x b
+double vCross2d(const double* a, const double* b)
+{
+	return a[0]*b[1] - a[1]*b[0];
+}
+
+
+double* vCopy2d(double* a, const double* b)
+{
+	memcpy(a, b, sizeof(double)*2);
+	return a;
+}
+
+double* vAssign2d(double* a, const double b)
+{
+	a[0] = a[1] = b;
+	return a;
+}
+
+// x = -x;
+double* vNegate2d(double* x)
+{
+	x[0] = -x[0];
+	x[1] = -x[1];
+	return x;
+}
+
+// a += b
+double* vAdd2d(double* a, const double* b)
+{
+	a[0] += b[0];
+	a[1] += b[1];
+	return a;
+}
+
 // c = a + b
-void vAdd2d(const double* a, const double* b, double* c)
+double* vAdd2d(const double* a, const double* b, double* c)
 {
 	c[0] = a[0] + b[0];
 	c[1] = a[1] + b[1];
+	return c;
 }
 
 // a -= b
-void vSub2d(double* a, const double* b)
+double* vSub2d(double* a, const double* b)
 {
 	a[0] -= b[0];
 	a[1] -= b[1];
+	return a;
+}
+
+// c = a - b
+double* vSub2d(const double* a, const double* b, double* c)
+{
+	c[0] = a[0] - b[0];
+	c[1] = a[1] - b[1];
+	return c;
+}
+
+// a *= b (element-wise multiplication)
+double* vMul2d(double* a, const double* b)
+{
+	a[0] *= b[0];
+	a[1] *= b[1];
+	return a;
+}
+
+// c = a * b (element-wise multiplication)
+double* vMul2d(const double* a, const double* b, double* c)
+{
+	c[0] = a[0] * b[0];
+	c[1] = a[1] * b[1];
+	return c;
+}
+
+// x *= a
+double* vMulScalar2d(double* x, const double& a)
+{
+	x[0] *= a;	x[1] *= a;
+	return x;
+}
+
+// x = a*k
+double* vMulScalar2d(double* x, const double* a, const double& k)
+{
+	x[0] = a[0]*k;
+	x[1] = a[1]*k;
+
+	return x;
+}
+
+// a /= b (element-wise division)
+double* vDiv2d(double* a, const double* b)
+{
+	a[0] /= b[0];
+	a[1] /= b[1];
+	return a;
+}
+
+// c = a / b (element-wise division)
+double* vDiv2d(const double* a, const double* b, double* c)
+{
+	c[0] = a[0] / b[0];
+	c[1] = a[1] / b[1];
+	return c;
 }
 
 // x /= a
-void vDivScalar2d( double* x, const double& a )
+double* vDivScalar2d( double* x, const double& a )
 {
-	x[0] /= a;	x[1] /= a;
+	x[0] /= a;
+	x[1] /= a;
+	return x;
 }
 
+// x = a/k
+double* vDivScalar2d(double* x, const double* a, const double& k)
+{
+	x[0] = a[0]/k;
+	x[1] = a[1]/k;
+	return x;
+}
