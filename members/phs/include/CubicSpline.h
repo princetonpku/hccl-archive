@@ -1,4 +1,4 @@
-#ifndef _CUBICSPLINE_H_
+﻿#ifndef _CUBICSPLINE_H_
 #define _CUBICSPLINE_H_
 
 #include <vector>

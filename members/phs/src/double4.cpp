@@ -1,4 +1,4 @@
-#include "double4.h"
+﻿#include "double4.h"
 #include <cmath>
 
 double4::double4()

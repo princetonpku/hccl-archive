@@ -1,4 +1,4 @@
-#ifndef _DOULBE2_H_
+﻿#ifndef _DOULBE2_H_
 #define _DOULBE2_H_
 
 class double2

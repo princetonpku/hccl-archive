@@ -1,4 +1,4 @@
-#ifndef _FLOAT4_H_
+﻿#ifndef _FLOAT4_H_
 #define _FLOAT4_H_
 
 class float4

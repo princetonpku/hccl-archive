@@ -1,4 +1,4 @@
-#ifndef _ROOTFINDER_H_
+﻿#ifndef _ROOTFINDER_H_
 #define _ROOTFINDER_H_
 
 /* code example

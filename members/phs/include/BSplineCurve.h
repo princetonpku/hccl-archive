@@ -1,4 +1,4 @@
-#ifndef _BSPLINECURVE_H_
+﻿#ifndef _BSPLINECURVE_H_
 #define _BSPLINECURVE_H_
 
 #include <vector>

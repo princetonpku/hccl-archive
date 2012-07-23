@@ -1,4 +1,4 @@
-#ifndef _MORTONIZER_H_
+﻿#ifndef _MORTONIZER_H_
 #define _MORTONIZER_H_
 
 // 3-Dimension

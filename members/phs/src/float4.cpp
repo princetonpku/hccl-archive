@@ -1,4 +1,4 @@
-#include "float4.h"
+﻿#include "float4.h"
 #include <cmath>
 
 float4::float4()

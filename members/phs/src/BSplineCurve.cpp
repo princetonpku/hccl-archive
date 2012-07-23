@@ -1,4 +1,4 @@
-#include "BSplineCurve.h"
+﻿#include "BSplineCurve.h"
 
 BSplineCurve::BSplineCurve()
     : degree(0), points(), knots()

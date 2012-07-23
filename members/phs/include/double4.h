@@ -1,4 +1,4 @@
-#ifndef _DOULBE4_H_
+﻿#ifndef _DOULBE4_H_
 #define _DOULBE4_H_
 
 class double4

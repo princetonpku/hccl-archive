@@ -1,4 +1,4 @@
-#include "RootFinder.h"
+﻿#include "RootFinder.h"
 #include <cmath>
 
 RootFinder::RootFinder()

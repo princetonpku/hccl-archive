@@ -1,4 +1,4 @@
-#include "CubicSpline.h"
+﻿#include "CubicSpline.h"
 #include <cmath>
 
 CubicSpline::CubicSpline()
