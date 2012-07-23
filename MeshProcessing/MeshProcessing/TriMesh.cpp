@@ -290,13 +290,14 @@ void CTriMesh::RenderGL_Flat()
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glEnableClientState( GL_VERTEX_ARRAY );
 		glEnableClientState( GL_NORMAL_ARRAY );
-		glEnableClientState( GL_COLOR_ARRAY );
+		if(vertex_color.size() == vertex.size())
+		{
+			glEnableClientState( GL_COLOR_ARRAY );
+			glColorPointer(3, GL_FLOAT, 0, &vertex_color[0]);
+		}
 
 		glVertexPointer(3, GL_DOUBLE, 0, &vertex[0]);
 		glNormalPointer(GL_DOUBLE, 0, &vertex_normal[0]);
-
-		if(vertex_color.size() == vertex.size())
-			glColorPointer(3, GL_FLOAT, 0, &vertex_color[0]);
 
 		//glDrawArrays(GL_POINTS, 0, vertex.size()/3);
 		glDrawElements( GL_TRIANGLES, facet.size(), GL_UNSIGNED_INT, &(facet[0]) );
