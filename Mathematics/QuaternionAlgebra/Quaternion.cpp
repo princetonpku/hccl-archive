@@ -28,6 +28,29 @@ Quaterniond::Quaterniond(const Quaterniond& q)									// copy constructor
 // TODO: axis-angle constructor
 // TODO: rotation matrix constructor
 // TODO: Euler angle constructor
+Quaterniond::Quaterniond(const Quaternionf& q)
+{
+	this->val[0] = (double)q.val[0];
+	this->val[1] = (double)q.val[1];
+	this->val[2] = (double)q.val[2];
+	this->val[3] = (double)q.val[3];
+}
+#ifdef Vector3d
+Quaterniond::Quaterniond(const Vector3d& v)
+{
+	this->val[0] = 0.0;
+	memcpy(this->val + 1, v.val, sizeof(double)*3);
+}
+#endif
+#ifdef Vector3f
+Quaterniond::Quaterniond(const Vector3f& v)
+{
+	this->val[0] = 0.0;
+	this->val[1] = (double)v.val[0];
+	this->val[2] = (double)v.val[1];
+	this->val[3] = (double)v.val[2];
+}
+#endif
 
 Quaterniond::~Quaterniond(void)
 {
@@ -369,6 +392,29 @@ Quaternionf::Quaternionf(const Quaternionf& q)									// copy constructor
 // TODO: axis-angle constructor
 // TODO: rotation matrix constructor
 // TODO: Euler angle constructor
+Quaternionf::Quaternionf(const Quaterniond& q)
+{
+	this->val[0] = (float)q.val[0];
+	this->val[1] = (float)q.val[1];
+	this->val[2] = (float)q.val[2];
+	this->val[3] = (float)q.val[3];
+}
+#ifdef Vector3d
+Quaternionf::Quaternionf(const Vector3d& v)
+{
+	this->val[0] = 0.0;
+	this->val[1] = (float)v.val[0];
+	this->val[2] = (float)v.val[1];
+	this->val[3] = (float)v.val[2];
+}
+#endif
+#ifdef Vector3f
+Quaternionf::Quaternionf(const Vector3f& v)
+{
+	this->val[0] = 0.0;
+	memcpy(this->val + 1, v.val, sizeof(float)*3);
+}
+#endif
 
 Quaternionf::~Quaternionf(void)
 {
