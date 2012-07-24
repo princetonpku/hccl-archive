@@ -802,3 +802,8 @@ int vNormSquared3i(const int* x)
 {
 	return vDot3i(x,x);
 }
+
+double vNorm3i(const int* x)
+{
+	return sqrt((double)vDot3i(x,x));
+}
