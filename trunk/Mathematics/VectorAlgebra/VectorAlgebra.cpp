@@ -412,6 +412,204 @@ double* vDivScalar3d(double* x, const double* a, const double& k)
 	return x;
 }
 
+// c = a + b
+int* vAdd3i(const int* a, const int* b, int* c)
+{
+	c[0]=a[0]+b[0];
+	c[1]=a[1]+b[1];
+	c[2]=a[2]+b[2];
+
+	return c;
+}
+
+// a += b
+int* vAdd3i(int* a, const int* b)
+{
+	a[0] += b[0];
+	a[1] += b[1];
+	a[2] += b[2];
+
+	return a;
+}
+
+c = a - b
+int* vSub3i(const int* a, const int* b, int* c)
+{
+	c[0] = a[0] - b[0];
+	c[1] = a[1] - b[1];
+	c[2] = a[2] - b[2];
+
+	return c;
+}
+
+a -= b
+int* vSub3i(int* a, const int* b)
+{
+	a[0] -= b[0];
+	a[1] -= b[1];
+	a[2] -= b[2];
+
+	return a;
+}
+
+a *= b
+int* vMul3i(int* a, const int* b)
+{
+	a[0] *= b[0];
+	a[1] *= b[1];
+	a[2] *= b[2];
+
+	return a;
+}
+
+c = a * b
+int* vMul3i(const int* a, const int* b, int* c)
+{
+	c[0] = a[0] * b[0];
+	c[1] = a[1] * b[1];
+	c[2] = a[2] * b[2];
+
+	return c;
+}
+
+a /= b
+int* vDiv3i(int* a, const int* b)
+{
+	a[0] /= b[0];
+	a[1] /= b[1];
+	a[2] /= b[2];
+
+	return a;
+}
+
+c = a / b
+int* vDiv3i(const int* a, const int* b, int* c)
+{
+	c[0] = a[0] / b[0];
+	c[1] = a[1] / b[1];
+	c[2] = a[2] / b[2];
+
+	return c;
+}
+
+a %= b
+int* vMod3i(int* a, const int* b)
+{
+	a[0] %= b[0];
+	a[1] %= b[1];
+	a[2] %= b[2];
+
+	return a;
+}
+
+c = a % b
+int* vMod3i(const int* a, const int* b, int* c)
+{
+	c[0] = a[0] % b[0];
+	c[1] = a[1] % b[1];
+	c[2] = a[2] % b[2];
+
+	return c;
+}
+
+x += a
+int* vAddScalar3i(int* x, const int& a)
+{
+	x[0] += a;
+	x[1] += a;
+	x[2] += a;
+
+	return x;
+}
+
+x = a + k
+int* vAddScalar3i(int* x, const int* a, const int& k)
+{
+	x[0] = a[0] + k;
+	x[1] = a[1] + k;
+	x[2] = a[2] + k;
+
+	return x;
+}
+
+x -= a
+int* vSubScalar3i(int* x, const int& a)
+{
+	x[0] -= a;
+	x[1] -= a;
+	x[2] -= a;
+	return x;
+}
+
+x = a - k
+int* vSubScalar3i(int* x, const int* a, const int& k)
+{
+	x[0] = a[0] - k;
+	x[1] = a[1] - k;
+	x[2] = a[2] - k;
+
+	return x;
+}
+
+x *= a
+int* vMulScalar3i(int* x, const int& a)
+{
+	x[0] *= a;
+	x[1] *= a;
+	x[2] *= a;
+
+	return x;
+}
+
+x = a * k
+int* vMulScalar3i(int* x, const int* a, const int& k)
+{
+	x[0] = a[0] * k;
+	x[1] = a[1] * k;
+	x[2] = a[2] * k;
+
+	return x;
+}
+
+x /= a
+int* vDivScalar3i(int* x, const int& a)
+{
+	x[0] /= k;
+	x[1] /= k;
+	x[2] /= k;
+
+	return x;
+}
+
+x = a / k
+int* vDivScalar3i(int* x, const int* a, const int& k)
+{
+	x[0] = a[0] / k;
+	x[1] = a[1] / k;
+	x[2] = a[2] / k;
+
+	return x;
+}
+
+x %= a
+int* vModScalar3i(int* x, const int& a)
+{
+	x[0] %= k;
+	x[1] %= k;
+	x[2] %= k;
+
+	return x;
+}
+
+x = a % k
+int* vModScalar3i(int* x, const int* a, const int& k)
+{
+	x[0] = a[0] % k;
+	x[1] = a[1] % k;
+	x[2] = a[2] % k;
+
+	return x;
+}
 
 //////////////////////////////////////////////////////////////////////////
 // 2D version
@@ -777,33 +975,182 @@ double* vDivScalar2d(double* x, const double* a, const double& k)
 	return x;
 }
 
-// a == b
-bool vIsEqual3i(const int* a, const int* b)
+// c = a + b
+int* vAdd2i(const int* a, const int* b, int* c)
 {
-	return (a[0]==b[0] && a[1]==b[1] && a[2]==b[2]);
+	c[0]=a[0]+b[0];
+	c[1]=a[1]+b[1];
+	
+	return c;
 }
 
-
-int vDot3i(const int* a, const int* b)
+// a += b
+int* vAdd2i(int* a, const int* b)
 {
-	return a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+	a[0] += b[0];
+	a[1] += b[1];
+
+	return a;
 }
 
-int* vCross3i(const int* a, const int* b, int* c)
+c = a - b
+int* vSub2i(const int* a, const int* b, int* c)
 {
-	c[0] = a[1]*b[2] - a[2]*b[1];
-	c[1] = a[0]*b[2] - a[2]*b[0];
-	c[2] = a[0]*b[1] - a[1]*b[0];
+	c[0] = a[0] - b[0];
+	c[1] = a[1] - b[1];
 
 	return c;
 }
 
-int vNormSquared3i(const int* x)
+a -= b
+int* vSub2i(int* a, const int* b)
 {
-	return vDot3i(x,x);
+	a[0] -= b[0];
+	a[1] -= b[1];
+
+	return a;
 }
 
-double vNorm3i(const int* x)
+a *= b
+int* vMul2i(int* a, const int* b)
 {
-	return sqrt((double)vDot3i(x,x));
+	a[0] *= b[0];
+	a[1] *= b[1];
+
+	return a;
+}
+
+c = a * b
+int* vMul2i(const int* a, const int* b, int* c)
+{
+	c[0] = a[0] * b[0];
+	c[1] = a[1] * b[1];
+
+	return c;
+}
+
+a /= b
+int* vDiv2i(int* a, const int* b)
+{
+	a[0] /= b[0];
+	a[1] /= b[1];
+
+	return a;
+}
+
+c = a / b
+int* vDiv2i(const int* a, const int* b, int* c)
+{
+	c[0] = a[0] / b[0];
+	c[1] = a[1] / b[1];
+
+	return c;
+}
+
+a %= b
+int* vMod2i(int* a, const int* b)
+{
+	a[0] %= b[0];
+	a[1] %= b[1];
+
+	return a;
+}
+
+c = a % b
+int* vMod2i(const int* a, const int* b, int* c)
+{
+	c[0] = a[0] % b[0];
+	c[1] = a[1] % b[1];
+
+	return c;
+}
+
+x += a
+int* vAddScalar2i(int* x, const int& a)
+{
+	x[0] += a;
+	x[1] += a;
+
+	return x;
+}
+
+x = a + k
+int* vAddScalar2i(int* x, const int* a, const int& k)
+{
+	x[0] = a[0] + k;
+	x[1] = a[1] + k;
+
+	return x;
+}
+
+x -= a
+int* vSubScalar2i(int* x, const int& a)
+{
+	x[0] -= a;
+	x[1] -= a;
+
+	return x;
+}
+
+x = a - k
+int* vSubScalar2i(int* x, const int* a, const int& k)
+{
+	x[0] = a[0] - k;
+	x[1] = a[1] - k;
+
+	return x;
+}
+
+x *= a
+int* vMulScalar2i(int* x, const int& a)
+{
+	x[0] *= a;
+	x[1] *= a;
+
+	return x;
+}
+
+x = a * k
+int* vMulScalar2i(int* x, const int* a, const int& k)
+{
+	x[0] = a[0] * k;
+	x[1] = a[1] * k;
+
+	return x;
+}
+
+x /= a
+int* vDivScalar2i(int* x, const int& a)
+{
+	x[0] /= k;
+	x[1] /= k;
+
+	return x;
+}
+
+x = a / k
+int* vDivScalar2i(int* x, const int* a, const int& k)
+{
+	x[0] = a[0] / k;
+	x[1] = a[1] / k;
+
+	return x;
+}
+
+x %= a
+int* vModScalar2i(int* x, const int& a)
+{
+	x[0] %= k;
+	x[1] %= k;
+
+	return x;
+}
+
+x = a % k
+int* vModScalar2i(int* x, const int* a, const int& k)
+{
+	x[0] = a[0] % k;
+	x[1] = a[1] % k;
+
+	return x;
 }
