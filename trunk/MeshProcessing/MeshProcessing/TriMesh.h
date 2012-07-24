@@ -4,12 +4,11 @@
 #ifdef QT_OPENGL_LIB
 #include <qgl.h>
 #else
-#ifdef WIN32
-#include <Windows.h>
-#endif
 #include <gl/GL.h>
 #include <gl/GLU.h>
 #endif
+
+#include "Vector.h"
 
 class CTriMesh
 {
@@ -21,6 +20,7 @@ public:
 	void Clear(void);
 
 	bool Import(const char* strFilePath);
+	//bool Export(const char* strFilePath); (TODO) should support ply, obj, off, stl, at least.
 
 	void UpdateProperties(void);
 
@@ -41,9 +41,45 @@ public:
 	void Sub(const double* p);
 	void Mul(const double k);
 
-public:
-	void RenderGL();
+public:	// should be changed to protected (TODO)
+	void RenderGL_Points();
+	void RenderGL_Wireframe();
 	void RenderGL_Flat();
+	void RenderGL_Smooth();
+
+	//public:
+	//void RenderGL(options, flags)	// this function gives an access to the above rendering functions with selectable options (TODO)
+
+// Accessors (TODO)
+public:
+// 	bool HasVertices();
+// 	bool HasFacets();
+// 	bool HasVertexColor();
+// 	bool HasFacetArea();
+// 	bool HasFacetNormal();
+// 	bool HasVertexNormal();
+// 	bool HasVertexNeighboringVertex();
+// 	bool HasCog();
+// 	bool HasBoundingBox();
+// 	bool HasBoundingSphere();
+
+	//Vector3d Vertex(int i);
+	//Vector3i Facet(int i);
+	//Vector3f VertexColor(int i);
+	//double FacetArea(int i);
+	//Vector3d FacetNormal(int i);
+	//Vector3d VertexNormal(int i);
+	//std::vector<size_t>& VertexNeighboringVertex(int i);
+
+	//size_t NumVertices();
+	//size_t NumFacets();
+
+	//void SetVertex(int i, const Vector3d& nv);
+	//void SetFacet(int i, const Vector3i& nv);
+	//void SetVertexColor(int i, const Vector3f& nv);
+	//double RecalcFacetArea(int i);
+	//Vector3d RecalcFacetNormal(int i);
+	//Vector3d RecalcVertexNormal(int i);
 
 public:
 	std::vector<double> vertex;
