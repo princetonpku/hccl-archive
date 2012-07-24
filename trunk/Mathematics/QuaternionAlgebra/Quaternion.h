@@ -1,6 +1,8 @@
 #pragma once
 #include "QuaternionAlgebra.h"
 
+class Quaternionf;
+
 class Quaterniond
 {
 public:
@@ -11,6 +13,13 @@ public:
 	// TODO: axis-angle constructor
 	// TODO: rotation matrix constructor
 	// TODO: Euler angle constructor
+	Quaterniond(const Quaternionf& q);
+#ifdef Vector3d
+	Quaterniond(const Vector3d& v);
+#endif
+#ifdef Vector3f
+	Quaterniond(const Vector3f& v);
+#endif
 	~Quaterniond(void);
 
 	// Conversion
@@ -108,6 +117,13 @@ public:
 	// TODO: axis-angle constructor
 	// TODO: rotation matrix constructor
 	// TODO: Euler angle constructor
+	Quaternionf(const Quaterniond& q);
+#ifdef Vector3d
+	Quaternionf(const Vector3d& v);
+#endif
+#ifdef Vector3f
+	Quaternionf(const Vector3f& v);
+#endif
 	~Quaternionf(void);
 
 	// Conversion
