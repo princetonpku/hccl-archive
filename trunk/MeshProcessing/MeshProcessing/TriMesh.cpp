@@ -19,10 +19,11 @@ static bool AssimpImport(CTriMesh* triMesh, const char* pFile)
 	// Usually - if speed is not the most important aspect for you - you'll 
 	// propably to request more postprocessing than we do in this example.
 	const aiScene* scene = importer.ReadFile( pFile, 
-		aiProcess_CalcTangentSpace       | 
-		aiProcess_Triangulate            |
-		aiProcess_JoinIdenticalVertices  |
-		aiProcess_SortByPType);
+		//aiProcess_CalcTangentSpace       | 
+		//aiProcess_Triangulate            |
+		aiProcess_JoinIdenticalVertices		|
+		aiProcess_SortByPType
+		);
 
 	// If the import failed, report it
 	if( !scene)
@@ -46,6 +47,11 @@ static bool AssimpImport(CTriMesh* triMesh, const char* pFile)
 	triMesh->vertex.resize(3*nVertices);
 	triMesh->facet.clear();
 	triMesh->facet.resize(3*nFacets);
+	if((*(scene->mMeshes))->HasVertexColors(0))
+	{
+		triMesh->vertex_color.clear();
+		triMesh->vertex_color.resize(3*nVertices);
+	}
 
 	std::vector<int> ind;
 	ind.resize((nVertices > nFacets) ? nVertices:nFacets);
@@ -62,6 +68,15 @@ static bool AssimpImport(CTriMesh* triMesh, const char* pFile)
 		triMesh->facet[3*n+1] = (*(scene->mMeshes))->mFaces[n].mIndices[1];
 		triMesh->facet[3*n+2] = (*(scene->mMeshes))->mFaces[n].mIndices[2];
 	});
+	if((*(scene->mMeshes))->HasVertexColors(0))
+	{
+		std::for_each(ind.begin(), ind.begin() + nVertices, [&](int& n){
+			triMesh->vertex_color[3*n] = (*(scene->mMeshes))->mColors[0][n].r;
+			triMesh->vertex_color[3*n+1] = (*(scene->mMeshes))->mColors[0][n].g;
+			triMesh->vertex_color[3*n+2] = (*(scene->mMeshes))->mColors[0][n].b;
+		});
+	}
+
 	// We're done. Everything will be cleaned up by the importer destructor
 	return true;
 }
@@ -258,33 +273,49 @@ void CTriMesh::Mul(const double k)
 	});
 }
 
-void CTriMesh::RenderGL()
+void CTriMesh::RenderGL_Points()
 {
-	glPointSize(1.0);
-	glLineWidth(1.0);
-	glShadeModel(GL_SMOOTH);                    // shading mathod: GL_SMOOTH or GL_FLAT
+	if(vertex.size())
+	{
+		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+		glEnableClientState( GL_VERTEX_ARRAY );
+		if(vertex_color.size() == vertex.size())
+			glEnableClientState( GL_COLOR_ARRAY );
+
+		glVertexPointer(3, GL_DOUBLE, 0, &vertex[0]);
+
+		if(vertex_color.size() == vertex.size())
+			glColorPointer(3, GL_FLOAT, 0, &vertex_color[0]);
+
+		glDrawElements( GL_TRIANGLES, facet.size(), GL_UNSIGNED_INT, &(facet[0]) );
+
+		glDisableClientState( GL_VERTEX_ARRAY );
+	}
+}
+
+void CTriMesh::RenderGL_Wireframe()
+{
 	if(vertex.size())
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glEnableClientState( GL_VERTEX_ARRAY );
-		glEnableClientState( GL_NORMAL_ARRAY );
+		if(vertex_color.size() == vertex.size())
+			glEnableClientState( GL_COLOR_ARRAY );
 
 		glVertexPointer(3, GL_DOUBLE, 0, &vertex[0]);
-		glNormalPointer(GL_DOUBLE, 0, &vertex_normal[0]);
 
-		//glDrawArrays(GL_POINTS, 0, vertex.size()/3);
+		if(vertex_color.size() == vertex.size())
+			glColorPointer(3, GL_FLOAT, 0, &vertex_color[0]);
+
 		glDrawElements( GL_TRIANGLES, facet.size(), GL_UNSIGNED_INT, &(facet[0]) );
 
 		glDisableClientState( GL_VERTEX_ARRAY );
-		glDisableClientState( GL_NORMAL_ARRAY );
 	}
 }
 
 void CTriMesh::RenderGL_Flat()
 {
-	glPointSize(1.0);
-	glLineWidth(1.0);
-	glShadeModel(GL_SMOOTH);                    // shading mathod: GL_SMOOTH or GL_FLAT
+	glShadeModel(GL_FLAT);
 	if(vertex.size())
 	{
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -299,10 +330,39 @@ void CTriMesh::RenderGL_Flat()
 		glVertexPointer(3, GL_DOUBLE, 0, &vertex[0]);
 		glNormalPointer(GL_DOUBLE, 0, &vertex_normal[0]);
 
-		//glDrawArrays(GL_POINTS, 0, vertex.size()/3);
 		glDrawElements( GL_TRIANGLES, facet.size(), GL_UNSIGNED_INT, &(facet[0]) );
 
 		glDisableClientState( GL_VERTEX_ARRAY );
 		glDisableClientState( GL_NORMAL_ARRAY );
+
+		if(vertex_color.size() == vertex.size())
+			glDisableClientState( GL_COLOR_ARRAY );
+	}
+}
+
+void CTriMesh::RenderGL_Smooth()
+{
+	glShadeModel(GL_SMOOTH);
+	if(vertex.size())
+	{
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glEnableClientState( GL_VERTEX_ARRAY );
+		glEnableClientState( GL_NORMAL_ARRAY );
+		if(vertex_color.size() == vertex.size())
+		{
+			glEnableClientState( GL_COLOR_ARRAY );
+			glColorPointer(3, GL_FLOAT, 0, &vertex_color[0]);
+		}
+
+		glVertexPointer(3, GL_DOUBLE, 0, &vertex[0]);
+		glNormalPointer(GL_DOUBLE, 0, &vertex_normal[0]);
+
+		glDrawElements( GL_TRIANGLES, facet.size(), GL_UNSIGNED_INT, &(facet[0]) );
+
+		glDisableClientState( GL_VERTEX_ARRAY );
+		glDisableClientState( GL_NORMAL_ARRAY );
+
+		if(vertex_color.size() == vertex.size())
+			glDisableClientState( GL_COLOR_ARRAY );
 	}
 }
