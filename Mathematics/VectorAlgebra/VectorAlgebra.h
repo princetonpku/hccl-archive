@@ -112,4 +112,26 @@ double* vMulScalar2d(double* x, const double* a, const double& k);	// x = a*k
 double* vDivScalar2d(double* x, const double& a);					// x /= a
 double* vDivScalar2d(double* x, const double* a, const double& k);	// x = a/k
 
+int* vAdd3i(const int* a, const int* b, int* c);                        // c = a + b
+int* vAdd3i(int* a, const int* b);                                                        // a += b
+int* vSub3i(const int* a, const int* b, int* c);                        // c = a - b
+int* vSub3i(int* a, const int* b);                                                        // a -= b
+int* vMul3i(int* a, const int* b);                                                        // a *= b (element-wise multiplication)
+int* vMul3i(const int* a, const int* b, int* c);                        // c = a * b (element-wise multiplication)
+int* vDiv3i(int* a, const int* b);                                                        // a /= b (element-wise division)
+int* vDiv3i(const int* a, const int* b, int* c);                        // c = a / b (element-wise division)
+int* vMod3i(int* a, const int* b);                                                        // a %= b
+int* vMod3i(const int* a, const int* b, int* c);                        // c = a % b
+int* vAddScalar3i(int* x, const int& a);                                          // x += a
+int* vAddScalar3i(int* x, const int* a, const int& k);          // x = a+k
+int* vSubScalar3i(int* x, const int& a);                                          // x -= a
+int* vSubScalar3i(int* x, const int* a, const int& k);          // x = a-k
+int* vMulScalar3i(int* x, const int& a);                                          // x *= a
+int* vMulScalar3i(int* x, const int* a, const int& k);          // x = a*k
+int* vDivScalar3i(int* x, const int& a);                                          // x /= a
+int* vDivScalar3i(int* x, const int* a, const int& k);          // x = a/k
+int* vModScalar3i(int* x, const int& a);                                          // x %= a
+int* vModScalar3i(int* x, const int* a, const int& k);          // x = a%k
+
+
 #endif // VECTORALGEBRA_H
