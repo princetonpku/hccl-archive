@@ -25,8 +25,12 @@ public:
 
 	static Vector3d Add(const Vector3d& a, const Vector3d& b);		// a + b
 	Vector3d Add(const Vector3d& v);								// this += v
+	static Vector3d Add(const Vector3d& a, const double& k);		// a + k
+	Vector3d Add(const double& k);									// this += k
 	static Vector3d Sub(const Vector3d& a, const Vector3d& b);		// a - b
 	Vector3d Sub(const Vector3d& v);								// this -= v
+	static Vector3d Sub(const Vector3d& a, const double& k);		// a - k
+	Vector3d Sub(const double& k);									// this -= k
 	static Vector3d Mul(const Vector3d& a, const Vector3d& b);		// a * b (element-wise)
 	Vector3d Mul(const Vector3d& v);								// this *= v (element-wise)
 	static Vector3d Mul(const Vector3d& a, const double& k);		// a * k
@@ -57,7 +61,9 @@ public:
 	bool operator!=(const Vector3d& v);								// negative compare operator
 
 	Vector3d operator+=(const Vector3d& v);							// unary addition operator
+	Vector3d operator+=(const double& k);							// unary scalar addition operator
 	Vector3d operator-=(const Vector3d& v);							// unary subtraction operator
+	Vector3d operator-=(const double& k);							// unary scalar subtraction operator
 	Vector3d operator*=(const Vector3d& v);							// unary multiplication operator (element-wise)
 	Vector3d operator*=(const double& k);							// unary scalar multiplication operator
 	Vector3d operator/=(const Vector3d& v);							// unary division operator (element-wise)

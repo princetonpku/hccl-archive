@@ -83,6 +83,22 @@ float* vAdd3f(float* a, const float* b)
 	return a;
 }
 
+// x += a
+float* vAddScalar3f(float* x, const float& a)
+{
+	x[0] += a;	x[1] += a;	x[2] += a;
+	return x;
+}
+
+// x = a+k
+float* vAddScalar3f(float* x, const float* a, const float& k)
+{
+	x[0] = a[0] + k;
+	x[1] = a[1] + k;
+	x[2] = a[2] + k;
+	return x;
+}
+
 // c = a - b
 float* vSub3f(const float* a, const float* b, float* c)
 {
@@ -99,6 +115,22 @@ float* vSub3f(float* a, const float* b)
 	a[1] -= b[1];
 	a[2] -= b[2];
 	return a;
+}
+
+// x -= a
+float* vSubScalar3f(float* x, const float& a)
+{
+	x[0] -= a;	x[1] -= a;	x[2] -= a;
+	return x;
+}
+
+// x = a-k
+float* vSubScalar3f(float* x, const float* a, const float& k)
+{
+	x[0] = a[0] - k;
+	x[1] = a[1] - k;
+	x[2] = a[2] - k;
+	return x;
 }
 
 // a *= b (element-wise multiplication)
@@ -256,6 +288,22 @@ double* vAdd3d(double* a, const double* b)
 	return a;
 }
 
+// x += a
+double* vAddScalar3d(double* x, const double& a)
+{
+	x[0] += a;	x[1] += a;	x[2] += a;
+	return x;
+}
+
+// x = a+k
+double* vAddScalar3d(double* x, const double* a, const double& k)
+{
+	x[0] = a[0] + k;
+	x[1] = a[1] + k;
+	x[2] = a[2] + k;
+	return x;
+}
+
 // c = a - b
 double* vSub3d(const double* a, const double* b, double* c)
 {
@@ -274,6 +322,22 @@ double* vSub3d(double* a, const double* b)
 	a[2] -= b[2];
 
 	return a;
+}
+
+// x -= a
+double* vSubScalar3d(double* x, const double& a)
+{
+	x[0] -= a;	x[1] -= a;	x[2] -= a;
+	return x;
+}
+
+// x = a-k
+double* vSubScalar3d(double* x, const double* a, const double& k)
+{
+	x[0] = a[0] - k;
+	x[1] = a[1] - k;
+	x[2] = a[2] - k;
+	return x;
 }
 
 // a *= b (element-wise multiplication)
@@ -421,6 +485,21 @@ float* vAdd2f(const float* a, const float* b, float* c)
 	return c;
 }
 
+// x += a
+float* vAddScalar2f(float* x, const float& a)
+{
+	x[0] += a;	x[1] += a;
+	return x;
+}
+
+// x = a+k
+float* vAddScalar2f(float* x, const float* a, const float& k)
+{
+	x[0] = a[0] + k;
+	x[1] = a[1] + k;	
+	return x;
+}
+
 // a -= b
 float* vSub2f(float* a, const float* b)
 {
@@ -435,6 +514,21 @@ float* vSub2f(const float* a, const float* b, float* c)
 	c[0] = a[0] - b[0];
 	c[1] = a[1] - b[1];
 	return c;
+}
+
+// x -= a
+float* vSubScalar2f(float* x, const float& a)
+{
+	x[0] -= a;	x[1] -= a;
+	return x;
+}
+
+// x = a-k
+float* vSubScalar2f(float* x, const float* a, const float& k)
+{
+	x[0] = a[0] - k;
+	x[1] = a[1] - k;	
+	return x;
 }
 
 // a *= b (element-wise multiplication)
@@ -573,6 +667,21 @@ double* vAdd2d(const double* a, const double* b, double* c)
 	return c;
 }
 
+// x += a
+double* vAddScalar2d(double* x, const double& a)
+{
+	x[0] += a;	x[1] += a;
+	return x;
+}
+
+// x = a+k
+double* vAddScalar2d(double* x, const double* a, const double& k)
+{
+	x[0] = a[0] + k;
+	x[1] = a[1] + k;	
+	return x;
+}
+
 // a -= b
 double* vSub2d(double* a, const double* b)
 {
@@ -587,6 +696,21 @@ double* vSub2d(const double* a, const double* b, double* c)
 	c[0] = a[0] - b[0];
 	c[1] = a[1] - b[1];
 	return c;
+}
+
+// x -= a
+double* vSubScalar2d(double* x, const double& a)
+{
+	x[0] -= a;	x[1] -= a;
+	return x;
+}
+
+// x = a-k
+double* vSubScalar2d(double* x, const double* a, const double& k)
+{
+	x[0] = a[0] - k;
+	x[1] = a[1] - k;	
+	return x;
 }
 
 // a *= b (element-wise multiplication)
