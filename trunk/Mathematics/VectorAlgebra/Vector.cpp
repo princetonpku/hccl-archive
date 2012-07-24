@@ -87,6 +87,17 @@ Vector3d Vector3d::Add(const Vector3d& v)
 	return vAdd3d(this->val, v.val);
 }
 
+Vector3d Vector3d::Add(const Vector3d& a, const double& k)
+{
+	double b[3];
+	return vAddScalar3d(b, a.val, k);
+}
+
+Vector3d Vector3d::Add(const double& k)
+{
+	return vAddScalar3d(this->val, k);
+}
+
 Vector3d Vector3d::Sub(const Vector3d& a, const Vector3d& b)
 {
 	double c[3];
@@ -96,6 +107,17 @@ Vector3d Vector3d::Sub(const Vector3d& a, const Vector3d& b)
 Vector3d Vector3d::Sub(const Vector3d& v)
 {
 	return vSub3d(this->val, v.val);
+}
+
+Vector3d Vector3d::Sub(const Vector3d& a, const double& k)
+{
+	double b[3];
+	return vSubScalar3d(b, a.val, k);
+}
+
+Vector3d Vector3d::Sub(const double& k)
+{
+	return vSubScalar3d(this->val, k);
 }
 
 Vector3d Vector3d::Mul(const Vector3d& a, const Vector3d& b)
@@ -218,10 +240,20 @@ Vector3d Vector3d::operator+=(const Vector3d& v)							// unary addition operato
 	vAdd3d(this->val, v.val);
 	return *this;
 }
+Vector3d Vector3d::operator+=(const double& k)								// unary scalar addition operator
+{
+	vAddScalar3d(this->val, k);
+	return *this;	
+}
 Vector3d Vector3d::operator-=(const Vector3d& v)							// unary subtraction operator
 {
 	vSub3d(this->val, v.val);
 	return *this;
+}
+Vector3d Vector3d::operator-=(const double& k)								// unary scalar subtraction operator
+{
+	vSubScalar3d(this->val, k);
+	return *this;	
 }
 Vector3d Vector3d::operator*=(const Vector3d& v)							// unary multiplication operator (element-wise)
 {
