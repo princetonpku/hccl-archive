@@ -776,3 +776,29 @@ double* vDivScalar2d(double* x, const double* a, const double& k)
 	x[1] = a[1]/k;
 	return x;
 }
+
+// a == b
+bool vIsEqual3i(const int* a, const int* b)
+{
+	return (a[0]==b[0] && a[1]==b[1] && a[2]==b[2]);
+}
+
+
+int vDot3i(const int* a, const int* b)
+{
+	return a[0]*b[0] + a[1]*b[1] + a[2]*b[2];
+}
+
+int* vCross3i(const int* a, const int* b, int* c)
+{
+	c[0] = a[1]*b[2] - a[2]*b[1];
+	c[1] = a[0]*b[2] - a[2]*b[0];
+	c[2] = a[0]*b[1] - a[1]*b[0];
+
+	return c;
+}
+
+int vNormSquared3i(const int* x)
+{
+	return vDot3i(x,x);
+}
