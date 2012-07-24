@@ -25,9 +25,6 @@ Quaterniond::Quaterniond(const Quaterniond& q)									// copy constructor
 	memcpy(this->val, q.val, sizeof(double)*4);
 }
 
-// TODO: axis-angle constructor
-// TODO: rotation matrix constructor
-// TODO: Euler angle constructor
 Quaterniond::Quaterniond(const Quaternionf& q)
 {
 	this->val[0] = (double)q.val[0];
@@ -35,6 +32,29 @@ Quaterniond::Quaterniond(const Quaternionf& q)
 	this->val[2] = (double)q.val[2];
 	this->val[3] = (double)q.val[3];
 }
+
+Quaterniond::Quaterniond( const double rad, const double* axis )
+{
+	qFromAxisAngled(this->val, rad, axis);
+}
+
+Quaterniond::Quaterniond( const double* R )			// rotation matrix constructor
+{
+	qFromMatrixd(this->val, R);
+}
+
+Quaterniond::Quaterniond( const double R[3][3] )	// rotation matrix constructor
+{
+	double Rtemp[9] = {R[0][0], R[1][0], R[2][0], R[0][1], R[1][1], R[2][1], R[0][2], R[1][2], R[2][2]};
+	qFromMatrixd(this->val, Rtemp);
+}
+
+Quaterniond::Quaterniond( const double a, const double b, const double c, const char* order )	// Euler angle constructor
+{	
+	qFromEulerd(this->val, a, b, c, order);	
+}
+
+
 #ifdef Vector3d
 Quaterniond::Quaterniond(const Vector3d& v)
 {
@@ -389,9 +409,6 @@ Quaternionf::Quaternionf(const Quaternionf& q)									// copy constructor
 	memcpy(this->val, q.val, sizeof(float)*4);
 }
 
-// TODO: axis-angle constructor
-// TODO: rotation matrix constructor
-// TODO: Euler angle constructor
 Quaternionf::Quaternionf(const Quaterniond& q)
 {
 	this->val[0] = (float)q.val[0];
@@ -399,6 +416,28 @@ Quaternionf::Quaternionf(const Quaterniond& q)
 	this->val[2] = (float)q.val[2];
 	this->val[3] = (float)q.val[3];
 }
+
+Quaternionf::Quaternionf( const float rad, const float* axis )
+{
+	qFromAxisAnglef(this->val, rad, axis);
+}
+
+Quaternionf::Quaternionf( const float* R )			// rotation matrix constructor
+{
+	qFromMatrixf(this->val, R);
+}
+
+Quaternionf::Quaternionf( const float R[3][3] )	// rotation matrix constructor
+{
+	float Rtemp[9] = {R[0][0], R[1][0], R[2][0], R[0][1], R[1][1], R[2][1], R[0][2], R[1][2], R[2][2]};
+	qFromMatrixf(this->val, Rtemp);
+}
+
+Quaternionf::Quaternionf( const float a, const float b, const float c, const char* order )	// Euler angle constructor
+{	
+	qFromEulerf(this->val, a, b, c, order);	
+}
+
 #ifdef Vector3d
 Quaternionf::Quaternionf(const Vector3d& v)
 {

@@ -10,10 +10,14 @@ public:
 	Quaterniond(double w, double x, double y, double z);				// (w, x, y, z)
 	Quaterniond(double* wxyz);											// (wxyz[0], wxyz[1], wxyz[2], wxyz[3])
 	Quaterniond(const Quaterniond& q);									// copy constructor
-	// TODO: axis-angle constructor
-	// TODO: rotation matrix constructor
-	// TODO: Euler angle constructor
 	Quaterniond(const Quaternionf& q);
+
+	Quaterniond(const double rad, const double* axis);								// axis-angle constructor
+	Quaterniond(const double* R);													// rotation matrix constructor
+	Quaterniond(const double R[3][3]);												// rotation matrix constructor
+	Quaterniond(const double a, const double b, const double c, const char* order);	// Euler angle constructor
+	
+	
 #ifdef Vector3d
 	Quaterniond(const Vector3d& v);
 #endif
@@ -114,10 +118,13 @@ public:
 	Quaternionf(float w, float x, float y, float z);				// (w, x, y, z)
 	Quaternionf(float* wxyz);											// (wxyz[0], wxyz[1], wxyz[2], wxyz[3])
 	Quaternionf(const Quaternionf& q);									// copy constructor
-	// TODO: axis-angle constructor
-	// TODO: rotation matrix constructor
-	// TODO: Euler angle constructor
 	Quaternionf(const Quaterniond& q);
+
+	Quaternionf(const float rad, const float* axis);								// axis-angle constructor
+	Quaternionf(const float* R);													// rotation matrix constructor
+	Quaternionf(const float R[3][3]);												// rotation matrix constructor
+	Quaternionf(const float a, const float b, const float c, const char* order);	// Euler angle constructor
+
 #ifdef Vector3d
 	Quaternionf(const Vector3d& v);
 #endif
