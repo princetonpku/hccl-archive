@@ -11,12 +11,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\ModelGenerator\ModelGenerator\Joint.cpp" />
-    <ClCompile Include="..\..\ModelGenerator\ModelGenerator\Skeleton.cpp" />
+    <ClCompile Include="..\HumanModel\Joint.cpp" />
+    <ClCompile Include="..\HumanModel\Skeleton.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\ModelGenerator\ModelGenerator\Joint.h" />
-    <ClInclude Include="..\..\ModelGenerator\ModelGenerator\Skeleton.h" />
+    <ClInclude Include="..\HumanModel\Joint.h" />
+    <ClInclude Include="..\HumanModel\Skeleton.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{AD23372F-2186-452F-9FF2-185503FBE6E3}</ProjectGuid>
