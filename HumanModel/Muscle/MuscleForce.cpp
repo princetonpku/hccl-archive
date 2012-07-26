@@ -3,29 +3,45 @@
 Muscle::Muscle()
 :_MaxForce(0), _OptLength(0), _MaxVelocity(0)
 {
-	std::vector<double2> FLPoints;
-	FLPoints.push_back(double2(-5.307692,0.012188));
-	FLPoints.push_back(double2(-4.307692, 0.021899));
-	FLPoints.push_back(double2(-1.923077, 0.036466));
-	FLPoints.push_back(double2(-0.884615, 0.052493));
-	FLPoints.push_back(double2(-0.269231, 0.075312));
-	FLPoints.push_back(double2(0.230769, 0.114158));
-	FLPoints.push_back(double2(0.461538, 0.157859));
-	FLPoints.push_back(double2(0.52725, 0.226667));
-	FLPoints.push_back(double2(0.62875, 0.636667));
-	FLPoints.push_back(double2(0.71875, 0.856667));
-	FLPoints.push_back(double2(0.86125, 0.95));
-	FLPoints.push_back(double2(1.045, 0.993333));
-	FLPoints.push_back(double2(1.2175, 0.77));
-	FLPoints.push_back(double2(1.43875, 0.246667));
-	FLPoints.push_back(double2(1.5, 0.193821));
-	FLPoints.push_back(double2(1.615385, 0.133252));
-	FLPoints.push_back(double2(2, 0.072683));
-	FLPoints.push_back(double2(2.961538, 0.044417));
-	FLPoints.push_back(double2(3.692308, 0.036341));
-	FLPoints.push_back(double2(5.461538, 0.021899));
-	FLPoints.push_back(double2(9.901902, 0.007332));
-	FLCurve.setPoints(FLPoints);
+	std::vector<double2> AFLPoints;
+	AFLPoints.push_back(double2(-5.307692,0.012188));
+	AFLPoints.push_back(double2(-4.307692, 0.021899));
+	AFLPoints.push_back(double2(-1.923077, 0.036466));
+	AFLPoints.push_back(double2(-0.884615, 0.052493));
+	AFLPoints.push_back(double2(-0.269231, 0.075312));
+	AFLPoints.push_back(double2(0.230769, 0.114158));
+	AFLPoints.push_back(double2(0.461538, 0.157859));
+	AFLPoints.push_back(double2(0.52725, 0.226667));
+	AFLPoints.push_back(double2(0.62875, 0.636667));
+	AFLPoints.push_back(double2(0.71875, 0.856667));
+	AFLPoints.push_back(double2(0.86125, 0.95));
+	AFLPoints.push_back(double2(1.045, 0.993333));
+	AFLPoints.push_back(double2(1.2175, 0.77));
+	AFLPoints.push_back(double2(1.43875, 0.246667));
+	AFLPoints.push_back(double2(1.5, 0.193821));
+	AFLPoints.push_back(double2(1.615385, 0.133252));
+	AFLPoints.push_back(double2(2, 0.072683));
+	AFLPoints.push_back(double2(2.961538, 0.044417));
+	AFLPoints.push_back(double2(3.692308, 0.036341));
+	AFLPoints.push_back(double2(5.461538, 0.021899));
+	AFLPoints.push_back(double2(9.901902, 0.007332));
+	AFLCurve.setPoints(AFLPoints);
+
+	std::vector<double2> PFLPoints;
+	PFLPoints.push_back(double2(-5, 0));
+	PFLPoints.push_back(double2(0.998, 0));
+	PFLPoints.push_back(double2(0.999, 0));
+	PFLPoints.push_back(double2(1, 0));
+	PFLPoints.push_back(double2(1.1, 0.035));
+	PFLPoints.push_back(double2(1.2, 0.12));
+	PFLPoints.push_back(double2(1.3, 0.26));
+	PFLPoints.push_back(double2(1.4, 0.55));
+	PFLPoints.push_back(double2(1.5, 1.17));
+	PFLPoints.push_back(double2(1.6, 2));
+	PFLPoints.push_back(double2(1.601, 2));
+	PFLPoints.push_back(double2(1.602, 2));
+	PFLPoints.push_back(double2(5, 2));
+	PFLCurve.setPoints(PFLPoints);
 
 	std::vector<double2> FVPoints;
 	FVPoints.push_back(double2(-1, 0));
@@ -104,6 +120,6 @@ double Muscle::getForce1(double a, double l, double v)
 		if(l < 0.0)
 			return -1;
 		else
-			return _MaxForce * a * FLCurve.evaluate(l/_OptLength) * FVCurve.evaluate(v/_MaxVelocity);
+			return _MaxForce * a * (AFLCurve.evaluate(l/_OptLength) + PFLCurve.evaluate(l/_OptLength)) * FVCurve.evaluate(v/_MaxVelocity);
 	}
 }
