@@ -22,7 +22,8 @@ private:
 	double _OptLength;
 	double _MaxVelocity;
 
-	CubicSpline FLCurve;
+	CubicSpline AFLCurve;
+	CubicSpline PFLCurve;
 	CubicSpline FVCurve;
 };
 
