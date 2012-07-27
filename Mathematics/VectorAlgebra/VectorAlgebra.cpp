@@ -432,7 +432,7 @@ int* vAdd3i(int* a, const int* b)
 	return a;
 }
 
-c = a - b
+// c = a - b
 int* vSub3i(const int* a, const int* b, int* c)
 {
 	c[0] = a[0] - b[0];
@@ -442,7 +442,7 @@ int* vSub3i(const int* a, const int* b, int* c)
 	return c;
 }
 
-a -= b
+// a -= b
 int* vSub3i(int* a, const int* b)
 {
 	a[0] -= b[0];
@@ -452,7 +452,7 @@ int* vSub3i(int* a, const int* b)
 	return a;
 }
 
-a *= b
+// a *= b
 int* vMul3i(int* a, const int* b)
 {
 	a[0] *= b[0];
@@ -462,7 +462,7 @@ int* vMul3i(int* a, const int* b)
 	return a;
 }
 
-c = a * b
+// c = a * b
 int* vMul3i(const int* a, const int* b, int* c)
 {
 	c[0] = a[0] * b[0];
@@ -472,7 +472,7 @@ int* vMul3i(const int* a, const int* b, int* c)
 	return c;
 }
 
-a /= b
+// a /= b
 int* vDiv3i(int* a, const int* b)
 {
 	a[0] /= b[0];
@@ -482,7 +482,7 @@ int* vDiv3i(int* a, const int* b)
 	return a;
 }
 
-c = a / b
+// c = a / b
 int* vDiv3i(const int* a, const int* b, int* c)
 {
 	c[0] = a[0] / b[0];
@@ -492,7 +492,7 @@ int* vDiv3i(const int* a, const int* b, int* c)
 	return c;
 }
 
-a %= b
+// a %= b
 int* vMod3i(int* a, const int* b)
 {
 	a[0] %= b[0];
@@ -502,7 +502,7 @@ int* vMod3i(int* a, const int* b)
 	return a;
 }
 
-c = a % b
+// c = a % b
 int* vMod3i(const int* a, const int* b, int* c)
 {
 	c[0] = a[0] % b[0];
@@ -512,7 +512,7 @@ int* vMod3i(const int* a, const int* b, int* c)
 	return c;
 }
 
-x += a
+// x += a
 int* vAddScalar3i(int* x, const int& a)
 {
 	x[0] += a;
@@ -522,7 +522,7 @@ int* vAddScalar3i(int* x, const int& a)
 	return x;
 }
 
-x = a + k
+// x = a + k
 int* vAddScalar3i(int* x, const int* a, const int& k)
 {
 	x[0] = a[0] + k;
@@ -532,7 +532,7 @@ int* vAddScalar3i(int* x, const int* a, const int& k)
 	return x;
 }
 
-x -= a
+// x -= a
 int* vSubScalar3i(int* x, const int& a)
 {
 	x[0] -= a;
@@ -541,7 +541,7 @@ int* vSubScalar3i(int* x, const int& a)
 	return x;
 }
 
-x = a - k
+// x = a - k
 int* vSubScalar3i(int* x, const int* a, const int& k)
 {
 	x[0] = a[0] - k;
@@ -551,7 +551,7 @@ int* vSubScalar3i(int* x, const int* a, const int& k)
 	return x;
 }
 
-x *= a
+// x *= a
 int* vMulScalar3i(int* x, const int& a)
 {
 	x[0] *= a;
@@ -561,7 +561,7 @@ int* vMulScalar3i(int* x, const int& a)
 	return x;
 }
 
-x = a * k
+// x = a * k
 int* vMulScalar3i(int* x, const int* a, const int& k)
 {
 	x[0] = a[0] * k;
@@ -571,8 +571,8 @@ int* vMulScalar3i(int* x, const int* a, const int& k)
 	return x;
 }
 
-x /= a
-int* vDivScalar3i(int* x, const int& a)
+// x /= a
+int* vDivScalar3i(int* x, const int& k)
 {
 	x[0] /= k;
 	x[1] /= k;
@@ -581,7 +581,7 @@ int* vDivScalar3i(int* x, const int& a)
 	return x;
 }
 
-x = a / k
+// x = a / k
 int* vDivScalar3i(int* x, const int* a, const int& k)
 {
 	x[0] = a[0] / k;
@@ -591,8 +591,8 @@ int* vDivScalar3i(int* x, const int* a, const int& k)
 	return x;
 }
 
-x %= a
-int* vModScalar3i(int* x, const int& a)
+// x %= a
+int* vModScalar3i(int* x, const int& k)
 {
 	x[0] %= k;
 	x[1] %= k;
@@ -601,7 +601,7 @@ int* vModScalar3i(int* x, const int& a)
 	return x;
 }
 
-x = a % k
+// x = a % k
 int* vModScalar3i(int* x, const int* a, const int& k)
 {
 	x[0] = a[0] % k;
@@ -993,7 +993,7 @@ int* vAdd2i(int* a, const int* b)
 	return a;
 }
 
-c = a - b
+// c = a - b
 int* vSub2i(const int* a, const int* b, int* c)
 {
 	c[0] = a[0] - b[0];
@@ -1002,7 +1002,7 @@ int* vSub2i(const int* a, const int* b, int* c)
 	return c;
 }
 
-a -= b
+// a -= b
 int* vSub2i(int* a, const int* b)
 {
 	a[0] -= b[0];
@@ -1011,7 +1011,7 @@ int* vSub2i(int* a, const int* b)
 	return a;
 }
 
-a *= b
+// a *= b
 int* vMul2i(int* a, const int* b)
 {
 	a[0] *= b[0];
@@ -1020,7 +1020,7 @@ int* vMul2i(int* a, const int* b)
 	return a;
 }
 
-c = a * b
+// c = a * b
 int* vMul2i(const int* a, const int* b, int* c)
 {
 	c[0] = a[0] * b[0];
@@ -1029,7 +1029,7 @@ int* vMul2i(const int* a, const int* b, int* c)
 	return c;
 }
 
-a /= b
+// a /= b
 int* vDiv2i(int* a, const int* b)
 {
 	a[0] /= b[0];
@@ -1038,7 +1038,7 @@ int* vDiv2i(int* a, const int* b)
 	return a;
 }
 
-c = a / b
+// c = a / b
 int* vDiv2i(const int* a, const int* b, int* c)
 {
 	c[0] = a[0] / b[0];
@@ -1047,7 +1047,7 @@ int* vDiv2i(const int* a, const int* b, int* c)
 	return c;
 }
 
-a %= b
+// a %= b
 int* vMod2i(int* a, const int* b)
 {
 	a[0] %= b[0];
@@ -1056,7 +1056,7 @@ int* vMod2i(int* a, const int* b)
 	return a;
 }
 
-c = a % b
+// c = a % b
 int* vMod2i(const int* a, const int* b, int* c)
 {
 	c[0] = a[0] % b[0];
@@ -1065,7 +1065,7 @@ int* vMod2i(const int* a, const int* b, int* c)
 	return c;
 }
 
-x += a
+// x += a
 int* vAddScalar2i(int* x, const int& a)
 {
 	x[0] += a;
@@ -1074,7 +1074,7 @@ int* vAddScalar2i(int* x, const int& a)
 	return x;
 }
 
-x = a + k
+// x = a + k
 int* vAddScalar2i(int* x, const int* a, const int& k)
 {
 	x[0] = a[0] + k;
@@ -1083,7 +1083,7 @@ int* vAddScalar2i(int* x, const int* a, const int& k)
 	return x;
 }
 
-x -= a
+// x -= a
 int* vSubScalar2i(int* x, const int& a)
 {
 	x[0] -= a;
@@ -1092,7 +1092,7 @@ int* vSubScalar2i(int* x, const int& a)
 	return x;
 }
 
-x = a - k
+// x = a - k
 int* vSubScalar2i(int* x, const int* a, const int& k)
 {
 	x[0] = a[0] - k;
@@ -1101,7 +1101,7 @@ int* vSubScalar2i(int* x, const int* a, const int& k)
 	return x;
 }
 
-x *= a
+// x *= a
 int* vMulScalar2i(int* x, const int& a)
 {
 	x[0] *= a;
@@ -1110,7 +1110,7 @@ int* vMulScalar2i(int* x, const int& a)
 	return x;
 }
 
-x = a * k
+// x = a * k
 int* vMulScalar2i(int* x, const int* a, const int& k)
 {
 	x[0] = a[0] * k;
@@ -1119,8 +1119,8 @@ int* vMulScalar2i(int* x, const int* a, const int& k)
 	return x;
 }
 
-x /= a
-int* vDivScalar2i(int* x, const int& a)
+// x /= a
+int* vDivScalar2i(int* x, const int& k)
 {
 	x[0] /= k;
 	x[1] /= k;
@@ -1128,7 +1128,7 @@ int* vDivScalar2i(int* x, const int& a)
 	return x;
 }
 
-x = a / k
+// x = a / k
 int* vDivScalar2i(int* x, const int* a, const int& k)
 {
 	x[0] = a[0] / k;
@@ -1137,8 +1137,8 @@ int* vDivScalar2i(int* x, const int* a, const int& k)
 	return x;
 }
 
-x %= a
-int* vModScalar2i(int* x, const int& a)
+// x %= a
+int* vModScalar2i(int* x, const int& k)
 {
 	x[0] %= k;
 	x[1] %= k;
@@ -1146,7 +1146,7 @@ int* vModScalar2i(int* x, const int& a)
 	return x;
 }
 
-x = a % k
+// x = a % k
 int* vModScalar2i(int* x, const int* a, const int& k)
 {
 	x[0] = a[0] % k;
