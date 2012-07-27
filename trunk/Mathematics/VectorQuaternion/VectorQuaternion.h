@@ -5,6 +5,8 @@
 #include <math.h>
 #include <algorithm>
 
+#include <iostream>
+
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
@@ -76,9 +78,9 @@ public:
 	}
 	Vector3<T> Normalize(void)											// this /= |this|
 	{
-		double n = Norm(*this);
+		double n = this->Norm();
 		this->val[0] /= n; this->val[1] /= n; this->val[2] /= n;
-		return v;
+		return *this;
 	}
 
 	Vector3<T> Add(const Vector3<T>& v)									// this += v
@@ -216,8 +218,24 @@ public:
 
 
 // Methods (Auxiliary)
-	// stream I/O
-	// etc.
+	template <class T> friend std::istream& operator>>(std::istream& is, Vector3<T>& v)
+	{
+		char str[1024];
+		char* tok;
+		is >> str;
+		tok = strtok(str, " ,()<>[]|:");
+		v.val[0] = (T)atof(tok);
+		tok = strtok(NULL, " ,()<>[]|:");
+		v.val[1] = (T)atof(tok);
+		tok = strtok(NULL, " ,()<>[]|:");
+		v.val[2] = (T)atof(tok);
+		return is;
+	}
+	template <class T> friend std::ostream& operator<<(std::ostream& os, const Vector3<T>& v)
+	{
+		os << "(" << v.val[0] << ", " << v.val[1] << ", " << v.val[2] << ")";
+		return os;
+	}
 
 // Accessors
 public:
@@ -291,7 +309,7 @@ template <class T> inline Vector3<T> Mul(const Vector3<T>& a, const T& k)					//
 {
 	return Vector3<T>(a.val[0] * k, a.val[1] * k, a.val[2] * k);
 }
-template <class T> inline Vector3<T> Mul(const Vector3<T>& a, const T& k)					// k * a
+template <class T> inline Vector3<T> Mul(const T& k, const Vector3<T>& a)					// k * a
 {
 	return Vector3<T>(a.val[0] * k, a.val[1] * k, a.val[2] * k);
 }
