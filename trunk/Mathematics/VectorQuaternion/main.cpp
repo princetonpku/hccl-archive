@@ -15,6 +15,11 @@ int main(void)
 	v3.Normalize();
 	std::cout << "v3/|v3| = " << v3 << std::endl;
 
+	Vector2d v5(1, 4);
+	std::cout << "v5 = " << v5 << std::endl;
+	v5.Normalize();
+	std::cout << "v5/|v5| = " << v5 << std::endl;
+
 	Vector3d v4;
 	std::cout << "enter a new vector: ";
 	std::cin >> v4;
