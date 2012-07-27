@@ -27,6 +27,7 @@
 #define Quaterniond Quaternion<double>		// TODO
 #define Quaternionf Quaternion<float>		// TODO
 
+template<class T> class Vector2;
 template<class T> class Quaternion;
 
 template <class T>
@@ -85,7 +86,7 @@ public:
 
 	Vector3<T> Add(const Vector3<T>& v)									// this += v
 	{
-		this->val[0] += v[0];		this->val[1] += v[1];		this->val[2] += v[2];
+		this->val[0] += v.val[0];		this->val[1] += v.val[1];		this->val[2] += v.val[2];
 		return *this;
 	}
 	Vector3<T> Add(const T& k)											// this += k
@@ -373,6 +374,346 @@ template <class T> inline Vector3<T> operator/(const Vector3<T>& v, const T& k)	
 template <class T> inline Vector3<T> operator/(const T& k, const Vector3<T>& v)				// binary scalar division operator
 {
 	return Vector3<T>(k / a.val[0], k / a.val[1], k / a.val[2]);
+}
+
+
+
+template <class T>
+class Vector2
+{
+	// Constructors
+public:
+	Vector2()															// zero vector
+	{
+		memset(val, 0, sizeof(T)*2);
+	}
+	Vector2(T x, T y)													// (x, y)
+	{
+		val[0] = x;	val[1] = y;
+	}
+	Vector2(T* xy)														// (xy[0], xy[1])
+	{
+		memcpy(val, xyz, sizeof(T)*2);
+	}
+	Vector2(const Vector2<T>& v)										// copy constructor
+	{
+		memcpy(this->val, v.val, sizeof(T)*2);
+	}
+	Vector2(const Quaternion<T>& q)										// typecast constructor
+	{
+		memcpy(this->val, q.val+1, sizeof(T)*2);
+	}
+	~Vector2(){}
+
+	// Methods (Algebra)
+public:
+	T Dot(const Vector2<T>& v) const									// this . v
+	{
+		return this->val[0]*v.val[0] + this->val[1]*v.val[1];
+	}
+	T Cross(const Vector2<T>& v) const									// this x v
+	{
+		return this->val[0]*v.val[1] - this->val[1]*v.val[0];			
+	}
+	T NormSquared() const												// |this|^2
+	{
+		return this->val[0]*this->val[0] + this->val[1]*this->val[1];
+	}
+	T Norm() const														// |this|
+	{
+		return sqrt(this->val[0]*this->val[0] + this->val[1]*this->val[1]);
+	}
+	Vector2<T> Normalize(void)											// this /= |this|
+	{
+		double n = this->Norm();
+		this->val[0] /= n; this->val[1] /= n;
+		return *this;
+	}
+
+	Vector2<T> Add(const Vector2<T>& v)									// this += v
+	{
+		this->val[0] += v.val[0];		this->val[1] += v.val[1];
+		return *this;
+	}
+	Vector2<T> Add(const T& k)											// this += k
+	{
+		this->val[0] += k;		this->val[1] += k;
+		return *this;
+	}
+	Vector2<T> Sub(const Vector2<T>& v)									// this -= v
+	{
+		this->val[0] -= v.val[0];		this->val[1] -= v.val[1];
+		return *this;
+	}
+	Vector2<T> Sub(const T& k)											// this -= k
+	{
+		this->val[0] -= k;		this->val[1] -= k;
+		return *this;
+	}
+	Vector2<T> Mul(const Vector2<T>& v)									// this *= v (element-wise)
+	{
+		this->val[0] *= v.val[0];		this->val[1] *= v.val[1];
+		return *this;
+	}
+	Vector2<T> Mul(const T& k)											// this *= k
+	{
+		this->val[0] *= k;		this->val[1] *= k;
+		return *this;
+	}
+	Vector2<T> Div(const Vector2<T>& v)									// this /= v (element-wise)
+	{
+		this->val[0] /= v.val[0];		this->val[1] /= v.val[1];
+		return *this;
+	}
+	Vector2<T> Div(const T& k)											// this /= k
+	{
+		this->val[0] /= k;		this->val[1] /= k;
+		return *this;
+	}
+
+	// Operators
+public:
+	Vector2<T> operator=(const Vector2<T>& v)							// assign operator
+	{
+		memcpy(this->val, v.val, sizeof(double)*2);
+	}
+
+	bool operator==(const Vector2<T>& v) const							// compare operator
+	{
+		return (this->val[0] == v.val[0] && this->val[1] == v.val[1]);
+	}
+	bool operator!=(const Vector2<T>& v) const							// negative compare operator
+	{	
+		return (this->val[0] != v.val[0] || this->val[1] != v.val[1]);
+	}
+
+	Vector2<T> operator+=(const Vector2<T>& v)							// unary addition operator
+	{
+		this->val[0] += v.val[0];		this->val[1] += v.val[1];
+		return *this;
+	}
+	Vector2<T> operator+=(const T& k)									// unary scalar addition operator
+	{
+		this->val[0] += k;		this->val[1] += k;
+		return *this;
+	}
+	Vector2<T> operator-=(const Vector2<T>& v)							// unary subtraction operator
+	{
+		this->val[0] -= v.val[0];		this->val[1] -= v.val[1];
+		return *this;
+	}
+	Vector2<T> operator-=(const T& k)									// unary scalar subtraction operator
+	{
+		this->val[0] -= k;		this->val[1] -= k;
+		return *this;
+	}
+	Vector2<T> operator*=(const Vector2<T>& v)							// unary multiplication operator (element-wise)
+	{
+		this->val[0] *= v.val[0];		this->val[1] *= v.val[1];
+		return *this;
+	}
+	Vector2<T> operator*=(const T& k)									// unary scalar multiplication operator
+	{
+		this->val[0] *= k;		this->val[1] *= k;
+		return *this;
+	}
+	Vector2<T> operator/=(const Vector2<T>& v)							// unary division operator (element-wise)
+	{
+		this->val[0] /= v.val[0];		this->val[1] /= v.val[1];
+		return *this;
+	}
+	Vector2<T> operator/=(const T& k)									// unary scalar division operator
+	{
+		this->val[0] /= k;		this->val[1] /= k;
+		return *this;
+	}
+
+	Vector2<T> operator-() const										// unary negation operator
+	{
+		return Vector2<T>(-this->val[0], -this->val[1]);
+	}
+
+
+
+	// Methods (Geometry)
+public:
+	Vector2<T> Rotate(const T rad, const Vector2<T>& axis)				// rotate this vector by given angle(rad) along the axis(must be unit)
+	{
+	}
+	Vector2<T> Rotate(const Vector2<T>& axis)							// rotate this vector by given angle(norm of axis) along the axis
+	{
+	}
+	Vector2<T> Rotate(const T* R)										// rotate this vector by multiplying the rotation matrix R (column-stacked)
+	{
+	}
+	Vector2<T> Rotate(const Quaternion<T>& q)
+	{
+	}
+	Vector2<T> Translate(const Vector2<T>& dx)							// this += dx
+	{
+	}
+	Vector2<T> Translate(const T mag, const Vector2<T>& dir)			// this += mag*dir
+	{
+	}
+
+	static T Angle(const Vector2<T>& a, const Vector2<T>& b)			// get angle between two vectors
+	{
+	}
+	T Angle(const Vector2<T>& a)										// get angle between this and a
+	{
+	}
+
+
+	// Methods (Auxiliary)
+	template <class T> friend std::istream& operator>>(std::istream& is, Vector2<T>& v)
+	{
+		char str[1024];
+		char* tok;
+		is >> str;
+		tok = strtok(str, " ,()<>[]|:");
+		v.val[0] = (T)atof(tok);
+		tok = strtok(NULL, " ,()<>[]|:");
+		v.val[1] = (T)atof(tok);		
+		return is;
+	}
+	template <class T> friend std::ostream& operator<<(std::ostream& os, const Vector2<T>& v)
+	{
+		os << "(" << v.val[0] << ", " << v.val[1] << ")";
+		return os;
+	}
+
+	// Accessors
+public:
+	T& operator[](int i)	{	return val[i];	}
+	T X() const				{	return val[0];	}
+	T Y() const				{	return val[1];	}	
+
+	void SetX(T nx)			{	val[0] = nx;	}
+	void SetY(T ny)			{	val[1] = ny;	}	
+
+public:
+	T val[2];
+};
+
+template <class T> inline T Dot(const Vector2<T>& a, const Vector2<T>& b)					// a . b
+{
+	return sqrt(a.val[0]*b.val[0] + a.val[1]*b.val[1]);
+}
+template <class T> inline T Cross(const Vector2<T>& a, const Vector2<T>& b)					// a x b
+{
+	return a.val[0]*b.val[1] - a.val[1]*b.val[0];
+}
+template <class T> inline T NormSquared(const Vector2<T>& v)								// |v|^2
+{
+	return v.val[0]*v.val[0] + v.val[1]*v.val[1];
+}
+template <class T> inline T Norm(const Vector2<T>& v)										// |v|
+{
+	return sqrt(v.val[0]*v.val[0] + v.val[1]*v.val[1]);
+}
+template <class T> inline Vector2<T> Normalize(Vector2<T>& v)								// v / |v|
+{
+	double n = Norm(v);
+	v.val[0] /= n; v.val[1] /= n;
+	return v;
+}
+
+template <class T> inline Vector2<T> Add(const Vector2<T>& a, const Vector2<T>& b)			// a + b
+{
+	return Vector2<T>(a.val[0] + b.val[0], a.val[1] + b.val[1]);
+}
+template <class T> inline Vector2<T> Add(const Vector2<T>& a, const T& k)					// a + k
+{
+	return Vector2<T>(a.val[0] + k, a.val[1] + k);
+}
+template <class T> inline Vector2<T> Add(const T& k, const Vector2<T>& a)					// k + a
+{
+	return Vector2<T>(a.val[0] + k, a.val[1] + k);
+}
+template <class T> inline Vector2<T> Sub(const Vector2<T>& a, const Vector2<T>& b)			// a - b
+{
+	return Vector2<T>(a.val[0] - b.val[0], a.val[1] - b.val[1]);
+}
+template <class T> inline Vector2<T> Sub(const Vector2<T>& a, const T& k)					// a - k
+{
+	return Vector2<T>(a.val[0] - k, a.val[1] - k);
+}
+template <class T> inline Vector2<T> Sub(const T& k, const Vector2<T>& a)					// k - a
+{
+	return Vector2<T>(k - a.val[0], k - a.val[1]);
+}
+template <class T> inline Vector2<T> Mul(const Vector2<T>& a, const Vector2<T>& b)			// a * b (element-wise)
+{
+	return Vector2<T>(a.val[0] * b.val[0], a.val[1] * b.val[1]);
+}
+template <class T> inline Vector2<T> Mul(const Vector2<T>& a, const T& k)					// a * k
+{
+	return Vector2<T>(a.val[0] * k, a.val[1] * k);
+}
+template <class T> inline Vector2<T> Mul(const T& k, const Vector2<T>& a)					// k * a
+{
+	return Vector2<T>(a.val[0] * k, a.val[1] * k);
+}
+template <class T> inline Vector2<T> Div(const Vector2<T>& a, const Vector2<T>& b)			// a / b (element-wise)
+{
+	return Vector2<T>(a.val[0] / b.val[0], a.val[1] / b.val[1]);
+}
+template <class T> inline Vector2<T> Div(const Vector2<T>& a, const T& k)					// a / k
+{
+	return Vector2<T>(a.val[0] / k, a.val[1] / k);
+}
+template <class T> inline Vector2<T> Div(const T& k, const Vector2<T>& a)					// (k / a_x, k / a_y)
+{
+	return Vector2<T>(k / a.val[0], k / a.val[1]);
+}
+
+template <class T> inline Vector2<T> operator+(const Vector2<T>& a, const Vector2<T>& b)	// binary addition operator
+{
+	return Vector2<T>(a.val[0] + b.val[0], a.val[1] + b.val[1]);
+}
+template <class T> inline Vector2<T> operator+(const Vector2<T>& a, const T& k)				// binary scalar addition operator
+{
+	return Vector2<T>(a.val[0] + k, a.val[1] + k);
+}
+template <class T> inline Vector2<T> operator+(const T& k, const Vector2<T>& a)				// binary scalar addition operator
+{
+	return Vector2<T>(a.val[0] + k, a.val[1] + k);
+}
+template <class T> inline Vector2<T> operator-(const Vector2<T>& a, const Vector2<T>& b)	// binary subtraction operator
+{
+	return Vector2<T>(a.val[0] - b.val[0], a.val[1] - b.val[1]);
+}
+template <class T> inline Vector2<T> operator-(const Vector2<T>& a, const T& k)				// binary scalar subtraction operator
+{
+	return Vector2<T>(a.val[0] - k, a.val[1] - k);
+}
+template <class T> inline Vector2<T> operator-(const T& k, const Vector2<T>& a)				// binary scalar subtraction operator
+{
+	return Vector2<T>(k - a.val[0], k - a.val[1]);
+}
+template <class T> inline Vector2<T> operator*(const Vector2<T>& a, const Vector2<T>& b)	// binary multiplication operator (element-wise)
+{
+	return Vector2<T>(a.val[0] * b.val[0], a.val[1] * b.val[1]);
+}
+template <class T> inline Vector2<T> operator*(const Vector2<T>& v, const T& k)				// binary scalar multiplication operator
+{
+	return Vector2<T>(a.val[0] * k, a.val[1] * k);
+}
+template <class T> inline Vector2<T> operator*(const T& k, const Vector2<T>& v)				// binary scalar multiplication operator
+{
+	return Vector2<T>(a.val[0] * k, a.val[1] * k);
+}
+template <class T> inline Vector2<T> operator/(const Vector2<T>& a, const Vector2<T>& b)	// binary division operator (element-wise)
+{
+	return Vector2<T>(a.val[0] / b.val[0], a.val[1] / b.val[1]);
+}
+template <class T> inline Vector2<T> operator/(const Vector2<T>& v, const T& k)				// binary scalar division operator
+{
+	return Vector2<T>(a.val[0] / k, a.val[1] / k);
+}
+template <class T> inline Vector2<T> operator/(const T& k, const Vector2<T>& v)				// binary scalar division operator
+{
+	return Vector2<T>(k / a.val[0], k / a.val[1]);
 }
 
 
