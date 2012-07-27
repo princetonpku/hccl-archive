@@ -896,7 +896,7 @@ public:
 	}
 	template <class T> friend std::ostream& operator<<(std::ostream& os, const Quaternion<T>& q)
 	{
-		os << "(" << q.val[0] << ", " << q.val[1] << ", " << q.val[2] << q.val[3] <<")";
+		os << "(" << q.val[0] << ", " << q.val[1] << ", " << q.val[2] << ", " << q.val[3] <<")";
 		return os;
 	}
 
@@ -947,13 +947,10 @@ template <class T> inline Quaternion<T> Sub(const Quaternion<T>& a, const Quater
 }
 template <class T> inline Quaternion<T> Mul(const Quaternion<T>& a, const Quaternion<T>& b)			// a * b
 {
-	double qtemp[4];
-	qtemp[0] = a[0]*b[0] - a[1]*b[1] - a[2]*b[2] - a[3]*b[3];
-	qtemp[1] = a[1]*b[0] + a[0]*b[1] - a[3]*b[2] + a[2]*b[3];
-	qtemp[2] = a[2]*b[0] + a[3]*b[1] + a[0]*b[2] - a[1]*b[3];
-	qtemp[3] = a[3]*b[0] - a[2]*b[1] + a[1]*b[2] + a[0]*b[3];
-
-	return Quaternion<T>(qtemp);
+	return Quaternion<T>(a[0]*b[0] - a[1]*b[1] - a[2]*b[2] - a[3]*b[3],
+						 a[1]*b[0] + a[0]*b[1] - a[3]*b[2] + a[2]*b[3],
+						 a[2]*b[0] + a[3]*b[1] + a[0]*b[2] - a[1]*b[3],
+						 a[3]*b[0] - a[2]*b[1] + a[1]*b[2] + a[0]*b[3]);
 }
 template <class T> inline Quaternion<T> Mul(const Quaternion<T>& a, const T& k)					// a * k
 {
@@ -965,7 +962,7 @@ template <class T> inline Quaternion<T> Mul(const T& k, const Quaternion<T>& a)	
 }
 template <class T> inline Quaternion<T> Div(const Quaternion<T>& a, const Quaternion<T>& b)			// a / b
 {
-	return Mul(a. Inv(b));	
+	return Mul(a, Inv(b));	
 }
 template <class T> inline Quaternion<T> Div(const Quaternion<T>& a, const T& k)						// a / k
 {
@@ -986,13 +983,10 @@ template <class T> inline Quaternion<T> operator-(const Quaternion<T>& a, const 
 }
 template <class T> inline Quaternion<T> operator*(const Quaternion<T>& a, const Quaternion<T>& b)	// binary multiplication operator (element-wise)
 {
-	double qtemp[4];
-	qtemp[0] = a[0]*b[0] - a[1]*b[1] - a[2]*b[2] - a[3]*b[3];
-	qtemp[1] = a[1]*b[0] + a[0]*b[1] - a[3]*b[2] + a[2]*b[3];
-	qtemp[2] = a[2]*b[0] + a[3]*b[1] + a[0]*b[2] - a[1]*b[3];
-	qtemp[3] = a[3]*b[0] - a[2]*b[1] + a[1]*b[2] + a[0]*b[3];
-
-	return Quaternion<T>(qtemp);
+	return Quaternion<T>(a[0]*b[0] - a[1]*b[1] - a[2]*b[2] - a[3]*b[3],
+						 a[1]*b[0] + a[0]*b[1] - a[3]*b[2] + a[2]*b[3],
+						 a[2]*b[0] + a[3]*b[1] + a[0]*b[2] - a[1]*b[3],
+						 a[3]*b[0] - a[2]*b[1] + a[1]*b[2] + a[0]*b[3]);
 }
 template <class T> inline Quaternion<T> operator*(const Quaternion<T>& v, const T& k)				// binary scalar multiplication operator
 {
@@ -1004,7 +998,7 @@ template <class T> inline Quaternion<T> operator*(const T& k, const Quaternion<T
 }
 template <class T> inline Quaternion<T> operator/(const Quaternion<T>& a, const Quaternion<T>& b)	// binary division operator (element-wise)
 {
-	return Mul(a. Inv(b));
+	return Mul(a, Inv(b));
 }
 template <class T> inline Quaternion<T> operator/(const Quaternion<T>& v, const T& k)				// binary scalar division operator
 {
