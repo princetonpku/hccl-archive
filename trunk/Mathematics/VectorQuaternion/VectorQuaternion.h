@@ -18,15 +18,6 @@
 #define RAD2DEG 180.0/M_PI
 #endif
 
-#define Vector3d Vector3<double>
-#define Vector3f Vector3<float>
-#define Vector3i Vector3<int>
-#define Vector2d Vector2<double>			// TODO
-#define Vector2f Vector2<float>				// TODO
-#define Vector2i Vector2<int>				// TODO
-#define Quaterniond Quaternion<double>		// TODO
-#define Quaternionf Quaternion<float>		// TODO
-
 template<class T> class Vector2;
 template<class T> class Quaternion;
 
@@ -376,6 +367,9 @@ template <class T> inline Vector3<T> operator/(const T& k, const Vector3<T>& v)	
 	return Vector3<T>(k / a.val[0], k / a.val[1], k / a.val[2]);
 }
 
+typedef Vector3<int>	Vector3i;
+typedef Vector3<float>	Vector3f;
+typedef Vector3<double>	Vector3d;
 
 
 template <class T>
@@ -599,10 +593,6 @@ template <class T> inline T Dot(const Vector2<T>& a, const Vector2<T>& b)					//
 {
 	return sqrt(a.val[0]*b.val[0] + a.val[1]*b.val[1]);
 }
-template <class T> inline T Cross(const Vector2<T>& a, const Vector2<T>& b)					// a x b
-{
-	return a.val[0]*b.val[1] - a.val[1]*b.val[0];
-}
 template <class T> inline T NormSquared(const Vector2<T>& v)								// |v|^2
 {
 	return v.val[0]*v.val[0] + v.val[1]*v.val[1];
@@ -715,6 +705,318 @@ template <class T> inline Vector2<T> operator/(const T& k, const Vector2<T>& v)	
 {
 	return Vector2<T>(k / a.val[0], k / a.val[1]);
 }
+
+typedef Vector2<int>	Vector2i;
+typedef Vector2<float>	Vector2f;
+typedef Vector2<double>	Vector2d;
+
+
+
+template <class T>
+class Quaternion
+{
+	// Constructors
+public:
+	Quaternion()															// Identity quaternion (1, 0, 0, 0)
+	{
+		val[0] = 1;
+		val[1] = val[2] = val[3] = 0;
+	}
+	Quaternion(T w, T x, T y, T z)											// (w, x, y, z)
+	{
+		val[0] = w, val[1] = x;	val[2] = y;	val[3] = z;
+	}
+	Quaternion(T* wxyz)														// (wxyz[0], wxyz[1], wxyz[2], wxyz[3])
+	{
+		memcpy(val, wxyz, sizeof(T)*4);
+	}
+	Quaternion(const Quaternion<T>& v)										// copy constructor
+	{
+		memcpy(this->val, v.val, sizeof(T)*4);
+	}
+	Quaternion(const Vector3<T>& q)											// typecast constructor
+	{
+		// TODO
+	}
+	Quaternion(const Vector2<T>& q)											// typecast constructor
+	{
+		// TODO
+	}
+	~Quaternion(){}
+
+// 	// Conversion ==> TODO
+// public:
+// 	Quaterniond FromAxisAngle(const double rad, const double axis_x, const double axis_y, const double axis_z);
+// 	Quaterniond FromMatrix(const double* R);
+// 	Quaterniond FromMatrix(const double R[3][3]);
+// 	Quaterniond FromEulerAngle(const double a, const double b, const double c, const char* order);
+// 
+// 	static Quaterniond Log(const Quaterniond& q);
+// 	Quaterniond Log(void);
+// 	static Quaterniond Exp(const Quaterniond& a);
+// 	Quaterniond Exp(void);
+
+	// Methods (Algebra)
+public:
+	T NormSquared() const												// |this|^2
+	{
+		return this->val[0]*this->val[0] + this->val[1]*this->val[1] + this->val[2]*this->val[2] + this->val[3]*this->val[3];
+	}
+	T Norm() const														// |this|
+	{
+		return sqrt(this->val[0]*this->val[0] + this->val[1]*this->val[1] + this->val[2]*this->val[2] + this->val[3]*this->val[3]);
+	}
+	Quaternion<T> Normalize(void)											// this /= |this|
+	{
+		double n = this->Norm();
+		this->val[0] /= n; this->val[1] /= n; this->val[2] /= n; this->val[3] /= n;
+		return *this;
+	}
+	Quaternion<T> Inv(void)													// inverse(this)
+	{
+		T n = NormSquared();
+		val[0] = val[0]/n;
+		val[1] = -val[1]/n;
+		val[2] = -val[2]/n;
+		val[3] = -val[3]/n;
+
+		return *this;
+	}
+	Quaternion<T> Add(const Quaternion<T>& q)									// this += q
+	{
+		this->val[0] += q[0];	this->val[1] += q[1];	this->val[2] += q[2];	this->val[3] += q[3];
+		return *this;
+	}
+	Quaternion<T> Sub(const Quaternion<T>& q)									// this -= q
+	{
+		this->val[0] -= q[0];	this->val[1] -= q[1];	this->val[2] -= q[2];	this->val[3] -= q[3];
+		return *this;
+	}
+	Quaternion<T> Mul(const Quaternion<T>& q)									// this *= q
+	{ 
+		double qtemp[4];
+		memcpy(qtemp, this->val, sizeof(T)*4);
+
+		val[0] = qtemp[0]*q.val[0] - qtemp[1]*q.val[1] - qtemp[2]*q.val[2] - qtemp[3]*q.val[3];
+		val[1] = qtemp[1]*q.val[0] + qtemp[0]*q.val[1] - qtemp[3]*q.val[2] + qtemp[2]*q.val[3];
+		val[2] = qtemp[2]*q.val[0] + qtemp[3]*q.val[1] + qtemp[0]*q.val[2] - qtemp[1]*q.val[3];
+		val[3] = qtemp[3]*q.val[0] - qtemp[2]*q.val[1] + qtemp[1]*q.val[2] + qtemp[0]*q.val[3];
+
+		return *this;
+	}
+	Quaternion<T> Mul(const T& k)											// this *= k
+	{
+		this->val[0] *= k;	this->val[1] *= k;	this->val[2] *= k;	this->val[3] *= k;
+		return *this;
+	}
+	Quaternion<T> Div(const Quaternion<T>& q)								// this /= q
+	{		
+		return Mul(q.Inv());
+	}
+	Quaternion<T> Div(const T& k)											// this /= k
+	{
+		this->val[0] /= k;	this->val[1] /= k;	this->val[2] /= k;	this->val[3] /= k;
+		return *this;
+	}
+
+	// Operators
+public:
+	Quaternion<T> operator=(const Quaternion<T>& q)							// assign operator
+	{
+		memcpy(this->val, q.val, sizeof(double)*4);
+	}
+
+	bool operator==(const Quaternion<T>& q) const							// compare operator
+	{
+		return (this->val[0] == q.val[0] && this->val[1] == q.val[1] && this->val[2] == q.val[2] && this->val[3] == q.val[3]);
+	}
+	bool operator!=(const Quaternion<T>& q) const							// negative compare operator
+	{	
+		return (this->val[0] != q.val[0] || this->val[1] != q.val[1] || this->val[2] != q.val[2] || this->val[3] != q.val[3]);
+	}
+
+	Quaternion<T> operator+=(const Quaternion<T>& q)							// unary addition operator
+	{
+		this->val[0] += q[0];	this->val[1] += q[1];	this->val[2] += q[2];	this->val[3] += q[3];
+		return *this;
+	}
+	Quaternion<T> operator-=(const Quaternion<T>& q)							// unary subtraction operator
+	{
+		this->val[0] -= q[0];	this->val[1] -= q[1];	this->val[2] -= q[2];	this->val[3] -= q[3];
+		return *this;
+	}
+	Quaternion<T> operator*=(const Quaternion<T>& q)							// unary multiplication operator (element-wise)
+	{
+		double qtemp[4];
+		memcpy(qtemp, this->val, sizeof(T)*4);
+
+		val[0] = qtemp[0]*q.val[0] - qtemp[1]*q.val[1] - qtemp[2]*q.val[2] - qtemp[3]*q.val[3];
+		val[1] = qtemp[1]*q.val[0] + qtemp[0]*q.val[1] - qtemp[3]*q.val[2] + qtemp[2]*q.val[3];
+		val[2] = qtemp[2]*q.val[0] + qtemp[3]*q.val[1] + qtemp[0]*q.val[2] - qtemp[1]*q.val[3];
+		val[3] = qtemp[3]*q.val[0] - qtemp[2]*q.val[1] + qtemp[1]*q.val[2] + qtemp[0]*q.val[3];
+
+		return *this;
+	}
+	Quaternion<T> operator*=(const T& k)									// unary scalar multiplication operator
+	{
+		this->val[0] *= k;	this->val[1] *= k;	this->val[2] *= k;	this->val[3] *= k;
+		return *this;
+	}
+	Quaternion<T> operator/=(const Quaternion<T>& q)							// unary division operator (element-wise)
+	{
+		return Mul(q.Inv());
+	}
+	Quaternion<T> operator/=(const T& k)									// unary scalar division operator
+	{
+		this->val[0] /= k;	this->val[1] /= k;	this->val[2] /= k;	this->val[3] /= k;
+		return *this;
+	}
+
+	Quaternion<T> operator-() const										// unary negation operator
+	{
+		return Quaternion<T>(-this->val[0], -this->val[1], -this->val[2], -this->val[3]);
+	}
+
+
+	// Methods (Auxiliary)
+	template <class T> friend std::istream& operator>>(std::istream& is, Quaternion<T>& q)
+	{
+		char str[1024];
+		char* tok;
+		is >> str;
+		tok = strtok(str, " ,()<>[]|:");
+		q.val[0] = (T)atof(tok);
+		tok = strtok(NULL, " ,()<>[]|:");
+		q.val[1] = (T)atof(tok);
+		tok = strtok(NULL, " ,()<>[]|:");
+		q.val[2] = (T)atof(tok);
+		tok = strtok(NULL, " ,()<>[]|:");
+		q.val[3] = (T)atof(tok);
+		return is;
+	}
+	template <class T> friend std::ostream& operator<<(std::ostream& os, const Quaternion<T>& q)
+	{
+		os << "(" << q.val[0] << ", " << q.val[1] << ", " << q.val[2] << q.val[3] <<")";
+		return os;
+	}
+
+	// Accessors
+public:
+	T& operator[](int i)	{	return val[i];	}
+	T W() const				{	return val[0];	}
+	T X() const				{	return val[1];	}
+	T Y() const				{	return val[2];	}
+	T Z() const				{	return val[3];	}
+
+	void SetW(T nw)			{	val[0] = nw;	}
+	void SetX(T nx)			{	val[1] = nx;	}
+	void SetY(T ny)			{	val[2] = ny;	}
+	void SetZ(T nz)			{	val[3] = nz;	}
+
+public:
+	T val[4];
+};
+
+template <class T> inline T NormSquared(const Quaternion<T>& q)								// |q|^2
+{
+	return q.val[0]*q.val[0] + q.val[1]*q.val[1] + q.val[2]*q.val[2] + q.val[3]*q.val[3];
+}
+template <class T> inline T Norm(const Quaternion<T>& q)										// |q|
+{
+	return sqrt(q.val[0]*q.val[0] + q.val[1]*q.val[1] + q.val[2]*q.val[2] + q.val[3]*q.val[3]);
+}
+template <class T> inline Quaternion<T> Normalize(Quaternion<T>& q)								// v / |v|
+{
+	T n = Norm(q);
+	q.val[0] /= n; q.val[1] /= n; q.val[2] /= n; q.val[3] /= n;
+	return q;
+}
+template <class T> inline Quaternion<T> Inv(const Quaternion<T>& q)								// inverse(this)
+{
+	T n = NormSquared(q);
+	return Quaternion<T>(val[0]/n, -val[1]/n, -val[2]/n, -val[3]/n);
+}
+
+template <class T> inline Quaternion<T> Add(const Quaternion<T>& a, const Quaternion<T>& b)			// a + b
+{
+	return Quaternion<T>(a.val[0] + b.val[0], a.val[1] + b.val[1], a.val[2] + b.val[2], a.val[3] + b.val[3]);
+}
+template <class T> inline Quaternion<T> Sub(const Quaternion<T>& a, const Quaternion<T>& b)			// a - b
+{
+	return Quaternion<T>(a.val[0] - b.val[0], a.val[1] - b.val[1], a.val[2] - b.val[2], a.val[3] - b.val[3]);
+}
+template <class T> inline Quaternion<T> Mul(const Quaternion<T>& a, const Quaternion<T>& b)			// a * b
+{
+	double qtemp[4];
+	qtemp[0] = a[0]*b[0] - a[1]*b[1] - a[2]*b[2] - a[3]*b[3];
+	qtemp[1] = a[1]*b[0] + a[0]*b[1] - a[3]*b[2] + a[2]*b[3];
+	qtemp[2] = a[2]*b[0] + a[3]*b[1] + a[0]*b[2] - a[1]*b[3];
+	qtemp[3] = a[3]*b[0] - a[2]*b[1] + a[1]*b[2] + a[0]*b[3];
+
+	return Quaternion<T>(qtemp);
+}
+template <class T> inline Quaternion<T> Mul(const Quaternion<T>& a, const T& k)					// a * k
+{
+	return Quaternion<T>(a.val[0] * k, a.val[1] * k, a.val[2] * k, a.val[3] * k);
+}
+template <class T> inline Quaternion<T> Mul(const T& k, const Quaternion<T>& a)					// k * a
+{
+	return Quaternion<T>(a.val[0] * k, a.val[1] * k, a.val[2] * k, a.val[3] * k);
+}
+template <class T> inline Quaternion<T> Div(const Quaternion<T>& a, const Quaternion<T>& b)			// a / b
+{
+	return Mul(a. Inv(b));	
+}
+template <class T> inline Quaternion<T> Div(const Quaternion<T>& a, const T& k)						// a / k
+{
+	return Quaternion<T>(a.val[0] / k, a.val[1] / k, a.val[2] / k, a.val[3] / k);
+}
+template <class T> inline Quaternion<T> Div(const T& k, const Quaternion<T>& a)					// (k / a_w, k / a_x, k / a_y, k / a_z)
+{
+	return Quaternion<T>(k / a.val[0], k / a.val[1], k / a.val[2], k / a.val[3]);
+}
+
+template <class T> inline Quaternion<T> operator+(const Quaternion<T>& a, const Quaternion<T>& b)	// binary addition operator
+{
+	return Quaternion<T>(a.val[0] + b.val[0], a.val[1] + b.val[1], a.val[2] + b.val[2], a.val[3] + b.val[3]);
+}
+template <class T> inline Quaternion<T> operator-(const Quaternion<T>& a, const Quaternion<T>& b)	// binary subtraction operator
+{
+	return Quaternion<T>(a.val[0] - b.val[0], a.val[1] - b.val[1], a.val[2] - b.val[2], a.val[3] - b.val[3]);
+}
+template <class T> inline Quaternion<T> operator*(const Quaternion<T>& a, const Quaternion<T>& b)	// binary multiplication operator (element-wise)
+{
+	double qtemp[4];
+	qtemp[0] = a[0]*b[0] - a[1]*b[1] - a[2]*b[2] - a[3]*b[3];
+	qtemp[1] = a[1]*b[0] + a[0]*b[1] - a[3]*b[2] + a[2]*b[3];
+	qtemp[2] = a[2]*b[0] + a[3]*b[1] + a[0]*b[2] - a[1]*b[3];
+	qtemp[3] = a[3]*b[0] - a[2]*b[1] + a[1]*b[2] + a[0]*b[3];
+
+	return Quaternion<T>(qtemp);
+}
+template <class T> inline Quaternion<T> operator*(const Quaternion<T>& v, const T& k)				// binary scalar multiplication operator
+{
+	return Quaternion<T>(a.val[0] * k, a.val[1] * k, a.val[2] * k, a.val[3] * k);
+}
+template <class T> inline Quaternion<T> operator*(const T& k, const Quaternion<T>& v)				// binary scalar multiplication operator
+{
+	return Quaternion<T>(a.val[0] * k, a.val[1] * k, a.val[2] * k, a.val[3] * k);
+}
+template <class T> inline Quaternion<T> operator/(const Quaternion<T>& a, const Quaternion<T>& b)	// binary division operator (element-wise)
+{
+	return Mul(a. Inv(b));
+}
+template <class T> inline Quaternion<T> operator/(const Quaternion<T>& v, const T& k)				// binary scalar division operator
+{
+	return Quaternion<T>(a.val[0] / k, a.val[1] / k, a.val[2] / k, a.val[3] / k);
+}
+template <class T> inline Quaternion<T> operator/(const T& k, const Quaternion<T>& v)				// binary scalar division operator
+{
+	return Quaternion<T>(k / a.val[0], k / a.val[1], k / a.val[2], k / a.val[3]);
+}
+
+typedef Quaternion<double>	Quaterniond;
+typedef Quaternion<float>	Quaternionf;
 
 
 #endif // HCCL_VECTORQUATERNION_H_
