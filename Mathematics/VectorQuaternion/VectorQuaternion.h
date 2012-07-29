@@ -24,7 +24,7 @@ template<class T> class Quaternion;
 template <class T>
 class Vector3
 {
-// Constructors
+	// Constructors
 public:
 	Vector3()															// zero vector
 	{
@@ -48,7 +48,7 @@ public:
 	}
 	~Vector3(){}
 
-// Methods (Algebra)
+	// Methods (Algebra)
 public:
 	T Dot(const Vector3<T>& v) const									// this . v
 	{
@@ -116,11 +116,12 @@ public:
 		return *this;
 	}
 
-// Operators
+	// Operators
 public:
 	Vector3<T> operator=(const Vector3<T>& v)							// assign operator
 	{
 		memcpy(this->val, v.val, sizeof(T)*3);
+		return *this;
 	}
 
 	bool operator==(const Vector3<T>& v) const							// compare operator
@@ -180,7 +181,7 @@ public:
 
 
 
-// Methods (Geometry)
+	// Methods (Geometry)
 public:
 	Vector3<T> Rotate(const T rad, const Vector3<T>& axis)				// rotate this vector by given angle(rad) along the axis(must be unit)
 	{
@@ -209,7 +210,7 @@ public:
 	}
 
 
-// Methods (Auxiliary)
+	// Methods (Auxiliary)
 	template <class T> friend std::istream& operator>>(std::istream& is, Vector3<T>& v)
 	{
 		char str[1024];
@@ -229,9 +230,10 @@ public:
 		return os;
 	}
 
-// Accessors
+	// Accessors
 public:
 	T& operator[](int i)	{	return val[i];	}
+	const T& operator[](int i) const	{	return val[i];	}
 	T X() const				{	return val[0];	}
 	T Y() const				{	return val[1];	}
 	T Z() const				{	return val[2];	}
@@ -348,11 +350,11 @@ template <class T> inline Vector3<T> operator*(const Vector3<T>& a, const Vector
 }
 template <class T> inline Vector3<T> operator*(const Vector3<T>& v, const T& k)				// binary scalar multiplication operator
 {
-	return Vector3<T>(a.val[0] * k, a.val[1] * k, a.val[2] * k);
+	return Vector3<T>(v.val[0] * k, v.val[1] * k, v.val[2] * k);
 }
 template <class T> inline Vector3<T> operator*(const T& k, const Vector3<T>& v)				// binary scalar multiplication operator
 {
-	return Vector3<T>(a.val[0] * k, a.val[1] * k, a.val[2] * k);
+	return Vector3<T>(v.val[0] * k, v.val[1] * k, v.val[2] * k);
 }
 template <class T> inline Vector3<T> operator/(const Vector3<T>& a, const Vector3<T>& b)	// binary division operator (element-wise)
 {
@@ -360,11 +362,11 @@ template <class T> inline Vector3<T> operator/(const Vector3<T>& a, const Vector
 }
 template <class T> inline Vector3<T> operator/(const Vector3<T>& v, const T& k)				// binary scalar division operator
 {
-	return Vector3<T>(a.val[0] / k, a.val[1] / k, a.val[2] / k);
+	return Vector3<T>(v.val[0] / k, v.val[1] / k, v.val[2] / k);
 }
 template <class T> inline Vector3<T> operator/(const T& k, const Vector3<T>& v)				// binary scalar division operator
 {
-	return Vector3<T>(k / a.val[0], k / a.val[1], k / a.val[2]);
+	return Vector3<T>(k / v.val[0], k / v.val[1], k / v.val[2]);
 }
 
 typedef Vector3<int>	Vector3i;
@@ -579,6 +581,7 @@ public:
 	// Accessors
 public:
 	T& operator[](int i)	{	return val[i];	}
+	const T& operator[](int i) const	{	return val[i];	}
 	T X() const				{	return val[0];	}
 	T Y() const				{	return val[1];	}	
 
@@ -745,7 +748,7 @@ public:
 		}		
 		else
 		{
- 			T sm = sin(axis[0]*0.5)/m;
+			T sm = sin(axis[0]*0.5)/m;
 			val[0] = cos(axis[0]*0.5);
 			val[1] = axis[1]*sm;
 			val[2] = axis[2]*sm;
@@ -851,7 +854,7 @@ public:
 public:
 	Quaternion<T> FromAxisAngle(const T rad, const T axis_x, const T axis_y, const T axis_z)
 	{
-		T m = Norm(axis);
+		T m = sqrt(axis_x*axis_x + axis_y*axis_y + axis_z*axis_z);
 
 		if(m == 0) // identity
 		{
@@ -860,11 +863,11 @@ public:
 		}		
 		else
 		{
-			T sm = sin(axis[0]*0.5)/m;
-			val[0] = cos(axis[0]*0.5);
-			val[1] = axis[1]*sm;
-			val[2] = axis[2]*sm;
-			val[3] = axis[3]*sm;
+			T sm = sin(rad*0.5)/m;
+			val[0] = cos(rad*0.5);
+			val[1] = axis_x*sm;
+			val[2] = axis_y*sm;
+			val[3] = axis_z*sm;
 
 			Normalize();				// Do I have to normalize q here?
 		}
@@ -914,40 +917,39 @@ public:
 	}
 	Quaternion<T> FromMatrix(const T R[3][3])
 	{
-		T Rtemp[9] = {R[0][0], R[1][0], R[2][0], R[0][1], R[1][1], R[2][1], R[0][2], R[1][2], R[2][2]};
-		T tr = Rtemp[0] + Rtemp[4] + Rtemp[8];
+		T tr = R[0][0] + R[1][1] + R[2][2];
 		if( tr > 0 )
 		{
 			T s = 0.5 / sqrt(tr + 1.0);
 			val[0] = 0.25 / s;
-			val[1] = ( Rtemp[5] - Rtemp[7] ) * s;			// (R21 - R12)*s
-			val[2] = ( Rtemp[6] - Rtemp[2] ) * s;			// (R02 - R20)*s
-			val[3] = ( Rtemp[1] - Rtemp[3] ) * s;			// (R10 - R01)*s
+			val[1] = ( R[2][1] - R[1][2] ) * s;			// (R21 - R12)*s
+			val[2] = ( R[0][2] - R[2][0] ) * s;			// (R02 - R20)*s
+			val[3] = ( R[1][0] - R[0][1] ) * s;			// (R10 - R01)*s
 		}
 		else
 		{
-			if( Rtemp[0] > Rtemp[4] && Rtemp[0] > Rtemp[8] )	// R00 > R11 && R00 > R22
+			if( R[0][0] > R[1][1] && R[0][0] > R[2][2] )	// R00 > R11 && R00 > R22
 			{
-				T s = 0.5 / sqrt(1.0 + Rtemp[0] - Rtemp[4] - Rtemp[8]);
-				val[0] = ( Rtemp[5] - Rtemp[7] ) * s;		// (R21 - R12)*s
+				T s = 0.5 / sqrt(1.0 + R[0][0] - R[1][1] - R[2][2]);
+				val[0] = ( R[2][1] - R[1][2] ) * s;		// (R21 - R12)*s
 				val[1] = 0.25 / s;
-				val[2] = ( Rtemp[3] + Rtemp[1] ) * s;		// (R01 + R10)*s
-				val[3] = ( Rtemp[6] + Rtemp[2] ) * s;		// (R02 + R20)*s
+				val[2] = ( R[0][1] + R[1][0] ) * s;		// (R01 + R10)*s
+				val[3] = ( R[0][2] + R[2][0] ) * s;		// (R02 + R20)*s
 			}
-			else if (Rtemp[4] > Rtemp[8])
+			else if (R[1][1] > R[2][2])
 			{
-				T s = 0.5 / sqrt(1.0 + Rtemp[4] - Rtemp[0] - Rtemp[8]);
-				val[0] = ( Rtemp[6] - Rtemp[2] ) * s;		// (R02 - R20)*s
-				val[1] = ( Rtemp[3] + Rtemp[1] ) * s;		// (R01 + R10)*s
+				T s = 0.5 / sqrt(1.0 + R[1][1] - R[0][0] - R[2][2]);
+				val[0] = ( R[0][2] - R[2][0] ) * s;		// (R02 - R20)*s
+				val[1] = ( R[0][1] + R[1][0] ) * s;		// (R01 + R10)*s
 				val[2] = 0.25 / s;
-				val[3] = ( Rtemp[7] + Rtemp[5] ) * s;		// (R12 + R21)*s
+				val[3] = ( R[1][2] + R[2][1] ) * s;		// (R12 + R21)*s
 			}
 			else
 			{
-				T s = 0.5 / sqrt(1.0 + Rtemp[8] - Rtemp[0] - Rtemp[4]);
-				val[0] = ( Rtemp[1] - Rtemp[3] ) * s;		// (R10 - R01)*s
-				val[1] = ( Rtemp[6] + Rtemp[2] ) * s;		// (R02 + R20)*s
-				val[2] = ( Rtemp[7] + Rtemp[5] ) * s;		// (R12 + R21)*s
+				T s = 0.5 / sqrt(1.0 + R[2][2] - R[0][0] - R[1][1]);
+				val[0] = ( R[1][0] - R[0][1] ) * s;		// (R10 - R01)*s
+				val[1] = ( R[0][2] + R[2][0] ) * s;		// (R02 + R20)*s
+				val[2] = ( R[1][2] + R[2][1] ) * s;		// (R12 + R21)*s
 				val[3] = 0.25f / s;
 			}
 		}
@@ -1038,6 +1040,7 @@ public:
 	Quaternion<T> operator=(const Quaternion<T>& q)							// assign operator
 	{
 		memcpy(this->val, q.val, sizeof(T)*4);
+		return *this;
 	}
 
 	bool operator==(const Quaternion<T>& q) const							// compare operator
@@ -1076,7 +1079,7 @@ public:
 		this->val[0] *= k;	this->val[1] *= k;	this->val[2] *= k;	this->val[3] *= k;
 		return *this;
 	}
-	Quaternion<T> operator/=(const Quaternion<T>& q)							// unary division operator (element-wise)
+	Quaternion<T> operator/=(const Quaternion<T>& q)						// unary division operator (element-wise)
 	{
 		return Mul(q.Inv());
 	}
@@ -1086,9 +1089,15 @@ public:
 		return *this;
 	}
 
-	Quaternion<T> operator-() const										// unary negation operator
+	Quaternion<T> operator-() const											// unary negation operator
 	{
 		return Quaternion<T>(-this->val[0], -this->val[1], -this->val[2], -this->val[3]);
+	}
+
+	Quaternion<T> operator!() const											// unary inversion operator
+	{
+		T n = this->Norm();
+		return Quaternion<T>(this->val[0]/n, -this->val[1]/n, -this->val[2]/n, -this->val[3]/n);
 	}
 
 
@@ -1117,6 +1126,7 @@ public:
 	// Accessors
 public:
 	T& operator[](int i)	{	return val[i];	}
+	const T& operator[](int i) const	{	return val[i];	}
 	T W() const				{	return val[0];	}
 	T X() const				{	return val[1];	}
 	T Y() const				{	return val[2];	}
@@ -1162,9 +1172,9 @@ template <class T> inline Quaternion<T> Sub(const Quaternion<T>& a, const Quater
 template <class T> inline Quaternion<T> Mul(const Quaternion<T>& a, const Quaternion<T>& b)			// a * b
 {
 	return Quaternion<T>(a[0]*b[0] - a[1]*b[1] - a[2]*b[2] - a[3]*b[3],
-						 a[1]*b[0] + a[0]*b[1] - a[3]*b[2] + a[2]*b[3],
-						 a[2]*b[0] + a[3]*b[1] + a[0]*b[2] - a[1]*b[3],
-						 a[3]*b[0] - a[2]*b[1] + a[1]*b[2] + a[0]*b[3]);
+		a[1]*b[0] + a[0]*b[1] - a[3]*b[2] + a[2]*b[3],
+		a[2]*b[0] + a[3]*b[1] + a[0]*b[2] - a[1]*b[3],
+		a[3]*b[0] - a[2]*b[1] + a[1]*b[2] + a[0]*b[3]);
 }
 template <class T> inline Quaternion<T> Mul(const Quaternion<T>& q, const T& k)					// a * k
 {
@@ -1198,9 +1208,9 @@ template <class T> inline Quaternion<T> operator-(const Quaternion<T>& a, const 
 template <class T> inline Quaternion<T> operator*(const Quaternion<T>& a, const Quaternion<T>& b)	// binary multiplication operator (element-wise)
 {
 	return Quaternion<T>(a[0]*b[0] - a[1]*b[1] - a[2]*b[2] - a[3]*b[3],
-						 a[1]*b[0] + a[0]*b[1] - a[3]*b[2] + a[2]*b[3],
-						 a[2]*b[0] + a[3]*b[1] + a[0]*b[2] - a[1]*b[3],
-						 a[3]*b[0] - a[2]*b[1] + a[1]*b[2] + a[0]*b[3]);
+		a[1]*b[0] + a[0]*b[1] - a[3]*b[2] + a[2]*b[3],
+		a[2]*b[0] + a[3]*b[1] + a[0]*b[2] - a[1]*b[3],
+		a[3]*b[0] - a[2]*b[1] + a[1]*b[2] + a[0]*b[3]);
 }
 template <class T> inline Quaternion<T> operator*(const Quaternion<T>& q, const T& k)				// binary scalar multiplication operator
 {
@@ -1221,6 +1231,117 @@ template <class T> inline Quaternion<T> operator/(const Quaternion<T>& q, const 
 template <class T> inline Quaternion<T> operator/(const T& k, const Quaternion<T>& q)				// binary scalar division operator
 {
 	return Quaternion<T>(k / q.val[0], k / q.val[1], k / q.val[2], k / q.val[3]);
+}
+
+template <class T> inline Quaternion<T> QuaternionFromAxisAngle(const T rad, const T axis_x, const T axis_y, const T axis_z)
+{
+	Quaternion<T> temp;
+	T m = sqrt(axis_x*axis_x + axis_y*axis_y + axis_z*axis_z);
+
+	if(m == 0) // identity
+	{
+		temp.val[0] = 1;
+		temp.val[1] = temp.val[2] = temp.val[3] = 0;
+	}		
+	else
+	{
+		T sm = sin(rad*0.5)/m;
+		temp.val[0] = cos(rad*0.5);
+		temp.val[1] = axis_x*sm;
+		temp.val[2] = axis_y*sm;
+		temp.val[3] = axis_z*sm;
+
+		temp.Normalize();				// Do I have to normalize q here?
+	}
+	return temp;
+}
+template <class T> inline Quaternion<T> QuaternionFromMatrix(const T* R)
+{
+	Quaternion<T> temp;
+	T tr = R[0] + R[4] + R[8];
+	if( tr > 0 )
+	{
+		T s = 0.5 / sqrt(tr + 1.0);
+		temp.val[0] = 0.25 / s;
+		temp.val[1] = ( R[5] - R[7] ) * s;			// (R21 - R12)*s
+		temp.val[2] = ( R[6] - R[2] ) * s;			// (R02 - R20)*s
+		temp.val[3] = ( R[1] - R[3] ) * s;			// (R10 - R01)*s
+	}
+	else
+	{
+		if( R[0] > R[4] && R[0] > R[8] )	// R00 > R11 && R00 > R22
+		{
+			T s = 0.5 / sqrt(1.0 + R[0] - R[4] - R[8]);
+			temp.val[0] = ( R[5] - R[7] ) * s;		// (R21 - R12)*s
+			temp.val[1] = 0.25 / s;
+			temp.val[2] = ( R[3] + R[1] ) * s;		// (R01 + R10)*s
+			temp.val[3] = ( R[6] + R[2] ) * s;		// (R02 + R20)*s
+		}
+		else if (R[4] > R[8])
+		{
+			T s = 0.5 / sqrt(1.0 + R[4] - R[0] - R[8]);
+			temp.val[0] = ( R[6] - R[2] ) * s;		// (R02 - R20)*s
+			temp.val[1] = ( R[3] + R[1] ) * s;		// (R01 + R10)*s
+			temp.val[2] = 0.25 / s;
+			temp.val[3] = ( R[7] + R[5] ) * s;		// (R12 + R21)*s
+		}
+		else
+		{
+			T s = 0.5 / sqrt(1.0 + R[8] - R[0] - R[4]);
+			temp.val[0] = ( R[1] - R[3] ) * s;		// (R10 - R01)*s
+			temp.val[1] = ( R[6] + R[2] ) * s;		// (R02 + R20)*s
+			temp.val[2] = ( R[7] + R[5] ) * s;		// (R12 + R21)*s
+			temp.val[3] = 0.25f / s;
+		}
+	}
+	return temp;
+}
+template <class T> inline Quaternion<T> QuaternionFromMatrix(const T R[3][3])
+{
+	Quaternion<T> temp;
+	T tr = R[0][0] + R[1][1] + R[2][2];
+	if( tr > 0 )
+	{
+		T s = 0.5 / sqrt(tr + 1.0);
+		temp.val[0] = 0.25 / s;
+		temp.val[1] = ( R[2][1] - R[1][2] ) * s;			// (R21 - R12)*s
+		temp.val[2] = ( R[0][2] - R[2][0] ) * s;			// (R02 - R20)*s
+		temp.val[3] = ( R[1][0] - R[0][1] ) * s;			// (R10 - R01)*s
+	}
+	else
+	{
+		if( R[0][0] > R[1][1] && R[0][0] > R[2][2] )	// R00 > R11 && R00 > R22
+		{
+			T s = 0.5 / sqrt(1.0 + R[0][0] - R[1][1] - R[2][2]);
+			temp.val[0] = ( R[2][1] - R[1][2] ) * s;		// (R21 - R12)*s
+			temp.val[1] = 0.25 / s;
+			temp.val[2] = ( R[0][1] + R[1][0] ) * s;		// (R01 + R10)*s
+			temp.val[3] = ( R[0][2] + R[2][0] ) * s;		// (R02 + R20)*s
+		}
+		else if (R[1][1] > R[2][2])
+		{
+			T s = 0.5 / sqrt(1.0 + R[1][1] - R[0][0] - R[2][2]);
+			temp.val[0] = ( R[0][2] - R[2][0] ) * s;		// (R02 - R20)*s
+			temp.val[1] = ( R[0][1] + R[1][0] ) * s;		// (R01 + R10)*s
+			temp.val[2] = 0.25 / s;
+			temp.val[3] = ( R[1][2] + R[2][1] ) * s;		// (R12 + R21)*s
+		}
+		else
+		{
+			T s = 0.5 / sqrt(1.0 + R[2][2] - R[0][0] - R[1][1]);
+			temp.val[0] = ( R[1][0] - R[0][1] ) * s;		// (R10 - R01)*s
+			temp.val[1] = ( R[0][2] + R[2][0] ) * s;		// (R02 + R20)*s
+			temp.val[2] = ( R[1][2] + R[2][1] ) * s;		// (R12 + R21)*s
+			temp.val[3] = 0.25f / s;
+		}
+	}
+	return temp;
+}
+template <class T> inline Quaternion<T> QuaternionFromEulerAngle(const T a, const T b, const T c, const char* order)
+{
+	Quaternion<T> temp;
+	//TODO
+	return temp;
 }
 
 template <class T> inline Quaternion<T> Log(const Quaternion<T>& q)
