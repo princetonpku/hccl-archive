@@ -24,7 +24,7 @@ template<class T> class Quaternion;
 template <class T>
 class Vector3
 {
-	// Constructors
+// Constructors
 public:
 	Vector3()															// zero vector
 	{
@@ -48,7 +48,7 @@ public:
 	}
 	~Vector3(){}
 
-	// Methods (Algebra)
+// Methods (Algebra)
 public:
 	T Dot(const Vector3<T>& v) const									// this . v
 	{
@@ -116,7 +116,7 @@ public:
 		return *this;
 	}
 
-	// Operators
+// Operators
 public:
 	Vector3<T> operator=(const Vector3<T>& v)							// assign operator
 	{
@@ -181,7 +181,7 @@ public:
 
 
 
-	// Methods (Geometry)
+// Methods (Geometry)
 public:
 	Vector3<T> Rotate(const T rad, const Vector3<T>& axis)				// rotate this vector by given angle(rad) along the axis(must be unit)
 	{
@@ -210,7 +210,8 @@ public:
 	}
 
 
-	// Methods (Auxiliary)
+// Methods (Auxiliary)
+public:
 	template <class T> friend std::istream& operator>>(std::istream& is, Vector3<T>& v)
 	{
 		char str[1024];
@@ -230,7 +231,7 @@ public:
 		return os;
 	}
 
-	// Accessors
+// Accessors
 public:
 	T& operator[](int i)	{	return val[i];	}
 	const T& operator[](int i) const	{	return val[i];	}
@@ -248,7 +249,7 @@ public:
 
 template <class T> inline T Dot(const Vector3<T>& a, const Vector3<T>& b)					// a . b
 {
-	return sqrt(a.val[0]*b.val[0] + a.val[1]*b.val[1] + a.val[2]*b.val[2]);
+	return a.val[0]*b.val[0] + a.val[1]*b.val[1] + a.val[2]*b.val[2];
 }
 template <class T> inline Vector3<T> Cross(const Vector3<T>& a, const Vector3<T>& b)		// a x b
 {
@@ -377,7 +378,7 @@ typedef Vector3<double>	Vector3d;
 template <class T>
 class Vector2
 {
-	// Constructors
+// Constructors
 public:
 	Vector2()															// zero vector
 	{
@@ -401,7 +402,7 @@ public:
 	}
 	~Vector2(){}
 
-	// Methods (Algebra)
+// Methods (Algebra)
 public:
 	T Dot(const Vector2<T>& v) const									// this . v
 	{
@@ -467,7 +468,7 @@ public:
 		return *this;
 	}
 
-	// Operators
+// Operators
 public:
 	Vector2<T> operator=(const Vector2<T>& v)							// assign operator
 	{
@@ -531,7 +532,7 @@ public:
 
 
 
-	// Methods (Geometry)
+// Methods (Geometry)
 public:
 	Vector2<T> Rotate(const T rad, const Vector2<T>& axis)				// rotate this vector by given angle(rad) along the axis(must be unit)
 	{
@@ -560,7 +561,8 @@ public:
 	}
 
 
-	// Methods (Auxiliary)
+// Methods (Auxiliary)
+public:
 	template <class T> friend std::istream& operator>>(std::istream& is, Vector2<T>& v)
 	{
 		char str[1024];
@@ -718,7 +720,7 @@ typedef Vector2<double>	Vector2d;
 template <class T>
 class Quaternion
 {
-	// Constructors
+// Constructors
 public:
 	Quaternion()															// Identity quaternion (1, 0, 0, 0)
 	{
@@ -748,7 +750,7 @@ public:
 		}		
 		else
 		{
-			T sm = sin(axis[0]*0.5)/m;
+ 			T sm = sin(axis[0]*0.5)/m;
 			val[0] = cos(axis[0]*0.5);
 			val[1] = axis[1]*sm;
 			val[2] = axis[2]*sm;
@@ -850,7 +852,7 @@ public:
 	}
 	~Quaternion(){}
 
-	// Conversion ==> TODO
+// Conversion ==> TODO
 public:
 	Quaternion<T> FromAxisAngle(const T rad, const T axis_x, const T axis_y, const T axis_z)
 	{
@@ -961,18 +963,57 @@ public:
 		//TODO
 		return *this;
 	}	
-	Quaternion<T> Log(void)
+	Quaternion<T> Log(void) const
 	{
-		//TODO
-		return *this;
+		Quaternion<T> q(*this);
+		q.Normalize();
+
+		if( q.val[0] == 0 )
+		{
+			q.val[0] = 0;
+			q.val[1] = 0.5*M_PI*q.val[1];
+			q.val[2] = 0.5*M_PI*q.val[2];
+			q.val[3] = 0.5*M_PI*q.val[3];
+		}
+		else if( q[0] == 1 )
+		{
+			q.val[0] = 0;
+			q.val[1] = 0;
+			q.val[2] = 0;
+			q.val[3] = 0;
+		}
+		else
+		{
+			T v = sqrt(q.val[1]*q.val[1] + q.val[2]*q.val[2] + q.val[3]*q.val[3]);
+			q.val[0] = 2*atan2(v, q.val[0]);
+			q.val[1] = q.val[1]/v;
+			q.val[2] = q.val[2]/v;
+			q.val[3] = q.val[3]/v;
+		}
+
+		return q;
 	}
-	Quaternion<T> Exp(void)
+	Quaternion<T> Exp(void) const
 	{
-		//TODO
-		return *this;
+		T m = val[1]*val[1] + val[2]*val[2] + val[3]*val[3];
+
+		if(m == 0)
+			return Quaternion<T>(1.0, 0.0, 0.0, 0.0);
+		else
+		{
+			Quaternion<T> q;
+			m = sqrt(m);
+			T sm = sin(val[0]*0.5)/m;
+			q.val[0] = cos(val[0]*0.5);
+			q.val[1] = val[1]*sm;
+			q.val[2] = val[2]*sm;
+			q.val[3] = val[3]*sm;
+
+			return q.Normalize();
+		}
 	}
 
-	// Methods (Algebra)
+// Methods (Algebra)
 public:
 	T NormSquared() const												// |this|^2
 	{
@@ -988,7 +1029,14 @@ public:
 		this->val[0] /= n; this->val[1] /= n; this->val[2] /= n; this->val[3] /= n;
 		return *this;
 	}
-	Quaternion<T> Inv(void)													// inverse(this)
+	Quaternion<T> SetIdentity(void)
+	{
+		val[0] = (T)1;
+		val[1] = (T)0;
+		val[2] = (T)0;
+		val[3] = (T)0;
+	}
+	Quaternion<T> Invert(void)												// inverse(this)
 	{
 		T n = NormSquared();
 		val[0] = val[0]/n;
@@ -997,6 +1045,11 @@ public:
 		val[3] = -val[3]/n;
 
 		return *this;
+	}
+	Quaternion<T> Inv(void) const													// inverse(this)
+	{
+		T n = NormSquared();
+		return Quaternion<T>(val[0]/n, -val[1]/n, -val[2]/n, -val[3]/n);
 	}
 	Quaternion<T> Add(const Quaternion<T>& q)									// this += q
 	{
@@ -1035,7 +1088,7 @@ public:
 		return *this;
 	}
 
-	// Operators
+// Operators
 public:
 	Quaternion<T> operator=(const Quaternion<T>& q)							// assign operator
 	{
@@ -1101,7 +1154,8 @@ public:
 	}
 
 
-	// Methods (Auxiliary)
+// Methods (Auxiliary)
+public:
 	template <class T> friend std::istream& operator>>(std::istream& is, Quaternion<T>& q)
 	{
 		char str[1024];
@@ -1123,7 +1177,7 @@ public:
 		return os;
 	}
 
-	// Accessors
+// Accessors
 public:
 	T& operator[](int i)	{	return val[i];	}
 	const T& operator[](int i) const	{	return val[i];	}
@@ -1172,9 +1226,9 @@ template <class T> inline Quaternion<T> Sub(const Quaternion<T>& a, const Quater
 template <class T> inline Quaternion<T> Mul(const Quaternion<T>& a, const Quaternion<T>& b)			// a * b
 {
 	return Quaternion<T>(a[0]*b[0] - a[1]*b[1] - a[2]*b[2] - a[3]*b[3],
-		a[1]*b[0] + a[0]*b[1] - a[3]*b[2] + a[2]*b[3],
-		a[2]*b[0] + a[3]*b[1] + a[0]*b[2] - a[1]*b[3],
-		a[3]*b[0] - a[2]*b[1] + a[1]*b[2] + a[0]*b[3]);
+						 a[1]*b[0] + a[0]*b[1] - a[3]*b[2] + a[2]*b[3],
+						 a[2]*b[0] + a[3]*b[1] + a[0]*b[2] - a[1]*b[3],
+						 a[3]*b[0] - a[2]*b[1] + a[1]*b[2] + a[0]*b[3]);
 }
 template <class T> inline Quaternion<T> Mul(const Quaternion<T>& q, const T& k)					// a * k
 {
@@ -1208,9 +1262,9 @@ template <class T> inline Quaternion<T> operator-(const Quaternion<T>& a, const 
 template <class T> inline Quaternion<T> operator*(const Quaternion<T>& a, const Quaternion<T>& b)	// binary multiplication operator (element-wise)
 {
 	return Quaternion<T>(a[0]*b[0] - a[1]*b[1] - a[2]*b[2] - a[3]*b[3],
-		a[1]*b[0] + a[0]*b[1] - a[3]*b[2] + a[2]*b[3],
-		a[2]*b[0] + a[3]*b[1] + a[0]*b[2] - a[1]*b[3],
-		a[3]*b[0] - a[2]*b[1] + a[1]*b[2] + a[0]*b[3]);
+						 a[1]*b[0] + a[0]*b[1] - a[3]*b[2] + a[2]*b[3],
+						 a[2]*b[0] + a[3]*b[1] + a[0]*b[2] - a[1]*b[3],
+						 a[3]*b[0] - a[2]*b[1] + a[1]*b[2] + a[0]*b[3]);
 }
 template <class T> inline Quaternion<T> operator*(const Quaternion<T>& q, const T& k)				// binary scalar multiplication operator
 {
@@ -1346,11 +1400,52 @@ template <class T> inline Quaternion<T> QuaternionFromEulerAngle(const T a, cons
 
 template <class T> inline Quaternion<T> Log(const Quaternion<T>& q)
 {
-	//TODO
+	Quaternion<T> qtemp(q);
+	qtemp.Normalize();
+
+	if( qtemp.val[0] == 0 )
+	{
+		qtemp.val[0] = 0;
+		qtemp.val[1] = 0.5*M_PI*qtemp.val[1];
+		qtemp.val[2] = 0.5*M_PI*qtemp.val[2];
+		qtemp.val[3] = 0.5*M_PI*qtemp.val[3];
+	}
+	else if( qtemp[0] == 1 )
+	{
+		qtemp.val[0] = 0;
+		qtemp.val[1] = 0;
+		qtemp.val[2] = 0;
+		qtemp.val[3] = 0;
+	}
+	else
+	{
+		T v = sqrt(qtemp.val[1]*qtemp.val[1] + qtemp.val[2]*qtemp.val[2] + qtemp.val[3]*qtemp.val[3]);
+		qtemp.val[0] = 2*atan2(v, qtemp.val[0]);
+		qtemp.val[1] = qtemp.val[1]/v;
+		qtemp.val[2] = qtemp.val[2]/v;
+		qtemp.val[3] = qtemp.val[3]/v;
+	}
+
+	return qtemp;
 }
 template <class T> inline Quaternion<T> Exp(const Quaternion<T>& q)
 {
-	//TODO
+	T m = q.val[1]*q.val[1] + q.val[2]*q.val[2] + q.val[3]*q.val[3];
+
+	if(m == 0)
+		return Quaternion<T>(1.0, 0.0, 0.0, 0.0);
+	else
+	{
+		Quaternion<T> qtemp(q);
+		m = sqrt(m);
+		T sm = sin(q.val[0]*0.5)/m;
+		qtemp.val[0] = cos(q.val[0]*0.5);
+		qtemp.val[1] = q.val[1]*sm;
+		qtemp.val[2] = q.val[2]*sm;
+		qtemp.val[3] = q.val[3]*sm;
+
+		return qtemp.Normalize();
+	}
 }
 
 typedef Quaternion<double>	Quaterniond;
