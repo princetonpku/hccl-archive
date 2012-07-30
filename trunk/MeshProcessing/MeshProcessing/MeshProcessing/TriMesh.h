@@ -117,5 +117,9 @@ public:
 	double GetVertexY(unsigned i);
 	double GetVertexZ(unsigned i);
 	size_t* GetFacet(unsigned i);
+
+	// property flag
+protected:
+	bool flag
 };
 
