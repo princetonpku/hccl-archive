@@ -48,6 +48,7 @@ void DeformableRegistration::OnFileOpenTemplate()
 	ui.view->templ.UpdateProperties();
 	ui.view->templ.UpdateBoundingBox();
 	ui.view->templ.UpdateBoundingSphere();
+	ui.view->templ.UpdateVoronoiArea();
 
 	double r = ui.view->templ.GetBoundingSphereRadius();
 	ui.view->camera()->setSceneRadius(r);
@@ -78,6 +79,8 @@ void DeformableRegistration::OnFileOpenTarget()
 	ui.view->target.UpdateProperties();
 	ui.view->target.UpdateBoundingBox();
 	ui.view->target.UpdateBoundingSphere();
+	ui.view->target.UpdateVoronoiArea();
+
 
 	double r = ui.view->target.GetBoundingSphereRadius();
 	ui.view->camera()->setSceneRadius(r);

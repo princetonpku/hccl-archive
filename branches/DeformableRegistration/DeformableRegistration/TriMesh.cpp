@@ -101,6 +101,8 @@ void CTriMesh::Clear(void)
 
 	vertex_normal.clear();
 	vertex_neighboring_vertex.clear();
+	vertex_voronoi_area.clear();
+
 
 	memset(cog, 0, sizeof(double)*3);
 	memset(bounding_box_max, 0, sizeof(double)*3);
@@ -126,6 +128,8 @@ void CTriMesh::UpdateProperties(void)
 	vertex_normal.resize(vertex.size());
 	vertex_neighboring_vertex.clear();
 	vertex_neighboring_vertex.resize(nVertex);
+	vertex_neighboring_facet.clear();
+	vertex_neighboring_facet.resize(nVertex);
 	std::vector<int> facet_cnt_per_vertex(nVertex, 0);
 
 
@@ -155,6 +159,10 @@ void CTriMesh::UpdateProperties(void)
 		vertex_neighboring_vertex[ 1*facet[f1] ].push_back(facet[f2]);
 		vertex_neighboring_vertex[ 1*facet[f2] ].push_back(facet[f0]);
 		vertex_neighboring_vertex[ 1*facet[f2] ].push_back(facet[f1]);
+
+		vertex_neighboring_facet[ 1*facet[f0] ].push_back(i);
+		vertex_neighboring_facet[ 1*facet[f1] ].push_back(i);
+		vertex_neighboring_facet[ 1*facet[f2] ].push_back(i);
 	});
 
 	if( nVertex )
@@ -184,6 +192,9 @@ void CTriMesh::UpdateProperties(void)
 
 		std::sort(vertex_neighboring_vertex[i].begin(), vertex_neighboring_vertex[i].end());
 		vertex_neighboring_vertex[i].resize(std::unique(vertex_neighboring_vertex[i].begin(), vertex_neighboring_vertex[i].end()) - vertex_neighboring_vertex[i].begin());
+
+		std::sort(vertex_neighboring_facet[i].begin(), vertex_neighboring_facet[i].end());
+		vertex_neighboring_facet[i].resize(std::unique(vertex_neighboring_facet[i].begin(), vertex_neighboring_facet[i].end()) - vertex_neighboring_facet[i].begin());
 	});
 	vDivScalar3d(cog, nVertex);
 	bounding_sphere_rad = sqrtf(bounding_sphere_rad);
@@ -271,4 +282,190 @@ void CTriMesh::Mul(const double k)
 	std::for_each(ind.begin(), ind.end(), [&](int& i){
 		vMulScalar3d(&vertex[3*i], k);
 	});
+}
+
+double CTriMesh::CalcFacetArea(int facet_idx)
+{
+	Vector3d v1, v2;
+	v1 = Vector3d(&vertex[facet[facet_idx*3+1]*3]) - Vector3d(&vertex[facet[facet_idx*3]*3]);
+	v1 = Vector3d(&vertex[facet[facet_idx*3+2]*3]) - Vector3d(&vertex[facet[facet_idx*3]*3]);
+
+	double aT = sqrt(v1.NormSquared()*v2.NormSquared() - Dot(v1, v2)*Dot(v1, v2)) / 2.0;
+	return aT;
+}
+double CTriMesh::CalcVoronoiArea(int facet_idx, int vtx_idx)
+{
+	int idx1, idx2;
+	double ang1, ang2;
+	int chk = 0;
+	double voroArea = 0.0;
+	for(int i=0; i<3; i++)
+	{
+		if(facet[facet_idx*3+i]==vtx_idx)
+			continue;
+		else
+		{
+			if(chk==0)
+			{
+				idx1 = facet[facet_idx*3+i];
+				chk++;
+			}
+			else
+				idx2 = facet[facet_idx*3+i];
+		}
+	}
+
+	Vector3d v1 = Vector3d(&vertex[idx1*3]) - Vector3d(&vertex[vtx_idx*3]);
+	Vector3d v2 = Vector3d(&vertex[idx2*3]) - Vector3d(&vertex[vtx_idx*3]);
+
+	ang1 = CalcFacetCornerAngle(facet_idx, idx1);
+	ang2 = CalcFacetCornerAngle(facet_idx, idx2);
+
+	voroArea = v1.NormSquared() / tan(ang2) + v2.NormSquared() / tan(ang1);
+	voroArea /= 8;
+
+	return voroArea;
+}
+double CTriMesh::CalcMixedArea(int vtx_idx)
+{
+	double mixedArea = 0.0;
+// 	for(int i=0; i<vertex_neighboring_facet[vtx_idx].size(); i++)		// vtx 의 neighbor facet 에 대해
+// 	{
+// 		int curFacetIdx = vertex_neighboring_facet[vtx_idx][i];
+// 
+// 		switch(IsObtuse(curFacetIdx, vtx_idx))
+// 		{
+// 		case 0:			// Non-obtuse (voronoi area)
+// 			mixedArea += CalcVoronoiArea(curFacetIdx, vtx_idx);
+// 			break;
+// 		case 1:			// Obtuse at current vertex
+// 			mixedArea += CalcFacetArea(curFacetIdx) / 2;
+// 			break;
+// 		case 2:			// Obtuse at not current vertex
+// 			mixedArea += CalcFacetArea(curFacetIdx) / 4;
+// 			break;
+// 		}
+// 	}
+	return mixedArea;
+}
+double CTriMesh::CalcFacetCornerAngle(int facet_idx, int vtx_idx)
+{
+	bool bInside = false;
+	int idx1, idx2;
+	int vtxCheck = 0;
+	double angle = 0.0;
+	for(int i=0; i<3; i++)
+	{
+		if(facet[facet_idx*3+i]==vtx_idx)
+		{
+			bInside = true;
+			continue;
+		}
+		else
+		{
+			if(vtxCheck==0)
+			{
+				idx1 = facet[facet_idx*3+i];
+				vtxCheck++;
+			}
+			else
+				idx2 = facet[facet_idx*3+i];
+		}		
+	}
+
+	if(!bInside)
+	{		
+		return 0.0; // Not In the Facet!!
+	}
+
+	Vector3d v1 = Vector3d(&vertex[idx1*3]) - Vector3d(&vertex[vtx_idx*3]);
+	Vector3d v2 = Vector3d(&vertex[idx2*3]) - Vector3d(&vertex[vtx_idx*3]);
+
+	if(v1.Norm()==0 || v2.Norm()==0)
+		angle = 0.0;
+	else
+		angle = acos(Dot(v1, v2) / (v1.Norm() * v2.Norm()));
+
+	return angle;
+
+}
+
+void CTriMesh::UpdateVoronoiArea( void )
+{
+	int nVertex = vertex.size()/3;
+
+	vertex_neighboring_dist.clear();
+	vertex_voronoi_area.clear();
+	vertex_neighboring_dist.resize(nVertex);
+	vertex_voronoi_area.resize(nVertex);
+
+	for (int i = 0; i<nVertex; ++i)
+	{
+		Vector3d center(&vertex[i*3]);
+		int nNeighbor = vertex_neighboring_vertex[i].size();
+		vertex_voronoi_area[i].resize(nNeighbor);
+		vertex_neighboring_dist[i].resize(nNeighbor);
+
+		for (int j = 0; j<nNeighbor; ++j)
+		{
+			Vector3d p1(&vertex[vertex_neighboring_vertex[i][j]*3]);
+			double norm2 = (p1-center).NormSquared();
+			double area = 0, angle = 0;
+			
+			int cnt = 0;
+
+			for (int k = 0; k<vertex_neighboring_facet[i].size(); ++k)
+			{
+				if (i==facet[vertex_neighboring_facet[i][k]*3+0] && vertex_neighboring_vertex[i][j]==facet[vertex_neighboring_facet[i][k]*3+1])
+				{
+					angle = CalcFacetCornerAngle(vertex_neighboring_facet[i][k], facet[vertex_neighboring_facet[i][k]*3+2]);
+					area += norm2 / tan(angle) /8;
+					cnt++;
+				}
+				else if (i==facet[vertex_neighboring_facet[i][k]*3+1] && vertex_neighboring_vertex[i][j]==facet[vertex_neighboring_facet[i][k]*3+2])
+				{
+					angle = CalcFacetCornerAngle(vertex_neighboring_facet[i][k], facet[vertex_neighboring_facet[i][k]*3+0]);
+					area += norm2 / tan(angle) /8;
+					cnt++;
+				}
+				else if (i==facet[vertex_neighboring_facet[i][k]*3+2] && vertex_neighboring_vertex[i][j]==facet[vertex_neighboring_facet[i][k]*3+0])
+				{
+					angle = CalcFacetCornerAngle(vertex_neighboring_facet[i][k], facet[vertex_neighboring_facet[i][k]*3+1]);
+					area += norm2 / tan(angle) /8;
+					cnt++;
+				}
+
+				else if (i==facet[vertex_neighboring_facet[i][k]*3+0] && vertex_neighboring_vertex[i][j]==facet[vertex_neighboring_facet[i][k]*3+2])
+				{
+					angle = CalcFacetCornerAngle(vertex_neighboring_facet[i][k], facet[vertex_neighboring_facet[i][k]*3+1]);
+					area += norm2 / tan(angle) /8;
+					cnt++;
+				}
+				else if (i==facet[vertex_neighboring_facet[i][k]*3+1] && vertex_neighboring_vertex[i][j]==facet[vertex_neighboring_facet[i][k]*3+0])
+				{
+					angle = CalcFacetCornerAngle(vertex_neighboring_facet[i][k], facet[vertex_neighboring_facet[i][k]*3+2]);
+					area += norm2 / tan(angle) /8;
+					cnt++;
+				}
+				else if (i==facet[vertex_neighboring_facet[i][k]*3+2] && vertex_neighboring_vertex[i][j]==facet[vertex_neighboring_facet[i][k]*3+1])
+				{
+					angle = CalcFacetCornerAngle(vertex_neighboring_facet[i][k], facet[vertex_neighboring_facet[i][k]*3+0]);
+					area += norm2 / tan(angle) /8;
+					cnt++;
+				}
+			}
+
+			if (cnt!=1 && cnt!=2)
+			{
+				int tem = 0;
+			}
+			if (cnt==1)
+			{
+				int tem = 0;
+			}
+
+			vertex_voronoi_area[i][j] = area;
+			vertex_neighboring_dist[i][j] = norm2;
+		}
+	}
 }

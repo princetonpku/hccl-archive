@@ -26,6 +26,8 @@ public:
 	void UpdateBoundingSphere(void);
 	void UpdateBoundingBox(void);
 	//void UpdateVertexNeighboringVertex(void);
+	void UpdateVoronoiArea(void);
+
 
 	void GetCog(double* _cog);
 	double GetBoundingSphereRadius(void);
@@ -58,10 +60,10 @@ public:
 	//double FacetArea(int i);
 	//Vector3d FacetNormal(int i);
 	//Vector3d VertexNormal(int i);
-	//std::vector<size_t>& VertexNeighboringVertex(int i);
+	//std::vector<int>& VertexNeighboringVertex(int i);
 
-	//size_t NumVertices();
-	//size_t NumFacets();
+	//int NumVertices();
+	//int NumFacets();
 
 	//void SetVertex(int i, const Vector3d& nv);
 	//void SetFacet(int i, const Vector3i& nv);
@@ -72,7 +74,7 @@ public:
 
 public:
 	std::vector<double> vertex;
-	std::vector<size_t> facet;
+	std::vector<int> facet;
 	std::vector<float> vertex_color;
 
 	//protected:
@@ -80,11 +82,22 @@ public:
 	std::vector<double> facet_normal;
 
 	std::vector<double> vertex_normal;
-	std::vector<std::vector<size_t>> vertex_neighboring_vertex;
+	std::vector<std::vector<int>> vertex_neighboring_facet;
+	std::vector<std::vector<int>> vertex_neighboring_vertex;
+	std::vector<std::vector<double>> vertex_neighboring_dist;
+	std::vector<std::vector<double>> vertex_voronoi_area;
 
 	double cog[3];
 	double bounding_box_max[3], bounding_box_min[3];
 	double bounding_sphere_rad;
+
+
+private:
+
+	double CalcFacetCornerAngle(int facet_idx, int vtx_idx);
+	double CalcFacetArea(int facet_idx);
+	double CalcVoronoiArea(int facet_idx, int vtx_idx);
+	double CalcMixedArea(int vtx_idx);
 };
 
 #endif // HCCL_TRIMESH_H_
