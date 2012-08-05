@@ -101,8 +101,7 @@ void CTriMesh::Clear(void)
 
 	vertex_normal.clear();
 	vertex_neighboring_vertex.clear();
-	vertex_voronoi_area.clear();
-
+	vertex_neighboring_facet.clear();
 
 	memset(cog, 0, sizeof(double)*3);
 	memset(bounding_box_max, 0, sizeof(double)*3);
@@ -390,14 +389,18 @@ double CTriMesh::CalcFacetCornerAngle(int facet_idx, int vtx_idx)
 
 }
 
-void CTriMesh::UpdateVoronoiArea( void )
+void CTriMesh::UpdatePauly( void )
 {
 	int nVertex = vertex.size()/3;
 
 	vertex_neighboring_dist.clear();
-	vertex_voronoi_area.clear();
 	vertex_neighboring_dist.resize(nVertex);
+
+	vertex_voronoi_area.clear();
 	vertex_voronoi_area.resize(nVertex);
+	
+	confidence.clear();
+	confidence.resize(nVertex);
 
 	for (int i = 0; i<nVertex; ++i)
 	{
@@ -406,66 +409,87 @@ void CTriMesh::UpdateVoronoiArea( void )
 		vertex_voronoi_area[i].resize(nNeighbor);
 		vertex_neighboring_dist[i].resize(nNeighbor);
 
+		double M[3][3] = {0};				// covariance matrix (3 by 3)
+		std::vector<double> D(3,0);			// eigenvalues
+
 		for (int j = 0; j<nNeighbor; ++j)
 		{
 			Vector3d p1(&vertex[vertex_neighboring_vertex[i][j]*3]);
-			double norm2 = (p1-center).NormSquared();
-			double area = 0, angle = 0;
+			Vector3d tem = p1-center;
+			double n = tem.NormSquared();
 			
-			int cnt = 0;
+			double r = sqrt(n);
+			vertex_neighboring_dist[i][j] = r;
 
+			
+			// get confidence lamda and sigma part
+			double w = r>1 ? 0 : 1-6*r*r+8*r*r*r-3*r*r*r*r;
+			for (int row = 0; row<3; ++row)
+			for (int col = 0; col<3; ++col)			
+				M[row][col] += tem[row]*tem[col]*w;
+
+
+			// get voronoi area part
+			double area = 0, angle = 0;
 			for (int k = 0; k<vertex_neighboring_facet[i].size(); ++k)
 			{
 				if (i==facet[vertex_neighboring_facet[i][k]*3+0] && vertex_neighboring_vertex[i][j]==facet[vertex_neighboring_facet[i][k]*3+1])
 				{
 					angle = CalcFacetCornerAngle(vertex_neighboring_facet[i][k], facet[vertex_neighboring_facet[i][k]*3+2]);
-					area += norm2 / tan(angle) /8;
-					cnt++;
+					area += n / tan(angle) /8;
 				}
 				else if (i==facet[vertex_neighboring_facet[i][k]*3+1] && vertex_neighboring_vertex[i][j]==facet[vertex_neighboring_facet[i][k]*3+2])
 				{
 					angle = CalcFacetCornerAngle(vertex_neighboring_facet[i][k], facet[vertex_neighboring_facet[i][k]*3+0]);
-					area += norm2 / tan(angle) /8;
-					cnt++;
+					area += n / tan(angle) /8;
 				}
 				else if (i==facet[vertex_neighboring_facet[i][k]*3+2] && vertex_neighboring_vertex[i][j]==facet[vertex_neighboring_facet[i][k]*3+0])
 				{
 					angle = CalcFacetCornerAngle(vertex_neighboring_facet[i][k], facet[vertex_neighboring_facet[i][k]*3+1]);
-					area += norm2 / tan(angle) /8;
-					cnt++;
+					area += n / tan(angle) /8;
 				}
 
 				else if (i==facet[vertex_neighboring_facet[i][k]*3+0] && vertex_neighboring_vertex[i][j]==facet[vertex_neighboring_facet[i][k]*3+2])
 				{
 					angle = CalcFacetCornerAngle(vertex_neighboring_facet[i][k], facet[vertex_neighboring_facet[i][k]*3+1]);
-					area += norm2 / tan(angle) /8;
-					cnt++;
+					area += n / tan(angle) /8;
 				}
 				else if (i==facet[vertex_neighboring_facet[i][k]*3+1] && vertex_neighboring_vertex[i][j]==facet[vertex_neighboring_facet[i][k]*3+0])
 				{
 					angle = CalcFacetCornerAngle(vertex_neighboring_facet[i][k], facet[vertex_neighboring_facet[i][k]*3+2]);
-					area += norm2 / tan(angle) /8;
-					cnt++;
+					area += n / tan(angle) /8;
 				}
 				else if (i==facet[vertex_neighboring_facet[i][k]*3+2] && vertex_neighboring_vertex[i][j]==facet[vertex_neighboring_facet[i][k]*3+1])
 				{
 					angle = CalcFacetCornerAngle(vertex_neighboring_facet[i][k], facet[vertex_neighboring_facet[i][k]*3+0]);
-					area += norm2 / tan(angle) /8;
-					cnt++;
+					area += n / tan(angle) /8;					
 				}
 			}
-
-			if (cnt!=1 && cnt!=2)
-			{
-				int tem = 0;
-			}
-			if (cnt==1)
-			{
-				int tem = 0;
-			}
-
 			vertex_voronoi_area[i][j] = area;
-			vertex_neighboring_dist[i][j] = norm2;
 		}
+
+		CalEigenValue(M, D.data());
+ 		std::sort(D.begin(), D.end(), [](double a, double b){return a>b;});
+
+		double confidence_lamda = 1-3*(D[0]/(D[0]+D[1]+D[2]));
+		double confidence_sigma = D[1]/D[2];
+		confidence[i] = confidence_lamda*confidence_sigma;
 	}
+}
+
+void CalEigenValue( const double M[3][3], double* D )
+{
+	double a,b,c,d,e,f,g,h,i;
+
+	a = M[0][0];
+	b = M[0][1];
+	c = M[0][2];
+	d = M[1][0];
+	e = M[1][1];
+	f = M[1][2];
+	g = M[2][0];
+	h = M[2][1];
+	i = M[2][2];
+
+	
 }
