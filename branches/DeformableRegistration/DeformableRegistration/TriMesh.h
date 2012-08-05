@@ -26,7 +26,6 @@ public:
 	void UpdateBoundingSphere(void);
 	void UpdateBoundingBox(void);
 	//void UpdateVertexNeighboringVertex(void);
-	void UpdateVoronoiArea(void);
 
 
 	void GetCog(double* _cog);
@@ -84,12 +83,17 @@ public:
 	std::vector<double> vertex_normal;
 	std::vector<std::vector<int>> vertex_neighboring_facet;
 	std::vector<std::vector<int>> vertex_neighboring_vertex;
-	std::vector<std::vector<double>> vertex_neighboring_dist;
-	std::vector<std::vector<double>> vertex_voronoi_area;
 
 	double cog[3];
 	double bounding_box_max[3], bounding_box_min[3];
 	double bounding_sphere_rad;
+
+
+	// for M. Pauly(2005)
+	std::vector<std::vector<double>> vertex_neighboring_dist;
+	std::vector<std::vector<double>> vertex_voronoi_area;
+	std::vector<double> confidence;
+	void UpdatePauly(void);
 
 
 private:
@@ -100,4 +104,5 @@ private:
 	double CalcMixedArea(int vtx_idx);
 };
 
+static void CalEigenValue( const double M[3][3], double* D );
 #endif // HCCL_TRIMESH_H_
