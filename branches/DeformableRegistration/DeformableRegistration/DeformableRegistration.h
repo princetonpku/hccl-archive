@@ -14,6 +14,14 @@ public:
 
 private:
 	Ui::DeformableRegistrationClass ui;
+
+private slots:
+	void OnFileNew();
+	void OnFileOpenTemplate();
+	void OnFileOpenTarget();
+	void OnFileSaveTemplate();
+	void OnFileSaveTarget();
+	void OnFileExit();
 };
 
 #endif // DEFORMABLEREGISTRATION_H
