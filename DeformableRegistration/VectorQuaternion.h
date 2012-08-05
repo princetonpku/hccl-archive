@@ -135,7 +135,7 @@ public:
 
 	Vector3<T> operator+=(const Vector3<T>& v)							// unary addition operator
 	{
-		this->val[0] += v[0];		this->val[1] += v[1];		this->val[2] += v[2];
+		this->val[0] += v.val[0];	this->val[1] += v.val[1];	this->val[2] += v.val[2];
 		return *this;
 	}
 	Vector3<T> operator+=(const T& k)									// unary scalar addition operator
@@ -145,7 +145,7 @@ public:
 	}
 	Vector3<T> operator-=(const Vector3<T>& v)							// unary subtraction operator
 	{
-		this->val[0] -= v[0];		this->val[1] -= v[1];		this->val[2] -= v[2];
+		this->val[0] -= v.val[0];	this->val[1] -= v.val[1];	this->val[2] -= v.val[2];
 		return *this;
 	}
 	Vector3<T> operator-=(const T& k)									// unary scalar subtraction operator
@@ -838,7 +838,7 @@ public:
 			}
 		}
 	}
-	Quaternion(const T a, const T b, const T c, const char* order)			// from Euler angle
+	Quaternion(const T angles[3], const char* order)			// from Euler angle
 	{
 		//TODO
 	}
@@ -1147,12 +1147,6 @@ public:
 		return Quaternion<T>(-this->val[0], -this->val[1], -this->val[2], -this->val[3]);
 	}
 
-	Quaternion<T> operator!() const											// unary inversion operator
-	{
-		T n = this->Norm();
-		return Quaternion<T>(this->val[0]/n, -this->val[1]/n, -this->val[2]/n, -this->val[3]/n);
-	}
-
 
 // Methods (Auxiliary)
 public:
@@ -1287,6 +1281,12 @@ template <class T> inline Quaternion<T> operator/(const T& k, const Quaternion<T
 	return Quaternion<T>(k / q.val[0], k / q.val[1], k / q.val[2], k / q.val[3]);
 }
 
+template <class T> inline Quaternion<T> operator!(const Quaternion<T>& q)							// unary inversion operator
+{
+	T n = q.NormSquared();
+	return Quaternion<T>(q.val[0]/n, -q.val[1]/n, -q.val[2]/n, -q.val[3]/n);
+}
+
 template <class T> inline Quaternion<T> QuaternionFromAxisAngle(const T rad, const T axis_x, const T axis_y, const T axis_z)
 {
 	Quaternion<T> temp;
@@ -1410,7 +1410,7 @@ template <class T> inline Quaternion<T> Log(const Quaternion<T>& q)
 		qtemp.val[2] = 0.5*M_PI*qtemp.val[2];
 		qtemp.val[3] = 0.5*M_PI*qtemp.val[3];
 	}
-	else if( qtemp[0] == 1 )
+	else if( qtemp.val[0] == 1 )
 	{
 		qtemp.val[0] = 0;
 		qtemp.val[1] = 0;
