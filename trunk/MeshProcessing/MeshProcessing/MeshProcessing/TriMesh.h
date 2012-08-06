@@ -32,22 +32,29 @@ public:
 	void Clear(void);
 
 	bool Import(const char* strFilePath);
-	bool Export(const char* strFilePath);
-	//bool Export(const char* strFilePath); (TODO) should support ply, obj, off, stl, at least.
+	bool Export(const char* strFilePath); // (TODO) should support ply, obj, off, stl, at least.
 
 	void UpdateProperties(void);
-
-	//void UpdateNormals(void);
-	//void UpdateFacetNormal(void);
-	//void UpdateVertexNormal(void);
+	void UpdateFacetNormal(void);
+	void UpdateFacetArea(void);
+	void UpdateVertexNeighboringVertex(void);
+	void UpdateVertexNormal(void);
 	void UpdateCog(void);
 	void UpdateBoundingSphere(void);
 	void UpdateBoundingBox(void);
-	//void UpdateVertexNeighboringVertex(void);
 
 	void GetCog(double* _cog);
 	double GetBoundingSphereRadius(void);
 	//void GetBoundingBox(double* _max, double* _min);
+
+	// property request
+	void RequestFaceNormal(void);
+	void RequestFaceArea(void);
+	void RequestVertexNormal(void);
+	void RequestCog(void);
+	void RequestBoundingBox(void);
+	void RequestBoundingSphere(void);
+	void RequestVertexNeighborVertex(void);
 
 public:
 	void Add(const double* p);
@@ -62,20 +69,7 @@ public:	// should be changed to protected (TODO)
 
 	//public:
 	//void RenderGL(options, flags)	// this function gives an access to the above rendering functions with selectable options (TODO)
-
-// Accessors (TODO)
-public:
-// 	bool HasVertices();
-// 	bool HasFacets();
-// 	bool HasVertexColor();
-// 	bool HasFacetArea();
-// 	bool HasFacetNormal();
-// 	bool HasVertexNormal();
-// 	bool HasVertexNeighboringVertex();
-// 	bool HasCog();
-// 	bool HasBoundingBox();
-// 	bool HasBoundingSphere();
-
+	
 	//Vector3d Vertex(int i);
 	//Vector3i Facet(int i);
 	//Vector3f VertexColor(int i);
@@ -99,7 +93,7 @@ public:
 	std::vector<size_t> facet;
 	std::vector<float> vertex_color;
 
-protected:
+//protected:
 	std::vector<double> facet_area;
 	std::vector<double> facet_normal;
 
@@ -112,14 +106,34 @@ protected:
 
 	// accessor
 public:
-	double* GetVertex(unsigned i);
+	void GetVertex(unsigned i, double* v);
 	double GetVertexX(unsigned i);
 	double GetVertexY(unsigned i);
 	double GetVertexZ(unsigned i);
-	size_t* GetFacet(unsigned i);
+	void GetFacet(unsigned i, size_t* f);
 
 	// property flag
 protected:
-	bool flag
+	bool fValidFaceNormal;	// true
+	bool fValidFaceArea;		// true
+	bool fValidVertexNormal;	// true
+	bool fValidCog;			// false
+	bool fValidBoundingBox;	// false
+	bool fValidBoundingSphere;// false
+	bool fValidVertexNeighborVertex;
+
+	// Accessors (TODO)
+public:
+	bool HasVertices()					{	(bool)vertex.size();		}
+	bool HasFacets()					{	(bool)facet.size();			}
+	bool HasVertexColor()				{	(bool)vertex_color.size();	}
+
+	bool HasFacetArea()					{	(bool)facet_area.size();	}
+	bool HasFacetNormal()				{	(bool)facet_normal.size();	}
+	bool HasVertexNormal()				{	(bool)vertex_normal.size();	}
+	bool HasVertexNeighboringVertex()	{	(bool)vertex_neighboring_vertex.size();	}
+	bool HasCog()						{	(bool)!(cog[0] == cog[1] == cog[2] == 0.0);	}
+	//bool HasBoundingBox()				{	(bool)bounding}
+	bool HasBoundingSphere()			{	(bool)bounding_sphere_rad != 0.0;	}
 };
 
