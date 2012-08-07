@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MeshProcessing", "MeshProcessing\MeshProcessing.vcxproj", "{0F4F688F-8960-497D-A499-7D41753DF349}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "L-BFGS-B", "L-BFGS-B\L-BFGS-B.vcxproj", "{FD2729D8-4D63-4598-9E52-4312D2FDB4E3}"
 EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
@@ -13,10 +13,10 @@ Global
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{0F4F688F-8960-497D-A499-7D41753DF349}.Debug|Win32.ActiveCfg = Debug|Win32
-		{0F4F688F-8960-497D-A499-7D41753DF349}.Debug|Win32.Build.0 = Debug|Win32
-		{0F4F688F-8960-497D-A499-7D41753DF349}.Release|Win32.ActiveCfg = Release|Win32
-		{0F4F688F-8960-497D-A499-7D41753DF349}.Release|Win32.Build.0 = Release|Win32
+		{FD2729D8-4D63-4598-9E52-4312D2FDB4E3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FD2729D8-4D63-4598-9E52-4312D2FDB4E3}.Debug|Win32.Build.0 = Debug|Win32
+		{FD2729D8-4D63-4598-9E52-4312D2FDB4E3}.Release|Win32.ActiveCfg = Release|Win32
+		{FD2729D8-4D63-4598-9E52-4312D2FDB4E3}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
