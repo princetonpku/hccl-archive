@@ -19,6 +19,8 @@ void Viewer::init()
 
 	glClearColor(1.f, 1.f, 1.f, 1.f);
 
+	
+	setSceneRadius(100.0);
 
 
 }

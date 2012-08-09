@@ -155,13 +155,15 @@ void CTriMesh::RenderSmooth(GLuint nFlag/* = 0*/)
 
 void CTriMesh::RenderNodes( GLuint nFlag /*= 0*/ )
 {
-	glColor3ub(255, 0, 0);
-	glPointSize(10);
+	glDisable(GL_LIGHTING);
+	glColor3ub(0, 255, 0);
+	glPointSize(5);
 	glBegin(GL_POINTS);
 	for(int i=0; i<nodes.size(); i++)
 		glVertex3d(nodes[i].X(), nodes[i].Y(), nodes[i].Z());
 	glEnd();
 	glPointSize(1);
+	glEnable(GL_LIGHTING);
 }
 
 void CTriMesh::UpdateBoundingSphere(void)
@@ -242,15 +244,51 @@ void CTriMesh::SamplingRandom( int nSamples )
 			idxCnt++;
 			if(idxCnt==nSamples)
 				break;
-		}		
-		
+		}				
 	}
-
-	int chubabo = 0;
 }
 
+void CTriMesh::SamplingDart( int nSamples )
+{
+	SamplingRandom(10*nSamples);
+	
+	if(n_vertices() <= 0  || nodes.size() == 0)
+		return;
 
+	int n_nodes = nodes.size();
+	std::vector<Vector3d> D_nodes(nSamples);
+	Vector3d temp;
+	auto f1 = [this, &temp](Vector3d v)->bool
+	{
+		if((temp - v).Norm() < 10)
+			return true;
+		else
+			return false;
+	};
 
+	int cnt = 0;
+	int r;
+	while(1)
+	{
+		n_nodes = nodes.size();
+		r = rand()%n_nodes;
+		temp = Vector3d(nodes[r].X(), nodes[r].Y(), nodes[r].Z());
+		D_nodes[cnt++] = Vector3d(nodes[r].X(), nodes[r].Y(), nodes[r].Z());
+		nodes.erase(std::remove_if(nodes.begin(), nodes.end(), f1), nodes.end());
+		if(cnt >= nSamples || nodes.size() == 0)
+			break;
+	}
+
+	auto f2 = [](Vector3d v)->bool
+	{
+		if(v.Norm()==0)
+			return true;
+		else
+			return false;
+	};
+	D_nodes.erase(std::remove_if(D_nodes.begin(), D_nodes.end(), f2), D_nodes.end());
+	nodes = D_nodes;
+}
 
 // void CTriMesh::renderPoints(bool color/* = true*/)
 // {

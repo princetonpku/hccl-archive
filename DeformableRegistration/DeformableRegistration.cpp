@@ -235,7 +235,7 @@ void DeformableRegistration::OnToolsDecimate()
 void DeformableRegistration::OnToolsSamplingRAND()
 {
 
-	int NumOfSamples = 500;
+	int NumOfSamples = 50000;
 	ui.view->templ.SamplingRandom(NumOfSamples);
 	
 	// Get a Set of vertices from shuffled list (That's nodes!)
@@ -254,7 +254,5 @@ void DeformableRegistration::OnToolsSamplingQUAD()
 
 void DeformableRegistration::OnToolsSamplingDART()
 {
-	QMessageBox msgBox;
-	msgBox.setText("Dart Throwing Sampling");
-	msgBox.exec();
+	ui.view->templ.SamplingDart(2000);
 }
