@@ -24,6 +24,7 @@ typedef OpenMesh::TriMesh_ArrayKernelT<>  Mesh;
 #define max(a, b) (((a) > (b))? (a) : (b))
 #endif
 
+
 struct HCCLTraits : public OpenMesh::DefaultTraits
 {
 	typedef OpenMesh::Vec3d Point;
