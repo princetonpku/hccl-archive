@@ -88,7 +88,24 @@ void CTriMesh::RenderPoints(GLuint nFlag/* = 0*/)
 
 void CTriMesh::RenderWireframe(GLuint nFlag/* = 0*/)
 {
+	if(n_vertices() <= 0)
+		return;
 
+	HCCLMesh::ConstFaceIter fIt(faces_begin()), fEnd(faces_end());
+	HCCLMesh::ConstFaceVertexIter fvIt;
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glBegin(GL_TRIANGLES);
+	for (; fIt!=fEnd; ++fIt)
+	{
+		fvIt = cfv_iter(fIt.handle()); 
+		glVertex3dv( &point(fvIt)[0] );
+		++fvIt;
+		glVertex3dv( &point(fvIt)[0] );
+		++fvIt;
+		glVertex3dv( &point(fvIt)[0] );
+	}
+	glEnd();
 }
 
 void CTriMesh::RenderFlat(GLuint nFlag/* = 0*/)
@@ -101,9 +118,9 @@ void CTriMesh::RenderSmooth(GLuint nFlag/* = 0*/)
 	if(n_vertices() <= 0)
 		return;
 
-	Mesh::ConstFaceIter fIt(faces_begin()), fEnd(faces_end());
+	HCCLMesh::ConstFaceIter fIt(faces_begin()), fEnd(faces_end());
 
-	Mesh::ConstFaceVertexIter fvIt;
+	HCCLMesh::ConstFaceVertexIter fvIt;
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_DOUBLE, 0, points());
