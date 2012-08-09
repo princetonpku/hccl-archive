@@ -96,7 +96,7 @@ public:
 // 	void Rotate(double angle, Mesh::Point axis);
 
 public:
-	void Decimate(double p);					// Decimate mesh while retaining p% of vertices.
+	void Decimate(double p);					// Decimate mesh while retaining p% of vertices. (0 < p < 1)
 
 // 	void getNeighbors(Mesh::VertexHandle vh, size_t n, std::vector<Mesh::VertexHandle>& neighbors);
 // 

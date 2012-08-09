@@ -14,6 +14,8 @@ DeformableRegistration::DeformableRegistration(QWidget *parent, Qt::WFlags flags
 	connect(ui.actionSaveTemplate, SIGNAL(triggered()), this, SLOT(OnFileSaveTemplate()));
 	connect(ui.actionSaveTarget, SIGNAL(triggered()), this, SLOT(OnFileSaveTarget()));
 	connect(ui.actionExit, SIGNAL(triggered()), this, SLOT(OnFileExit()));
+
+	connect(ui.actionDecimate, SIGNAL(triggered()), this, SLOT(OnToolsDecimate()));
 }
 
 DeformableRegistration::~DeformableRegistration()
@@ -23,8 +25,8 @@ DeformableRegistration::~DeformableRegistration()
 
 void DeformableRegistration::OnFileNew()
 {
-	ui.view->templ.Clear();
-	ui.view->target.Clear();
+	ui.view->templ.clear();
+	ui.view->target.clear();
 }
 
 void DeformableRegistration::OnFileOpenTemplate()
@@ -44,12 +46,10 @@ void DeformableRegistration::OnFileOpenTemplate()
 	char* filename = byteName.data();
 	//sprintf(filename, "%s", file.toAscii().data());
 	ui.view->templ.Clear();
-	ui.view->templ.Import(filename);
-	ui.view->templ.UpdateProperties();
-	ui.view->templ.UpdateBoundingBox();
-	ui.view->templ.UpdateBoundingSphere();
-	ui.view->templ.UpdatePauly();
+	ui.view->templ.Read(filename);
+	//	ui.view->templ.UpdatePauly();
 
+	ui.view->templ.UpdateBoundingSphere();
 	double r = ui.view->templ.GetBoundingSphereRadius();
 	ui.view->camera()->setSceneRadius(r);
 	ui.view->camera()->showEntireScene();
@@ -75,13 +75,10 @@ void DeformableRegistration::OnFileOpenTarget()
 	char* filename = byteName.data();
 	//sprintf(filename, "%s", file.toAscii().data());
 	ui.view->target.Clear();
-	ui.view->target.Import(filename);
-	ui.view->target.UpdateProperties();
-	ui.view->target.UpdateBoundingBox();
+	ui.view->target.Read(filename);
+	//	ui.view->target.UpdatePauly();
+
 	ui.view->target.UpdateBoundingSphere();
-	ui.view->target.UpdatePauly();
-
-
 	double r = ui.view->target.GetBoundingSphereRadius();
 	ui.view->camera()->setSceneRadius(r);
 	ui.view->camera()->showEntireScene();
@@ -103,4 +100,12 @@ void DeformableRegistration::OnFileSaveTarget()
 void DeformableRegistration::OnFileExit()
 {
 	close();
+}
+
+void DeformableRegistration::OnToolsDecimate()
+{
+	setCursor(Qt::WaitCursor);
+	ui.view->templ.Decimate(0.7);
+	setCursor(Qt::ArrowCursor);
+	ui.view->updateGL();
 }
