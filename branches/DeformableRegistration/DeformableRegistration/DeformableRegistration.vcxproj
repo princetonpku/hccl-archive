@@ -75,7 +75,7 @@
       <TreatWChar_tAsBuiltInType>false</TreatWChar_tAsBuiltInType>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <OutputFile>$(OutDir)\$(ProjectName).exe</OutputFile>
       <AdditionalLibraryDirectories>$(QTDIR)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>false</GenerateDebugInformation>
@@ -133,9 +133,15 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="allocator.hpp" />
+    <ClInclude Include="function.hpp" />
     <ClInclude Include="GeneratedFiles\ui_Decimate.h" />
     <ClInclude Include="GeneratedFiles\ui_DeformableRegistration.h" />
+    <ClInclude Include="iterator.hpp" />
+    <ClInclude Include="kdtree.hpp" />
+    <ClInclude Include="node.hpp" />
     <ClInclude Include="OpenMeshWrapper.h" />
+    <ClInclude Include="region.hpp" />
     <ClInclude Include="VectorAlgebra.h" />
     <ClInclude Include="VectorQuaternion.h" />
     <CustomBuild Include="Viewer.h">

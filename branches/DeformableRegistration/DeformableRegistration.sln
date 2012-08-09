@@ -3,6 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DeformableRegistration", "DeformableRegistration\DeformableRegistration.vcxproj", "{908B407E-B3D4-45D5-B73D-0D0B9690E3BE}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F89F6D43-969D-4DDE-A16E-DC9CC1EDE362}"
+	ProjectSection(SolutionItems) = preProject
+		DeformableRegistration\kdtree.hpp = DeformableRegistration\kdtree.hpp
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SubversionScc) = preSolution
 		Svn-Managed = True
