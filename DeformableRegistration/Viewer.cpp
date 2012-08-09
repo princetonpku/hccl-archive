@@ -1,5 +1,4 @@
 #include "Viewer.h"
-#include "Renderer_gl.h"
 #include <QMouseEvent>
 
 Viewer::Viewer(QWidget *parent) : QGLViewer(parent)
@@ -8,7 +7,6 @@ Viewer::Viewer(QWidget *parent) : QGLViewer(parent)
 
 void Viewer::init()
 {
-
 	// Restore previous viewer state.
 	//restoreStateFromFile();
 
@@ -27,6 +25,10 @@ void Viewer::init()
 
 void Viewer::draw()
 {
-	RenderGL_Smooth(templ);
-	RenderGL_Smooth(target);
+	glColor3ub(255, 190, 100);
+	templ.RenderSmooth();
+// 	glColor3ub(50, 50, 50);
+// 	templ.renderWireframe();
+	glColor3ub(128, 128, 200);
+	target.RenderSmooth();
 }

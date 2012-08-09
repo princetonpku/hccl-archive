@@ -51,7 +51,14 @@
      <string>Hao Li 2008</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuCommon_Tools">
+    <property name="title">
+     <string>Common Tools</string>
+    </property>
+    <addaction name="actionDecimate"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuCommon_Tools"/>
    <addaction name="menuHaoLi2008"/>
   </widget>
   <widget class="QToolBar" name="mainToolBar">
@@ -91,6 +98,11 @@
   <action name="actionExit">
    <property name="text">
     <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionDecimate">
+   <property name="text">
+    <string>Decimate</string>
    </property>
   </action>
  </widget>

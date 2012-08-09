@@ -22,6 +22,8 @@ private slots:
 	void OnFileSaveTemplate();
 	void OnFileSaveTarget();
 	void OnFileExit();
+
+	void OnToolsDecimate();
 };
 
 #endif // DEFORMABLEREGISTRATION_H
