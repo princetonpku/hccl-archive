@@ -6,7 +6,8 @@
 #include <vector>
 using namespace std;
 
-#include "TriMesh.h"
+#include "OpenMeshWrapper.h"
+
 
 class Viewer : public QGLViewer
 {
