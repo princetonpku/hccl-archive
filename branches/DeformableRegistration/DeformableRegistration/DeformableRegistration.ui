@@ -55,7 +55,16 @@
     <property name="title">
      <string>Common Tools</string>
     </property>
+    <widget class="QMenu" name="menuSampling">
+     <property name="title">
+      <string>Sampling</string>
+     </property>
+     <addaction name="actionRANDOM"/>
+     <addaction name="actionQuadricFitting"/>
+     <addaction name="actionDartThrowing"/>
+    </widget>
     <addaction name="actionDecimate"/>
+    <addaction name="menuSampling"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuCommon_Tools"/>
@@ -103,6 +112,21 @@
   <action name="actionDecimate">
    <property name="text">
     <string>Decimate</string>
+   </property>
+  </action>
+  <action name="actionRANDOM">
+   <property name="text">
+    <string>RANDOM</string>
+   </property>
+  </action>
+  <action name="actionQuadricFitting">
+   <property name="text">
+    <string>Quadric_Fitting</string>
+   </property>
+  </action>
+  <action name="actionDartThrowing">
+   <property name="text">
+    <string>Dart_Throwing</string>
    </property>
   </action>
  </widget>

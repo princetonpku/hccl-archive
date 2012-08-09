@@ -24,6 +24,10 @@ private slots:
 	void OnFileExit();
 
 	void OnToolsDecimate();
+	void OnToolsSamplingRAND();		// Random Sampling
+	void OnToolsSamplingQUAD();		// Sampling by Quadric Fitting
+	void OnToolsSamplingDART();		// Sampling by user-defined distance
+
 };
 
 #endif // DEFORMABLEREGISTRATION_H

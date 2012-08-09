@@ -16,6 +16,12 @@ DeformableRegistration::DeformableRegistration(QWidget *parent, Qt::WFlags flags
 	connect(ui.actionExit, SIGNAL(triggered()), this, SLOT(OnFileExit()));
 
 	connect(ui.actionDecimate, SIGNAL(triggered()), this, SLOT(OnToolsDecimate()));
+	connect(ui.actionRANDOM, SIGNAL(triggered()), this, SLOT(OnToolsSamplingRAND()));
+	connect(ui.actionQuadricFitting, SIGNAL(triggered()), this, SLOT(OnToolsSamplingQUAD()));
+	connect(ui.actionDartThrowing, SIGNAL(triggered()), this, SLOT(OnToolsSamplingDART()));
+
+	srand((unsigned)time(NULL));			// 매번 다른 random number 생성을 위해
+	
 }
 
 DeformableRegistration::~DeformableRegistration()
@@ -224,4 +230,31 @@ void DeformableRegistration::OnToolsDecimate()
 // 		HCCLMesh::Point pt = *found.first;
 // 		std::cout << pt[0] << ", " << pt[1] << ", " << pt[2] << std::endl;
 // 	}
+}
+
+void DeformableRegistration::OnToolsSamplingRAND()
+{
+
+	int NumOfSamples = 500;
+	ui.view->templ.SamplingRandom(NumOfSamples);
+	
+	// Get a Set of vertices from shuffled list (That's nodes!)
+// 	QMessageBox msgBox;
+// 	msgBox.setText("RANDOM Sampling");
+// 	msgBox.exec();
+
+}
+
+void DeformableRegistration::OnToolsSamplingQUAD()
+{
+	QMessageBox msgBox;
+	msgBox.setText("Quadric Fitting Sampling");
+	msgBox.exec();
+}
+
+void DeformableRegistration::OnToolsSamplingDART()
+{
+	QMessageBox msgBox;
+	msgBox.setText("Dart Throwing Sampling");
+	msgBox.exec();
 }

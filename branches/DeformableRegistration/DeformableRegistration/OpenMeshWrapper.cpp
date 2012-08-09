@@ -83,7 +83,15 @@ void CTriMesh::Render(GLenum nMethod, GLuint nFlag)
 
 void CTriMesh::RenderPoints(GLuint nFlag/* = 0*/)
 {
+	if(n_vertices() <= 0)
+		return;
 
+	HCCLMesh::ConstVertexIter vit(vertices_begin()), vEnd(vertices_end());
+
+	glBegin(GL_POINTS);
+	for(; vit != vEnd; ++vit)
+		glVertex3dv(&point(vit)[0]);
+	glEnd();
 }
 
 void CTriMesh::RenderWireframe(GLuint nFlag/* = 0*/)
@@ -145,6 +153,17 @@ void CTriMesh::RenderSmooth(GLuint nFlag/* = 0*/)
 	glDisableClientState(GL_NORMAL_ARRAY);
 }
 
+void CTriMesh::RenderNodes( GLuint nFlag /*= 0*/ )
+{
+	glColor3ub(255, 0, 0);
+	glPointSize(10);
+	glBegin(GL_POINTS);
+	for(int i=0; i<nodes.size(); i++)
+		glVertex3d(nodes[i].X(), nodes[i].Y(), nodes[i].Z());
+	glEnd();
+	glPointSize(1);
+}
+
 void CTriMesh::UpdateBoundingSphere(void)
 {
 	double r = 0.0;
@@ -184,6 +203,53 @@ void CTriMesh::Decimate(double p)
 
 	garbage_collection();
 }
+
+int CTriMesh::numVertices( void )
+{
+	return n_vertices();
+}
+
+void CTriMesh::SamplingRandom( int nSamples )
+{
+	if(n_vertices() <= 0)
+		return;
+
+	//////////////////////////////////////////////////////////////////////////
+	// Random Sampling Method
+	nodes.clear();
+	nodes.resize(nSamples);
+
+	// Vertices List
+	std::vector<int> vtxIdxList;
+	std::vector<int> vtxSelect(nSamples);
+
+	vtxIdxList.resize(n_vertices());
+	std::iota(vtxIdxList.begin(), vtxIdxList.end(), 0);				// Generate a vertex index list (Non-zero base indexing)
+
+	// Random Shuffle
+	std::random_shuffle(vtxIdxList.begin(), vtxIdxList.end());		// Randomly shuffle
+	std::copy(vtxIdxList.begin(), vtxIdxList.begin()+nSamples, vtxSelect.begin());
+	std::sort(vtxSelect.begin(), vtxSelect.end());
+
+	HCCLMesh::ConstVertexIter vit(vertices_begin()), vEnd(vertices_end());
+	int cnt = 0;
+	int idxCnt = 0;
+	for(; vit != vEnd; ++vit, ++cnt)
+	{
+		if(cnt==vtxSelect[idxCnt])
+		{
+			nodes[idxCnt] = Vector3d(&point(vit)[0]);
+			idxCnt++;
+			if(idxCnt==nSamples)
+				break;
+		}		
+		
+	}
+
+	int chubabo = 0;
+}
+
+
 
 
 // void CTriMesh::renderPoints(bool color/* = true*/)
