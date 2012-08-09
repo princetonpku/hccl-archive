@@ -76,6 +76,8 @@ public:
 	void RenderFlat(GLuint nFlag = 0);
 	void RenderSmooth(GLuint nFlag = 0);
 
+	void RenderNodes(GLuint nFlag = 0);
+
 	// TODO
 // 	void Draw_BoundingBox(void);				// TODO: bounding box 및 sphere도 trait으로 넣자T
 // 	void Draw_BoundingSphere(void);
@@ -99,11 +101,15 @@ public:
 public:
 	void Decimate(double p);					// Decimate mesh while retaining p% of vertices. (0 < p < 1)
 
+	// Sampling
+	void SamplingRandom(int nSamples);
+
 // 	void getNeighbors(Mesh::VertexHandle vh, size_t n, std::vector<Mesh::VertexHandle>& neighbors);
 // 
 // 	// Query functions
 // public:
 // 	bool hasVertices(void);
+	int numVertices(void);
 // 	size_t numVertices(void);
 // 	size_t numFaces(void);
 // 	size_t numEdges(void);
@@ -121,7 +127,8 @@ public:
 // 
 // 	Mesh::Point cog;
 // 	Mesh::Point bounding_box_min, bounding_box_max;
-	double bounding_sphere_rad;
+	double bounding_sphere_rad;	
+	std::vector<Vector3d> nodes;
 };
 
 

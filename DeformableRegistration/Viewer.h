@@ -25,7 +25,7 @@ protected :
 
 public:
 	CTriMesh templ;
-	CTriMesh target;
+	CTriMesh target;	
 };
 
 #endif // VIEWER_H
