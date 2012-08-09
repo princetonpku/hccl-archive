@@ -129,7 +129,7 @@ struct FindN_predicate
 		size_t num_wanted;
 	};
 
-	FindN_predicate(Data * data) : data(data), cs(&data->candidates) {}
+	FindN_predicate(Data * data_) : data(data_), cs(&data_->candidates) {}
 
 	// note: when this returns true, libkdtree will trim the search range so that
 	//       it will avoid visiting any items further away.
@@ -175,7 +175,7 @@ struct FindN_predicate
 				}
 
 				// insert our new candidate in its rightful position
-				cs->insert( lower_bound(cs->begin(),cs->end(),dist), Candidate(dist,t) );
+ 				cs->insert( lower_bound(cs->begin(),cs->end(),Candidate(dist,t)/*dist*/), Candidate(dist,t) );
 
 				// time to return
 				return let_libkdtree_trim;
@@ -194,21 +194,34 @@ struct FindN_predicate
 
 void DeformableRegistration::OnToolsDecimate()
 {
-// 	setCursor(Qt::WaitCursor);
-// 	ui.view->templ.Decimate(0.7);
-// 	setCursor(Qt::ArrowCursor);
-// 	ui.view->updateGL();
+	setCursor(Qt::WaitCursor);
+	ui.view->templ.Decimate(0.7);
+	setCursor(Qt::ArrowCursor);
+	ui.view->updateGL();
 
 	tree_type src(std::ptr_fun(tac));
 	for(int i = 0; i < ui.view->templ.n_vertices(); i++)
 	{
 		src.insert(ui.view->templ.point(ui.view->templ.vertex_handle(i)));
 	}
-	std::pair<tree_type::const_iterator, double> found = src.find_nearest(HCCLMesh::Point(1.0, 0.0, 0.0));
 
-	//if(found.first != src.end() && found.second == 2)
+	HCCLMesh::Point target(4.0, 0.0, 0.0);
+	int num_nearest_data = 5;
+
+	FindN_predicate::Data nearest_n(target, num_nearest_data);
+	src.find_nearest_if(target, 999999.0/*numeric_limits<double>::max()*/, FindN_predicate(&nearest_n));
+
+	for (int i = 0; i<nearest_n.candidates.size(); ++i)
 	{
-		HCCLMesh::Point pt = *found.first;
+		HCCLMesh::Point pt = nearest_n.candidates[i].second;
 		std::cout << pt[0] << ", " << pt[1] << ", " << pt[2] << std::endl;
 	}
+
+
+// 	std::pair<tree_type::const_iterator, double> found = src.find_nearest(HCCLMesh::Point(1.0, 0.0, 0.0));
+// 	//if(found.first != src.end() && found.second == 2)
+// 	{
+// 		HCCLMesh::Point pt = *found.first;
+// 		std::cout << pt[0] << ", " << pt[1] << ", " << pt[2] << std::endl;
+// 	}
 }
