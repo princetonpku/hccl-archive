@@ -50,12 +50,6 @@
     <ClCompile Include="GeneratedFiles\qrc_DeformableRegistration.cpp">
       <Filter>Generated Files</Filter>
     </ClCompile>
-    <ClCompile Include="Renderer_gl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="TriMesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="VectorAlgebra.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -67,6 +61,9 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\Release\moc_Viewer.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="OpenMeshWrapper.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -82,22 +79,25 @@
     <CustomBuild Include="Viewer.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="Decimate.ui">
+      <Filter>Form Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GeneratedFiles\ui_DeformableRegistration.h">
       <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Renderer_gl.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="TriMesh.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VectorAlgebra.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="VectorQuaternion.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenMeshWrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_Decimate.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
