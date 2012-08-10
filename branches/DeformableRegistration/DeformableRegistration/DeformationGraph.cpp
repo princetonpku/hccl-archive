@@ -28,7 +28,9 @@ void DeformationGraph::SetMesh(const CTriMesh* _mesh)
 void DeformationGraph::BuildGraph(double sampling_rate/* = 0.2*/, int k/* = 4*/)
 {
 //	mesh->SampleUniform(mesh->n_vertices()*sampling_rate, nodes, TM_SAMPLE_UNIFORM_DART);
-	mesh->SampleRandom(mesh->n_vertices()*sampling_rate, nodes);
+	//mesh->SampleRandom(mesh->n_vertices()*sampling_rate, nodes);
+	mesh->SampleUniform(mesh->n_vertices()*sampling_rate, nodes);
+
 
 // 	BuildKDTree();
 // 
@@ -131,6 +133,7 @@ void DeformationGraph::DestroyKDTree(void)
 
 void DeformationGraph::Render(void)
 {
+	glEnable(GL_LIGHTING);
 	glBegin(GL_POINTS);
 	for(int i = 0; i < nodes.size(); i++)
 		glVertex3d(nodes[i].X(), nodes[i].Y(), nodes[i].Z());
