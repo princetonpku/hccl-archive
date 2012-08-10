@@ -59,6 +59,10 @@ typedef OpenMesh::TriMesh_ArrayKernelT<HCCLTraits> HCCLMesh;
 typedef std::pair<HCCLMesh::Point, int> IndexedPoint;
 typedef KDTree::KDTree<3, IndexedPoint, std::pointer_to_binary_function<IndexedPoint, size_t, double> > HCCLKDTree;
 
+
+#define TM_SAMPLE_UNIFORM_DART 0x0001
+
+
 class CTriMesh : public HCCLMesh
 {
 public:
@@ -110,7 +114,7 @@ public:
 // Sampling methods
 public:
 	void SampleRandom(int nSamples, std::vector<Vector3d>& samples) const;	
-	void SampleUniform_Dart(int nSamples, std::vector<Vector3d>& samples) const;
+	void SampleUniform(int nSamples, std::vector<Vector3d>& samples, uint nFlag = TM_SAMPLE_UNIFORM_DART) const;
 
 // Find closest point via KD-Tree search
 public:

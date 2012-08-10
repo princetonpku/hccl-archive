@@ -234,7 +234,8 @@ void CTriMesh::SampleRandom(int nSamples, std::vector<Vector3d>& samples) const
 	std::vector<int> vtxIdxList;
 	std::vector<int> vtxSelect(nSamples);
 
-	vtxIdxList.resize(n_vertices());
+	//vtxIdxList.resize(n_vertices());
+	vtxIdxList.resize(nSamples);
 	std::iota(vtxIdxList.begin(), vtxIdxList.end(), 0);				// Generate a vertex index list (Non-zero base indexing)
 
 	// Random Shuffle
@@ -257,46 +258,49 @@ void CTriMesh::SampleRandom(int nSamples, std::vector<Vector3d>& samples) const
 	}
 }
 
-void CTriMesh::SampleUniform_Dart(int nSamples, std::vector<Vector3d>& samples) const
+void CTriMesh::SampleUniform(int nSamples, std::vector<Vector3d>& samples, uint nFlag/* = TM_SAMPLE_UNIFORM_DART*/) const
 {
-	SampleRandom(10*nSamples, samples);
+	if( (nFlag & TM_SAMPLE_UNIFORM_DART) == TM_SAMPLE_UNIFORM_DART )
+	{
+		SampleRandom(10*nSamples, samples);
 	
-	if(n_vertices() <= 0  || samples.size() == 0)
-		return;
+		if(n_vertices() <= 0  || samples.size() == 0)
+			return;
 
-	int n_nodes = samples.size();
-	std::vector<Vector3d> D_nodes(nSamples);
-	Vector3d temp;
-	auto f1 = [this, &temp](Vector3d v)->bool
-	{
-		if((temp - v).Norm() < 10)
-			return true;
-		else
-			return false;
-	};
+		int n_nodes = samples.size();
+		std::vector<Vector3d> D_nodes(nSamples);
+		Vector3d temp;
+		auto f1 = [this, &temp](Vector3d v)->bool
+		{
+			if((temp - v).Norm() < 10)
+				return true;
+			else
+				return false;
+		};
 
-	int cnt = 0;
-	int r;
-	while(1)
-	{
-		n_nodes = samples.size();
-		r = rand()%n_nodes;
-		temp = Vector3d(samples[r].X(), samples[r].Y(), samples[r].Z());
-		D_nodes[cnt++] = Vector3d(samples[r].X(), samples[r].Y(), samples[r].Z());
-		samples.erase(std::remove_if(samples.begin(), samples.end(), f1), samples.end());
-		if(cnt >= nSamples || samples.size() == 0)
-			break;
+		int cnt = 0;
+		int r;
+		while(1)
+		{
+			n_nodes = samples.size();
+			r = rand()%n_nodes;
+			temp = Vector3d(samples[r].X(), samples[r].Y(), samples[r].Z());
+			D_nodes[cnt++] = Vector3d(samples[r].X(), samples[r].Y(), samples[r].Z());
+			samples.erase(std::remove_if(samples.begin(), samples.end(), f1), samples.end());
+			if(cnt >= nSamples || samples.size() == 0)
+				break;
+		}
+
+		auto f2 = [](Vector3d v)->bool
+		{
+			if(v.Norm()==0)
+				return true;
+			else
+				return false;
+		};
+		D_nodes.erase(std::remove_if(D_nodes.begin(), D_nodes.end(), f2), D_nodes.end());
+		samples = D_nodes;
 	}
-
-	auto f2 = [](Vector3d v)->bool
-	{
-		if(v.Norm()==0)
-			return true;
-		else
-			return false;
-	};
-	D_nodes.erase(std::remove_if(D_nodes.begin(), D_nodes.end(), f2), D_nodes.end());
-	samples = D_nodes;
 }
 
 inline double tac( IndexedPoint indexed_pt, size_t k ) { return indexed_pt.first[k]; }
@@ -341,7 +345,7 @@ void CTriMesh::FindClosestPoint(Vector3d ref, int* idx, int n/* = 1*/, Vector3d*
 						cs->pop_back();
 						let_libkdtree_trim = (cs->empty() || dist > cs->back().first);
 					}
-					cs->insert( lower_bound(cs->begin(),cs->end(),Candidate(dist,t)/*dist*/), Candidate(dist,t) );
+					cs->insert( std::lower_bound(cs->begin(),cs->end(),/*Candidate(dist,t)*/dist, [&](Candidate& c, const double& d)->bool{return (c.first < d);}), Candidate(dist,t) );
 					return let_libkdtree_trim;
 				}
 			}

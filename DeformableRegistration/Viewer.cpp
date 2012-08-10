@@ -30,7 +30,14 @@ void Viewer::draw()
 	glColor3ub(255, 190, 100);
  	templ.RenderSmooth();
  	glColor3ub(50, 50, 50);
- 	templ.RenderWireframe();
+ //	templ.RenderWireframe();
+
+	glDisable(GL_DEPTH_TEST);
+	glColor3ub(0,0,0);
+	glPointSize(10.0);
+	glLineWidth(2.0);
+	graph.Render();
+	glEnable(GL_DEPTH_TEST);
 //	templ.RenderPoints();
 //	templ.RenderNodes();
  	glColor3ub(128, 128, 200);
