@@ -94,16 +94,19 @@ public:
 // 	//get 함수들??
 
 // (TODO) Rigid-Body Transformations
-// public:
-// 	void Translate(Mesh::Point p);						// TODO: Mesh::Point대신에 vector를 사용?
-// 	void Rotate(double angle, Mesh::Point axis);
+public:
+	void Translate(double x, double y, double z);
+	void Translate(OpenMesh::Vec3d v);
+	void Translate(Vector3d v);
+	//void Rotate(double angle, Mesh::Point axis);
 
 public:
 	void Decimate(double p);					// Decimate mesh while retaining p% of vertices. (0 < p < 1)
 
-	// Sampling
-	void SamplingRandom(int nSamples);	
-	void SamplingDart(int nSamples);
+// Sampling methods
+public:
+	void SampleRandom(int nSamples);	
+	void SampleUniform_Dart(int nSamples);
 
 // 	void getNeighbors(Mesh::VertexHandle vh, size_t n, std::vector<Mesh::VertexHandle>& neighbors);
 // 

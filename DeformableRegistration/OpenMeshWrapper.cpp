@@ -170,8 +170,8 @@ void CTriMesh::UpdateBoundingSphere(void)
 {
 	double r = 0.0;
 	double r_temp;
-	Mesh::VertexIter v_it, v_end(vertices_end());
-	Mesh::Point temp;
+	HCCLMesh::VertexIter v_it, v_end(vertices_end());
+	HCCLMesh::Point temp;
 	for(v_it = vertices_begin(); v_it != v_end; ++v_it)
 	{
 		r_temp = point(v_it).norm();
@@ -185,6 +185,25 @@ double CTriMesh::GetBoundingSphereRadius(void)
 	return bounding_sphere_rad;
 }
 
+void CTriMesh::Translate(double x, double y, double z)
+{
+	std::for_each(vertices_begin(), vertices_end(), [&](const HCCLMesh::VertexHandle& vh){
+		this->set_point(vh, HCCLMesh::Point(x, y, z));
+	});
+}
+
+void CTriMesh::Translate(OpenMesh::Vec3d v)
+{
+	std::for_each(vertices_begin(), vertices_end(), [&](const HCCLMesh::VertexHandle& vh){
+		this->set_point(vh, v);
+	});
+}
+void CTriMesh::Translate(Vector3d v)
+{
+	std::for_each(vertices_begin(), vertices_end(), [&](const HCCLMesh::VertexHandle& vh){
+		this->set_point(vh, HCCLMesh::Point(v.X(), v.Y(), v.Z()));
+	});
+}
 
 void CTriMesh::Decimate(double p)
 {
@@ -211,7 +230,7 @@ int CTriMesh::numVertices( void )
 	return n_vertices();
 }
 
-void CTriMesh::SamplingRandom( int nSamples )
+void CTriMesh::SampleRandom( int nSamples )
 {
 	if(n_vertices() <= 0)
 		return;
@@ -248,9 +267,9 @@ void CTriMesh::SamplingRandom( int nSamples )
 	}
 }
 
-void CTriMesh::SamplingDart( int nSamples )
+void CTriMesh::SampleUniform_Dart( int nSamples )
 {
-	SamplingRandom(10*nSamples);
+	SampleRandom(10*nSamples);
 	
 	if(n_vertices() <= 0  || nodes.size() == 0)
 		return;
