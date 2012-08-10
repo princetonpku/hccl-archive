@@ -5,7 +5,7 @@
 #include <limits>
 
 
-#include <armadillo>
+//#include <armadillo>
 #include <OpenMesh/Tools/Decimater/DecimaterT.hh>
 #include <OpenMesh/Tools/Decimater/ModQuadricT.hh>
 
@@ -165,7 +165,7 @@ void CTriMesh::UpdateBoundingSphere(void)
 	for(v_it = vertices_begin(); v_it != v_end; ++v_it)
 	{
 		r_temp = point(v_it).norm();
-		r = std::max(r_temp, r);
+		r = /*std::*/max(r_temp, r);
 	}
 	bounding_sphere_rad = r;
 }
@@ -299,12 +299,12 @@ void CTriMesh::SampleUniform_Dart(int nSamples, std::vector<Vector3d>& samples) 
 	samples = D_nodes;
 }
 
-inline double tac( HCCLMesh::Point t, size_t k ) { return t[k]; }
+inline double tac( IndexedPoint indexed_pt, size_t k ) { return indexed_pt.first[k]; }
 void CTriMesh::BuildKDTree(void)
 {
 	kdtree = new HCCLKDTree(std::ptr_fun(tac));
 	std::for_each(vertices_begin(), vertices_end(), [&](const HCCLMesh::VertexHandle& vh){
-		kdtree->insert(point(vh));
+		kdtree->insert(IndexedPoint(point(vh), vh.idx()));
 	});
 }
 
@@ -312,12 +312,13 @@ void CTriMesh::FindClosestPoint(Vector3d ref, int* idx, int n/* = 1*/, Vector3d*
 {
 	struct FindN_predicate
 	{
-		typedef std::pair<double, HCCLMesh::Point> Candidate;
+		typedef std::pair<double, IndexedPoint> Candidate;
 		typedef std::vector<Candidate> Candidates;
 
 		struct Data
 		{
-			Data(HCCLMesh::Point t, size_t n) : target(t), num_wanted(n)		{			candidates.reserve(n);		}
+			Data(HCCLMesh::Point t, size_t n) : target(t), num_wanted(n)	{candidates.reserve(n);}
+			
 			Candidates candidates;
 			HCCLMesh::Point target;
 			size_t num_wanted;
@@ -325,11 +326,11 @@ void CTriMesh::FindClosestPoint(Vector3d ref, int* idx, int n/* = 1*/, Vector3d*
 
 		FindN_predicate(Data * data_) : data(data_), cs(&data_->candidates) {}
 
-		bool operator()( HCCLMesh::Point const& t )
+		bool operator()( IndexedPoint const& t )
 		{
 			if (data->num_wanted > 0)
 			{
-				double dist = (data->target - t).norm();
+				double dist = (data->target - t.first).norm();
 				bool full = (cs->size() == data->num_wanted);
 
 				if (!full || dist < cs->back().first)
@@ -351,14 +352,23 @@ void CTriMesh::FindClosestPoint(Vector3d ref, int* idx, int n/* = 1*/, Vector3d*
 		Candidates * cs;
 	};
 
+	IndexedPoint target(HCCLMesh::Point(ref[0], ref[1], ref[2]), -1);
 
-	FindN_predicate::Data nearest_n(HCCLMesh::Point(ref[0], ref[1], ref[2]), n);
-	kdtree->find_nearest_if(HCCLMesh::Point(ref[0], ref[1], ref[2]), std::numeric_limits<double>::infinity()/*numeric_limits<double>::max()*/, FindN_predicate(&nearest_n));
+	FindN_predicate::Data nearest_n(target.first, n);
+	kdtree->find_nearest_if(target, std::numeric_limits<double>::infinity(), FindN_predicate(&nearest_n));
 
+	
 	for (int i = 0; i < nearest_n.candidates.size(); ++i)
 	{
-		HCCLMesh::Point pt = nearest_n.candidates[i].second;
-		std::cout << pt[0] << ", " << pt[1] << ", " << pt[2] << std::endl;
+		idx[i] = nearest_n.candidates[i].second.second;
+	}
+	if (pt!=NULL)
+	{
+		for (int i = 0; i < nearest_n.candidates.size(); ++i)
+		{
+			HCCLMesh::Point hccl_pt = nearest_n.candidates[i].second.first;
+			pt[i] = Vector3d(hccl_pt.data());
+		}			
 	}
 
 }
