@@ -7,6 +7,7 @@
 using namespace std;
 
 #include "OpenMeshWrapper.h"
+#include "DeformationGraph.h"
 
 
 class Viewer : public QGLViewer
@@ -25,7 +26,9 @@ protected :
 
 public:
 	CTriMesh templ;
-	CTriMesh target;	
+	CTriMesh target;
+	
+	DeformationGraph graph;
 };
 
 #endif // VIEWER_H

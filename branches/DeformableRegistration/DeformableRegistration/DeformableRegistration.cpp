@@ -110,10 +110,13 @@ void DeformableRegistration::OnFileExit()
 
 void DeformableRegistration::OnToolsDecimate()
 {
-	setCursor(Qt::WaitCursor);
-	ui.view->templ.Decimate(0.7);
-	setCursor(Qt::ArrowCursor);
-	ui.view->updateGL();
+// 	setCursor(Qt::WaitCursor);
+// 	ui.view->templ.Decimate(0.7);
+// 	setCursor(Qt::ArrowCursor);
+// 	ui.view->updateGL();
+
+	ui.view->graph.SetMesh(&(ui.view->templ));
+	ui.view->graph.BuildGraph(0.8);
 }
 
 void DeformableRegistration::OnToolsSample_Random()
@@ -138,5 +141,5 @@ void DeformableRegistration::OnToolsSample_Quad()
 
 void DeformableRegistration::OnToolsSample_Uniform_Dart()
 {
-	//ui.view->templ.SampleUniform_Dart(2000);
+	//ui.view->templ.SampleUniform(2000, TM_SAMPLE_UNIFORM_DART);
 }

@@ -397,10 +397,10 @@ public:
 	{
 		memcpy(this->val, v.val, sizeof(T)*2);
 	}
-	Vector2(const Quaternion<T>& q)										// typecast constructor
-	{
-		memcpy(this->val, q.val+1, sizeof(T)*2);
-	}
+// 	Vector2(const Quaternion<T>& q)										// typecast constructor
+// 	{
+// 		memcpy(this->val, q.val+1, sizeof(T)*2);
+// 	}
 	~Vector2(){}
 
 // Methods (Algebra)
@@ -474,6 +474,7 @@ public:
 	Vector2<T> operator=(const Vector2<T>& v)							// assign operator
 	{
 		memcpy(this->val, v.val, sizeof(T)*2);
+		return *this;
 	}
 
 	bool operator==(const Vector2<T>& v) const							// compare operator
