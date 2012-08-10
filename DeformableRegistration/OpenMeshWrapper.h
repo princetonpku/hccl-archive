@@ -82,8 +82,6 @@ public:
 	void RenderFlat(GLuint nFlag = 0) const;
 	void RenderSmooth(GLuint nFlag = 0) const;
 
-	void RenderNodes(GLuint nFlag = 0) const;	
-
 	// TODO
 // 	void Draw_BoundingBox(void);				// TODO: bounding box 및 sphere도 trait으로 넣자T
 // 	void Draw_BoundingSphere(void);
@@ -144,7 +142,6 @@ public:
 // 	Mesh::Point cog;
 // 	Mesh::Point bounding_box_min, bounding_box_max;
 	double bounding_sphere_rad;
-	//std::vector<Vector3d> nodes;
 	HCCLKDTree* kdtree;
 };
 
