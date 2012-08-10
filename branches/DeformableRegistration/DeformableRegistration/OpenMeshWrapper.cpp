@@ -1,5 +1,6 @@
 #include "OpenMeshWrapper.h"
 
+
 #include <algorithm>
 #include <numeric>
 #include <limits>
@@ -135,7 +136,7 @@ void CTriMesh::RenderSmooth(GLuint nFlag/* = 0*/) const
 
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_DOUBLE, 0, points());
-
+	
 	glEnableClientState(GL_NORMAL_ARRAY);
 	glNormalPointer(GL_DOUBLE, 0, vertex_normals());
 
@@ -145,10 +146,8 @@ void CTriMesh::RenderSmooth(GLuint nFlag/* = 0*/) const
 	{
 		fvIt = cfv_iter(fIt.handle()); 
 		glArrayElement(fvIt.handle().idx());
-		++fvIt;
-		glArrayElement(fvIt.handle().idx());
-		++fvIt;
-		glArrayElement(fvIt.handle().idx());
+		glArrayElement((++fvIt).handle().idx());
+		glArrayElement((++fvIt).handle().idx());
 	}
 	glEnd();
 
@@ -267,21 +266,28 @@ void CTriMesh::SampleUniform(int nSamples, std::vector<Vector3d>& samples, uint 
 	{
 		HCCLMesh::ConstFaceIter fIt(faces_begin()), fEnd(faces_end());
 		HCCLMesh::ConstFaceVertexIter fvIt;
-		HCCLMesh::Point pt1, pt2, pt3;
+		HCCLMesh::Point pt1, pt2, pt3;		
 		double area = 0;
 		double mean_dist = 0;
 		for (; fIt!=fEnd; ++fIt)
 		{
 			fvIt = cfv_iter(fIt.handle()); 
-			pt1 = point(vertex_handle(fvIt.handle().idx()));
-			++fvIt;
-			pt2 = point(vertex_handle(fvIt.handle().idx()));
-			++fvIt;
-			pt3 = point(vertex_handle(fvIt.handle().idx()));
-			Vector3d t1 = Vector3d(pt1.values_[0]-pt2.values_[0],pt1.values_[1]-pt2.values_[1],pt1.values_[2]-pt2.values_[2]);
-			Vector3d t2 = Vector3d(pt1.values_[0]-pt3.values_[0],pt1.values_[1]-pt3.values_[1],pt1.values_[2]-pt3.values_[2]);
-			area += 0.5*t1.Cross(t2).Norm();
-			mean_dist += 0.5*(t1.Norm() + t2.Norm());
+// 			pt1 = point(vertex_handle(fvIt.handle().idx()));
+// 			++fvIt;
+// 			pt2 = point(vertex_handle(fvIt.handle().idx()));
+// 			++fvIt;
+// 			pt3 = point(vertex_handle(fvIt.handle().idx()));
+			pt1 = point(fvIt.handle());
+			pt2 = point((++fvIt).handle());
+			pt3 = point((++fvIt).handle());
+// 			Vector3d t1 = Vector3d(pt1.values_[0]-pt2.values_[0],pt1.values_[1]-pt2.values_[1],pt1.values_[2]-pt2.values_[2]);
+// 			Vector3d t2 = Vector3d(pt1.values_[0]-pt3.values_[0],pt1.values_[1]-pt3.values_[1],pt1.values_[2]-pt3.values_[2]);
+// 			area += 0.5*t1.Cross(t2).Norm();
+// 			mean_dist += 0.5*(t1.Norm() + t2.Norm());
+			HCCLMesh::Point t1 = pt1-pt2;
+			HCCLMesh::Point t2 = pt1-pt3;
+			area += 0.5*(t1%t2).norm();
+			mean_dist += 0.5*(t1.norm()+t2.norm());			
 		}	
 
 		mean_dist /= n_vertices();
@@ -329,8 +335,6 @@ void CTriMesh::SampleUniform(int nSamples, std::vector<Vector3d>& samples, uint 
 			else if(cnt >= 0.98*nSamples && samples.size() == 0)
 				break;
 		}
-
-
 
 		auto f2 = [](Vector3d v)->bool
 		{

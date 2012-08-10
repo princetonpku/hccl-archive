@@ -1,4 +1,6 @@
 #include "DeformationGraph.h"
+#include "OpenMeshWrapper.h"
+
 #include <algorithm>
 
 

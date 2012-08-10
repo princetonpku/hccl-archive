@@ -1,7 +1,6 @@
 #ifndef HCCL_DEFORMATIONGRAPH_H_
 #define HCCL_DEFORMATIONGRAPH_H_
 
-#include "OpenMeshWrapper.h"
 #include "VectorQuaternion.h"
 
 #include <vector>
@@ -9,6 +8,8 @@
 #include "kdtree.hpp"
 typedef std::pair<Vector3d, int> DG_IndexedPoint;
 typedef KDTree::KDTree<3, DG_IndexedPoint, std::pointer_to_binary_function<DG_IndexedPoint, size_t, double> > DG_KDTree;
+
+class CTriMesh;
 
 class DeformationGraph
 {
