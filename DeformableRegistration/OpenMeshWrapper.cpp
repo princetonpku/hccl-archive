@@ -70,7 +70,7 @@ bool CTriMesh::Read(std::string strFilePath)
 	return true;
 }
 
-bool CTriMesh::Write(std::string strFilePath)
+bool CTriMesh::Write(std::string strFilePath) const
 {
 	if ( !OpenMesh::IO::write_mesh(*this, strFilePath) )
 	{
@@ -80,11 +80,11 @@ bool CTriMesh::Write(std::string strFilePath)
 	return true;
 }
 
-void CTriMesh::Render(GLenum nMethod, GLuint nFlag)
+void CTriMesh::Render(GLenum nMethod, GLuint nFlag) const
 {
 }
 
-void CTriMesh::RenderPoints(GLuint nFlag/* = 0*/)
+void CTriMesh::RenderPoints(GLuint nFlag/* = 0*/) const
 {
 	if(n_vertices() <= 0)
 		return;
@@ -97,7 +97,7 @@ void CTriMesh::RenderPoints(GLuint nFlag/* = 0*/)
 	glEnd();
 }
 
-void CTriMesh::RenderWireframe(GLuint nFlag/* = 0*/)
+void CTriMesh::RenderWireframe(GLuint nFlag/* = 0*/) const
 {
 	if(n_vertices() <= 0)
 		return;
@@ -119,12 +119,12 @@ void CTriMesh::RenderWireframe(GLuint nFlag/* = 0*/)
 	glEnd();
 }
 
-void CTriMesh::RenderFlat(GLuint nFlag/* = 0*/)
+void CTriMesh::RenderFlat(GLuint nFlag/* = 0*/) const
 {
 
 }
 
-void CTriMesh::RenderSmooth(GLuint nFlag/* = 0*/)
+void CTriMesh::RenderSmooth(GLuint nFlag/* = 0*/) const
 {
 	if(n_vertices() <= 0)
 		return;
@@ -156,7 +156,7 @@ void CTriMesh::RenderSmooth(GLuint nFlag/* = 0*/)
 	glDisableClientState(GL_NORMAL_ARRAY);
 }
 
-void CTriMesh::RenderNodes( GLuint nFlag /*= 0*/ )
+void CTriMesh::RenderNodes( GLuint nFlag /*= 0*/ ) const
 {
 	glDisable(GL_LIGHTING);
 	glColor3ub(0, 255, 0);
@@ -183,7 +183,7 @@ void CTriMesh::UpdateBoundingSphere(void)
 	bounding_sphere_rad = r;
 }
 
-double CTriMesh::GetBoundingSphereRadius(void)
+double CTriMesh::GetBoundingSphereRadius(void) const
 {
 	return bounding_sphere_rad;
 }
@@ -229,20 +229,19 @@ void CTriMesh::Decimate(double p)
 	garbage_collection();
 }
 
-int CTriMesh::numVertices( void )
+int CTriMesh::numVertices(void) const
 {
 	return n_vertices();
 }
 
-void CTriMesh::SampleRandom( int nSamples )
+void CTriMesh::SampleRandom(int nSamples, std::vector<Vector3d>& samples) const
 {
 	if(n_vertices() <= 0)
 		return;
 
 	//////////////////////////////////////////////////////////////////////////
 	// Random Sampling Method
-	nodes.clear();
-	nodes.resize(nSamples);
+	samples.resize(nSamples);
 
 	// Vertices List
 	std::vector<int> vtxIdxList;
@@ -263,7 +262,7 @@ void CTriMesh::SampleRandom( int nSamples )
 	{
 		if(cnt==vtxSelect[idxCnt])
 		{
-			nodes[idxCnt] = Vector3d(&point(vit)[0]);
+			samples[idxCnt] = Vector3d(&point(vit)[0]);
 			idxCnt++;
 			if(idxCnt==nSamples)
 				break;
@@ -271,14 +270,14 @@ void CTriMesh::SampleRandom( int nSamples )
 	}
 }
 
-void CTriMesh::SampleUniform_Dart( int nSamples )
+void CTriMesh::SampleUniform_Dart(int nSamples, std::vector<Vector3d>& samples) const
 {
-	SampleRandom(10*nSamples);
+	SampleRandom(10*nSamples, samples);
 	
-	if(n_vertices() <= 0  || nodes.size() == 0)
+	if(n_vertices() <= 0  || samples.size() == 0)
 		return;
 
-	int n_nodes = nodes.size();
+	int n_nodes = samples.size();
 	std::vector<Vector3d> D_nodes(nSamples);
 	Vector3d temp;
 	auto f1 = [this, &temp](Vector3d v)->bool
@@ -293,12 +292,12 @@ void CTriMesh::SampleUniform_Dart( int nSamples )
 	int r;
 	while(1)
 	{
-		n_nodes = nodes.size();
+		n_nodes = samples.size();
 		r = rand()%n_nodes;
-		temp = Vector3d(nodes[r].X(), nodes[r].Y(), nodes[r].Z());
-		D_nodes[cnt++] = Vector3d(nodes[r].X(), nodes[r].Y(), nodes[r].Z());
-		nodes.erase(std::remove_if(nodes.begin(), nodes.end(), f1), nodes.end());
-		if(cnt >= nSamples || nodes.size() == 0)
+		temp = Vector3d(samples[r].X(), samples[r].Y(), samples[r].Z());
+		D_nodes[cnt++] = Vector3d(samples[r].X(), samples[r].Y(), samples[r].Z());
+		samples.erase(std::remove_if(samples.begin(), samples.end(), f1), samples.end());
+		if(cnt >= nSamples || samples.size() == 0)
 			break;
 	}
 
@@ -310,7 +309,7 @@ void CTriMesh::SampleUniform_Dart( int nSamples )
 			return false;
 	};
 	D_nodes.erase(std::remove_if(D_nodes.begin(), D_nodes.end(), f2), D_nodes.end());
-	nodes = D_nodes;
+	samples = D_nodes;
 }
 
 inline double tac( HCCLMesh::Point t, size_t k ) { return t[k]; }
@@ -322,7 +321,7 @@ void CTriMesh::BuildKDTree(void)
 	});
 }
 
-void CTriMesh::FindClosestPoint(Vector3d ref, int* idx, int n/* = 1*/, Vector3d* pt/* = NULL*/)
+void CTriMesh::FindClosestPoint(Vector3d ref, int* idx, int n/* = 1*/, Vector3d* pt/* = NULL*/) const
 {
 	struct FindN_predicate
 	{

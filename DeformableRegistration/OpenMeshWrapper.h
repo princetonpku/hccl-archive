@@ -71,18 +71,18 @@ public:
 // File I/O
 public:
 	bool Read(std::string strFilePath);
-	bool Write(std::string strFilePath);
+	bool Write(std::string strFilePath) const;
 
 // OpenGL Display
 public:
-	void Render(GLenum nMethod, GLuint nFlag);				// TODO: flag 구현할 것
+	void Render(GLenum nMethod, GLuint nFlag) const;				// TODO: flag 구현할 것
 //protected:
-	void RenderPoints(GLuint nFlag = 0);
-	void RenderWireframe(GLuint nFlag = 0);
-	void RenderFlat(GLuint nFlag = 0);
-	void RenderSmooth(GLuint nFlag = 0);
+	void RenderPoints(GLuint nFlag = 0) const;
+	void RenderWireframe(GLuint nFlag = 0) const;
+	void RenderFlat(GLuint nFlag = 0) const;
+	void RenderSmooth(GLuint nFlag = 0) const;
 
-	void RenderNodes(GLuint nFlag = 0);	
+	void RenderNodes(GLuint nFlag = 0) const;	
 
 	// TODO
 // 	void Draw_BoundingBox(void);				// TODO: bounding box 및 sphere도 trait으로 넣자T
@@ -96,7 +96,7 @@ public:
 // 	void UpdateBoundingBox(void);
 	void UpdateBoundingSphere(void);
 
-	double GetBoundingSphereRadius(void);
+	double GetBoundingSphereRadius(void) const;
 // 	//get 함수들??
 
 // (TODO) Rigid-Body Transformations
@@ -111,13 +111,13 @@ public:
 
 // Sampling methods
 public:
-	void SampleRandom(int nSamples);	
-	void SampleUniform_Dart(int nSamples);
+	void SampleRandom(int nSamples, std::vector<Vector3d>& samples) const;	
+	void SampleUniform_Dart(int nSamples, std::vector<Vector3d>& samples) const;
 
 // Find closest point via KD-Tree search
 public:
 	void BuildKDTree(void);
-	void FindClosestPoint(Vector3d ref, int* idx, int n = 1, Vector3d* pt = NULL);
+	void FindClosestPoint(Vector3d ref, int* idx, int n = 1, Vector3d* pt = NULL) const;
 	void DestroyKDTree(void);
 
 // 	void getNeighbors(Mesh::VertexHandle vh, size_t n, std::vector<Mesh::VertexHandle>& neighbors);
@@ -125,7 +125,7 @@ public:
 // 	// Query functions
 // public:
 // 	bool hasVertices(void);
-	int numVertices(void);
+	int numVertices(void) const;
 // 	size_t numVertices(void);
 // 	size_t numFaces(void);
 // 	size_t numEdges(void);
@@ -143,8 +143,8 @@ public:
 // 
 // 	Mesh::Point cog;
 // 	Mesh::Point bounding_box_min, bounding_box_max;
-	double bounding_sphere_rad;	
-	std::vector<Vector3d> nodes;
+	double bounding_sphere_rad;
+	//std::vector<Vector3d> nodes;
 	HCCLKDTree* kdtree;
 };
 
