@@ -48,11 +48,11 @@ void DeformableRegistration::OnFileOpenTemplate()
 	if(file == "")
 		return;
 	setCursor(Qt::WaitCursor);
-	QByteArray byteName = file.toLocal8Bit();
-	char* filename = byteName.data();
-	//sprintf(filename, "%s", file.toAscii().data());
+//	QByteArray byteName = file.toLocal8Bit();
+// 	char* filename = byteName.data();
+// 	//sprintf(filename, "%s", file.toAscii().data());
 	ui.view->templ.Clear();
-	ui.view->templ.Read(filename);
+	ui.view->templ.Read(file.toStdString().c_str());
 	//	ui.view->templ.UpdatePauly();
 
 	ui.view->templ.UpdateBoundingSphere();
@@ -77,11 +77,11 @@ void DeformableRegistration::OnFileOpenTarget()
 	if(file == "")
 		return;
 	setCursor(Qt::WaitCursor);
-	QByteArray byteName = file.toLocal8Bit();
-	char* filename = byteName.data();
-	//sprintf(filename, "%s", file.toAscii().data());
+// 	QByteArray byteName = file.toLocal8Bit();
+// 	char* filename = byteName.data();
+// 	//sprintf(filename, "%s", file.toAscii().data());
 	ui.view->target.Clear();
-	ui.view->target.Read(filename);
+	ui.view->target.Read(file.toStdString().c_str());
 	//	ui.view->target.UpdatePauly();
 
 	ui.view->target.UpdateBoundingSphere();
