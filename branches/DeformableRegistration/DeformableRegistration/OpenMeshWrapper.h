@@ -12,10 +12,9 @@
 
 #include "VectorQuaternion.h"
 
+// OpenMesh
 #include <OpenMesh/Core/IO/MeshIO.hh>
 #include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
-
-typedef OpenMesh::TriMesh_ArrayKernelT<>  Mesh;
 
 #ifndef min
 #define min(a, b) (((a) < (b))? (a) : (b))
@@ -52,6 +51,13 @@ struct HCCLTraits : public OpenMesh::DefaultTraits
 
 };
 typedef OpenMesh::TriMesh_ArrayKernelT<HCCLTraits> HCCLMesh;
+
+
+/* 3rd party libraries */
+// libkdtree++
+#include "kdtree.hpp"
+typedef KDTree::KDTree<3, HCCLMesh::Point, std::pointer_to_binary_function<HCCLMesh::Point,size_t,double> > HCCLKDTree;
+
 
 class CTriMesh : public HCCLMesh
 {
@@ -96,8 +102,8 @@ public:
 // (TODO) Rigid-Body Transformations
 public:
 	void Translate(double x, double y, double z);
-	void Translate(OpenMesh::Vec3d v);
 	void Translate(Vector3d v);
+	void Translate(OpenMesh::Vec3d v);
 	//void Rotate(double angle, Mesh::Point axis);
 
 public:
@@ -107,6 +113,12 @@ public:
 public:
 	void SampleRandom(int nSamples);	
 	void SampleUniform_Dart(int nSamples);
+
+// Find closest point via KD-Tree search
+public:
+	void BuildKDTree(void);
+	void FindClosestPoint(Vector3d ref, int* idx, int n = 1, Vector3d* pt = NULL);
+	void DestroyKDTree(void);
 
 // 	void getNeighbors(Mesh::VertexHandle vh, size_t n, std::vector<Mesh::VertexHandle>& neighbors);
 // 
@@ -132,7 +144,8 @@ public:
 // 	Mesh::Point cog;
 // 	Mesh::Point bounding_box_min, bounding_box_max;
 	double bounding_sphere_rad;	
-	std::vector<Vector3d> nodes;	
+	std::vector<Vector3d> nodes;
+	HCCLKDTree* kdtree;
 };
 
 
