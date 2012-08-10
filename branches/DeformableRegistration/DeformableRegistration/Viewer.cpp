@@ -32,7 +32,7 @@ void Viewer::draw()
  	glColor3ub(50, 50, 50);
  	templ.RenderWireframe();
 //	templ.RenderPoints();
-	templ.RenderNodes();
+//	templ.RenderNodes();
  	glColor3ub(128, 128, 200);
 	target.RenderSmooth();
 }

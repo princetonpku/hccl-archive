@@ -156,19 +156,6 @@ void CTriMesh::RenderSmooth(GLuint nFlag/* = 0*/) const
 	glDisableClientState(GL_NORMAL_ARRAY);
 }
 
-void CTriMesh::RenderNodes( GLuint nFlag /*= 0*/ ) const
-{
-	glDisable(GL_LIGHTING);
-	glColor3ub(0, 255, 0);
-	glPointSize(5);
-	glBegin(GL_POINTS);
-	for(int i=0; i<nodes.size(); i++)
-		glVertex3d(nodes[i].X(), nodes[i].Y(), nodes[i].Z());
-	glEnd();
-	glPointSize(1);
-	glEnable(GL_LIGHTING);
-}
-
 void CTriMesh::UpdateBoundingSphere(void)
 {
 	double r = 0.0;
