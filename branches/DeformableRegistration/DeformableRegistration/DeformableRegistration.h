@@ -24,9 +24,9 @@ private slots:
 	void OnFileExit();
 
 	void OnToolsDecimate();
-	void OnToolsSamplingRAND();		// Random Sampling
-	void OnToolsSamplingQUAD();		// Sampling by Quadric Fitting
-	void OnToolsSamplingDART();		// Sampling by user-defined distance
+	void OnToolsSample_Random();		// Random Sampling
+	void OnToolsSample_Quad();		// Sampling by Quadric Fitting
+	void OnToolsSample_Uniform_Dart();		// Sampling by user-defined distance
 
 };
 
