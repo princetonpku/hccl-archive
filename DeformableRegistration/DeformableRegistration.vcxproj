@@ -84,6 +84,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DeformableRegistration.cpp" />
+    <ClCompile Include="DeformationGraph.cpp" />
     <ClCompile Include="GeneratedFiles\Debug\moc_DeformableRegistration.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
@@ -134,6 +135,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="allocator.hpp" />
+    <ClInclude Include="DeformationGraph.h" />
     <ClInclude Include="function.hpp" />
     <ClInclude Include="GeneratedFiles\ui_Decimate.h" />
     <ClInclude Include="GeneratedFiles\ui_DeformableRegistration.h" />

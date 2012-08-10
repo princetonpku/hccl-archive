@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <numeric>
+#include <limits>
 
 
 #include <armadillo>
@@ -9,6 +10,7 @@
 #include <OpenMesh/Tools/Decimater/ModQuadricT.hh>
 
 CTriMesh::CTriMesh(void)
+	: kdtree(NULL)
 {
 	// 	cog[0] = cog[1] = cog[2] = 0.f;
 	// 	bounding_box_min[0] = bounding_box_min[1] = bounding_box_min[2] = 0.f;
@@ -19,6 +21,7 @@ CTriMesh::CTriMesh(void)
 
 CTriMesh::~CTriMesh(void)
 {
+	DestroyKDTree();
 }
 
 void CTriMesh::Clear()
@@ -192,16 +195,17 @@ void CTriMesh::Translate(double x, double y, double z)
 	});
 }
 
-void CTriMesh::Translate(OpenMesh::Vec3d v)
-{
-	std::for_each(vertices_begin(), vertices_end(), [&](const HCCLMesh::VertexHandle& vh){
-		this->set_point(vh, v);
-	});
-}
 void CTriMesh::Translate(Vector3d v)
 {
 	std::for_each(vertices_begin(), vertices_end(), [&](const HCCLMesh::VertexHandle& vh){
 		this->set_point(vh, HCCLMesh::Point(v.X(), v.Y(), v.Z()));
+	});
+}
+
+void CTriMesh::Translate(OpenMesh::Vec3d v)
+{
+	std::for_each(vertices_begin(), vertices_end(), [&](const HCCLMesh::VertexHandle& vh){
+		this->set_point(vh, v);
 	});
 }
 
@@ -307,6 +311,79 @@ void CTriMesh::SampleUniform_Dart( int nSamples )
 	};
 	D_nodes.erase(std::remove_if(D_nodes.begin(), D_nodes.end(), f2), D_nodes.end());
 	nodes = D_nodes;
+}
+
+inline double tac( HCCLMesh::Point t, size_t k ) { return t[k]; }
+void CTriMesh::BuildKDTree(void)
+{
+	kdtree = new HCCLKDTree(std::ptr_fun(tac));
+	std::for_each(vertices_begin(), vertices_end(), [&](const HCCLMesh::VertexHandle& vh){
+		kdtree->insert(point(vh));
+	});
+}
+
+void CTriMesh::FindClosestPoint(Vector3d ref, int* idx, int n/* = 1*/, Vector3d* pt/* = NULL*/)
+{
+	struct FindN_predicate
+	{
+		typedef std::pair<double, HCCLMesh::Point> Candidate;
+		typedef std::vector<Candidate> Candidates;
+
+		struct Data
+		{
+			Data(HCCLMesh::Point t, size_t n) : target(t), num_wanted(n)		{			candidates.reserve(n);		}
+			Candidates candidates;
+			HCCLMesh::Point target;
+			size_t num_wanted;
+		};
+
+		FindN_predicate(Data * data_) : data(data_), cs(&data_->candidates) {}
+
+		bool operator()( HCCLMesh::Point const& t )
+		{
+			if (data->num_wanted > 0)
+			{
+				double dist = (data->target - t).norm();
+				bool full = (cs->size() == data->num_wanted);
+
+				if (!full || dist < cs->back().first)
+				{
+					bool let_libkdtree_trim = false;
+					if (full)
+					{
+						cs->pop_back();
+						let_libkdtree_trim = (cs->empty() || dist > cs->back().first);
+					}
+					cs->insert( lower_bound(cs->begin(),cs->end(),Candidate(dist,t)/*dist*/), Candidate(dist,t) );
+					return let_libkdtree_trim;
+				}
+			}
+			return true;
+		}
+
+		Data * data;
+		Candidates * cs;
+	};
+
+
+	FindN_predicate::Data nearest_n(HCCLMesh::Point(ref[0], ref[1], ref[2]), n);
+	kdtree->find_nearest_if(HCCLMesh::Point(ref[0], ref[1], ref[2]), std::numeric_limits<double>::infinity()/*numeric_limits<double>::max()*/, FindN_predicate(&nearest_n));
+
+	for (int i = 0; i < nearest_n.candidates.size(); ++i)
+	{
+		HCCLMesh::Point pt = nearest_n.candidates[i].second;
+		std::cout << pt[0] << ", " << pt[1] << ", " << pt[2] << std::endl;
+	}
+
+}
+
+void CTriMesh::DestroyKDTree(void)
+{
+	if(kdtree)
+	{
+		delete kdtree;
+		kdtree = NULL;
+	}
 }
 
 // void CTriMesh::renderPoints(bool color/* = true*/)
