@@ -56,8 +56,8 @@ typedef OpenMesh::TriMesh_ArrayKernelT<HCCLTraits> HCCLMesh;
 /* 3rd party libraries */
 // libkdtree++
 #include "kdtree.hpp"
-typedef KDTree::KDTree<3, HCCLMesh::Point, std::pointer_to_binary_function<HCCLMesh::Point,size_t,double> > HCCLKDTree;
-
+typedef std::pair<HCCLMesh::Point, int> IndexedPoint;
+typedef KDTree::KDTree<3, IndexedPoint, std::pointer_to_binary_function<IndexedPoint, size_t, double> > HCCLKDTree;
 
 class CTriMesh : public HCCLMesh
 {
