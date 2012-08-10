@@ -235,7 +235,7 @@ void CTriMesh::SampleRandom(int nSamples, std::vector<Vector3d>& samples) const
 	std::vector<int> vtxSelect(nSamples);
 
 	//vtxIdxList.resize(n_vertices());
-	vtxIdxList.resize(nSamples);
+	vtxIdxList.resize(n_vertices());
 	std::iota(vtxIdxList.begin(), vtxIdxList.end(), 0);				// Generate a vertex index list (Non-zero base indexing)
 
 	// Random Shuffle
@@ -244,13 +244,15 @@ void CTriMesh::SampleRandom(int nSamples, std::vector<Vector3d>& samples) const
 	std::sort(vtxSelect.begin(), vtxSelect.end());
 
 	HCCLMesh::ConstVertexIter vit(vertices_begin()), vEnd(vertices_end());
+	HCCLMesh::Point temp;
 	int cnt = 0;
 	int idxCnt = 0;
 	for(; vit != vEnd; ++vit, ++cnt)
 	{
 		if(cnt==vtxSelect[idxCnt])
 		{
-			samples[idxCnt] = Vector3d(&point(vit)[0]);
+			temp = point(vit);
+			samples[idxCnt] = Vector3d(&temp[0]);
 			idxCnt++;
 			if(idxCnt==nSamples)
 				break;
@@ -260,19 +262,41 @@ void CTriMesh::SampleRandom(int nSamples, std::vector<Vector3d>& samples) const
 
 void CTriMesh::SampleUniform(int nSamples, std::vector<Vector3d>& samples, uint nFlag/* = TM_SAMPLE_UNIFORM_DART*/) const
 {
+	int s_tic = clock();
 	if( (nFlag & TM_SAMPLE_UNIFORM_DART) == TM_SAMPLE_UNIFORM_DART )
 	{
-		SampleRandom(10*nSamples, samples);
+		HCCLMesh::ConstFaceIter fIt(faces_begin()), fEnd(faces_end());
+		HCCLMesh::ConstFaceVertexIter fvIt;
+		HCCLMesh::Point pt1, pt2, pt3;
+		double area = 0;
+		double mean_dist = 0;
+		for (; fIt!=fEnd; ++fIt)
+		{
+			fvIt = cfv_iter(fIt.handle()); 
+			pt1 = point(vertex_handle(fvIt.handle().idx()));
+			++fvIt;
+			pt2 = point(vertex_handle(fvIt.handle().idx()));
+			++fvIt;
+			pt3 = point(vertex_handle(fvIt.handle().idx()));
+			Vector3d t1 = Vector3d(pt1.values_[0]-pt2.values_[0],pt1.values_[1]-pt2.values_[1],pt1.values_[2]-pt2.values_[2]);
+			Vector3d t2 = Vector3d(pt1.values_[0]-pt3.values_[0],pt1.values_[1]-pt3.values_[1],pt1.values_[2]-pt3.values_[2]);
+			area += 0.5*t1.Cross(t2).Norm();
+			mean_dist += 0.5*(t1.Norm() + t2.Norm());
+		}	
+
+		mean_dist /= n_vertices();
+		SampleRandom(10*nSamples > n_vertices() ? n_vertices() : 10*nSamples, samples);
 	
 		if(n_vertices() <= 0  || samples.size() == 0)
 			return;
 
 		int n_nodes = samples.size();
+		double dist = sqrt(area/(double)(sqrt(3.0)*nSamples));
 		std::vector<Vector3d> D_nodes(nSamples);
 		Vector3d temp;
-		auto f1 = [this, &temp](Vector3d v)->bool
+		auto f1 = [this, &temp, &dist](Vector3d v)->bool
 		{
-			if((temp - v).Norm() < 10)
+			if((temp - v).Norm() < dist)
 				return true;
 			else
 				return false;
@@ -280,6 +304,7 @@ void CTriMesh::SampleUniform(int nSamples, std::vector<Vector3d>& samples, uint 
 
 		int cnt = 0;
 		int r;
+		int num_iter = 0;
 		while(1)
 		{
 			n_nodes = samples.size();
@@ -287,9 +312,25 @@ void CTriMesh::SampleUniform(int nSamples, std::vector<Vector3d>& samples, uint 
 			temp = Vector3d(samples[r].X(), samples[r].Y(), samples[r].Z());
 			D_nodes[cnt++] = Vector3d(samples[r].X(), samples[r].Y(), samples[r].Z());
 			samples.erase(std::remove_if(samples.begin(), samples.end(), f1), samples.end());
-			if(cnt >= nSamples || samples.size() == 0)
+			if(cnt <= 0.98*nSamples && samples.size() == 0)
+			{
+				SampleRandom(10*nSamples > n_vertices() ? n_vertices() : 10*nSamples, samples);
+				cnt = 0;
+				dist *= 0.99;
+				num_iter++;
+			}
+			else if(cnt == nSamples && samples.size() != 0)
+			{
+				SampleRandom(10*nSamples > n_vertices() ? n_vertices() : 10*nSamples, samples);
+				cnt = 0;
+				dist *= 1.01;
+				num_iter++;
+			}
+			else if(cnt >= 0.98*nSamples && samples.size() == 0)
 				break;
 		}
+
+		std::cout << num_iter << std::endl;
 
 		auto f2 = [](Vector3d v)->bool
 		{
@@ -300,7 +341,12 @@ void CTriMesh::SampleUniform(int nSamples, std::vector<Vector3d>& samples, uint 
 		};
 		D_nodes.erase(std::remove_if(D_nodes.begin(), D_nodes.end(), f2), D_nodes.end());
 		samples = D_nodes;
+
+		std::cout << nSamples << std::endl;
+		std::cout << samples.size() << std::endl;
 	}
+	int e_tic = clock();
+	std::cout << (e_tic - s_tic)/(double)CLOCKS_PER_SEC << "sec"<< std::endl;
 }
 
 inline double tac( IndexedPoint indexed_pt, size_t k ) { return indexed_pt.first[k]; }
