@@ -133,11 +133,11 @@ void DeformationGraph::DestroyKDTree(void)
 
 void DeformationGraph::Render(void)
 {
-	glEnable(GL_LIGHTING);
 	glBegin(GL_POINTS);
 	for(int i = 0; i < nodes.size(); i++)
 		glVertex3d(nodes[i].X(), nodes[i].Y(), nodes[i].Z());
 	glEnd();
+
 
 	glBegin(GL_LINES);
 	for(int i = 0; i < edges.size(); i++)

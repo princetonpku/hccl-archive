@@ -312,25 +312,25 @@ void CTriMesh::SampleUniform(int nSamples, std::vector<Vector3d>& samples, uint 
 			temp = Vector3d(samples[r].X(), samples[r].Y(), samples[r].Z());
 			D_nodes[cnt++] = Vector3d(samples[r].X(), samples[r].Y(), samples[r].Z());
 			samples.erase(std::remove_if(samples.begin(), samples.end(), f1), samples.end());
-			if(cnt <= 0.98*nSamples && samples.size() == 0)
+			if(cnt < 0.98*nSamples && samples.size() == 0)
 			{
 				SampleRandom(10*nSamples > n_vertices() ? n_vertices() : 10*nSamples, samples);
 				cnt = 0;
-				dist *= 0.99;
+				dist *= 0.98;
 				num_iter++;
 			}
 			else if(cnt == nSamples && samples.size() != 0)
 			{
 				SampleRandom(10*nSamples > n_vertices() ? n_vertices() : 10*nSamples, samples);
 				cnt = 0;
-				dist *= 1.01;
+				dist *= 1.02;
 				num_iter++;
 			}
 			else if(cnt >= 0.98*nSamples && samples.size() == 0)
 				break;
 		}
 
-		std::cout << num_iter << std::endl;
+
 
 		auto f2 = [](Vector3d v)->bool
 		{
@@ -342,8 +342,9 @@ void CTriMesh::SampleUniform(int nSamples, std::vector<Vector3d>& samples, uint 
 		D_nodes.erase(std::remove_if(D_nodes.begin(), D_nodes.end(), f2), D_nodes.end());
 		samples = D_nodes;
 
-		std::cout << nSamples << std::endl;
-		std::cout << samples.size() << std::endl;
+//		std::cout << num_iter << std::endl;
+// 		std::cout << nSamples << std::endl;
+// 		std::cout << samples.size() << std::endl;
 	}
 	int e_tic = clock();
 	std::cout << (e_tic - s_tic)/(double)CLOCKS_PER_SEC << "sec"<< std::endl;
