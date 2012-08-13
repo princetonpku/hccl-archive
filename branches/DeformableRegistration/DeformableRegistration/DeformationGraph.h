@@ -20,6 +20,7 @@ public:
 
 // User Interface
 public:
+	void Clear(void);
 	void SetMesh(const CTriMesh* _mesh);
 	void BuildGraph(double sampling_rate = 0.2, int k = 4);
 	// void SetDeformationConstraints(something);
