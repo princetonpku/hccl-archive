@@ -6,6 +6,7 @@
 Viewer::Viewer(QWidget *parent) : QGLViewer(parent)
 	, btn_pressed(Qt::NoButton)
 	, onDrag(false)
+	, onRealTimeDeformation(false)
 {
 }
 
@@ -139,7 +140,7 @@ void Viewer::drawWithNames()
 
 void Viewer::mousePressEvent(QMouseEvent* e)
 {
-	if ((e->button() == Qt::LeftButton) )
+	if ((e->button() == Qt::LeftButton) && onRealTimeDeformation)
 	{
 		QGLViewer::mousePressEvent(e);
 		int sel_facet = selectedName();
@@ -174,7 +175,7 @@ void Viewer::mousePressEvent(QMouseEvent* e)
 
 void Viewer::mouseMoveEvent(QMouseEvent *e)
 {
-	if(btn_pressed == Qt::LeftButton)
+	if(btn_pressed == Qt::LeftButton && onRealTimeDeformation)
 	{
 		if(selected_handle_idx.size())
 		{
@@ -190,6 +191,7 @@ void Viewer::mouseMoveEvent(QMouseEvent *e)
 					moved_point[i] += Vector3d(displacement.x, displacement.y, 0.0);
 				}
 			}
+			Deform();
 			onDrag = true;
 			mouse_prev = mouse_curr;
 			updateGL();
@@ -201,7 +203,7 @@ void Viewer::mouseMoveEvent(QMouseEvent *e)
 void Viewer::mouseReleaseEvent(QMouseEvent *e)
 {
 
-	if ((e->button() == Qt::LeftButton) && !onDrag)
+	if ((e->button() == Qt::LeftButton) && !onDrag && onRealTimeDeformation)
 	{
 		QGLViewer::mousePressEvent(e);
 		int sel_facet = selectedName();
@@ -339,8 +341,8 @@ void Viewer::InitOptimize()
 	std::cout<< (clock()-start)/double(CLOCKS_PER_SEC) << std::endl;
 
 	moved_node = graph.nodes;
-	for(int i = 0; i < 1; ++i)
-		moved_point[i].SetY(moved_point[i].Y()-50);
+// 	for(int i = 0; i < 1; ++i)
+// 		moved_point[i].SetY(moved_point[i].Y()-50);
 }
 
 void Viewer::Deform()
@@ -370,5 +372,4 @@ void Viewer::Deform()
 
 	for(int i = 0; i < n_node; ++i)
 		moved_node[i] = Vector3d(x(12*i+10), x(12*i+11), x(12*i+12));
-
 }

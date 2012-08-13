@@ -120,7 +120,8 @@ void DeformableRegistration::OnToolsDecimate()
 // 	ui.view->graph.BuildGraph( min(300.0/ui.view->templ.n_vertices(), 1.0) );
 
 	ui.view->InitOptimize();
-	ui.view->Deform();
+	ui.view->onRealTimeDeformation = true;
+	//ui.view->Deform();
 }
 
 void DeformableRegistration::OnToolsSample_Random()
