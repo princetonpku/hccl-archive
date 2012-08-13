@@ -304,7 +304,8 @@ void Viewer::InitOptimize()
 	std::cout<< (clock()-start)/double(CLOCKS_PER_SEC) << std::endl;
 
 	moved_node = graph.nodes;
-	moved_point[0].SetX(moved_point[0].X()+20);
+	for(int i = 0; i < 10; ++i)
+		moved_point[i].SetY(moved_point[i].Y()-50);
 }
 
 void Viewer::Deform()
@@ -321,13 +322,16 @@ void Viewer::Deform()
 
 	for(int i = 1; i <= n_node*12; i++)
 	{
-		x(i) = 0;
+		if(i%12 == 1 || i%12 == 5 || i%12 == 9)
+			x(i) = 1;
+		else
+			x(i) = 0;
 		nbd(i) = 0;
 		lbd(i) = 0.0;
 		ubd(i) = 0.0;
 	}
 	int info = 0;
-	lbfgsbminimize(n_node*12, 7, x, *this, 0.001, 0.001, 0.001, 5, nbd, lbd, ubd, info);
+	lbfgsbminimize(n_node*12, 7, x, *this, 0.00001, 0.00001, 0.00001, 200, nbd, lbd, ubd, info);
 
 	for(int i = 0; i < n_node; ++i)
 		moved_node[i] = Vector3d(x(12*i+10), x(12*i+11), x(12*i+12));
