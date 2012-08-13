@@ -7,6 +7,7 @@
 #include <gl/GL.h>
 #include <gl/GLU.h>
 #endif
+#include <climits>
 
 //#include "Vector.h"
 
@@ -48,13 +49,59 @@ public:
 	//void GetBoundingBox(double* _max, double* _min);
 
 	// property request
-	void RequestFaceNormal(void);
-	void RequestFaceArea(void);
-	void RequestVertexNormal(void);
-	void RequestCog(void);
-	void RequestBoundingBox(void);
-	void RequestBoundingSphere(void);
-	void RequestVertexNeighborVertex(void);
+	void RequestFaceNormal(void)				{ fHasFaceNormal = true;				}
+	void RequestFaceArea(void)					{ fHasFaceArea = true;				}
+	void RequestVertexNormal(void)				{ fHasVertexNormal = true;			}
+	void RequestCog(void)						{ fHasCog = true;						}						
+	void RequestBoundingBox(void)				{ fHasBoundingBox = true;				}		
+	void RequestBoundingSphere(void)			{ fHasBoundingSphere = true;			}				
+	void RequestVertexNeighborVertex(void)		{ fHasVertexNeighborVertex = true;	}
+
+	// property 
+	void ReleaseFaceNormal(void)				{ fHasFaceNormal = false;				}
+	void ReleaseFaceArea(void)					{ fHasFaceArea = false;				}
+	void ReleaseVertexNormal(void)				{ fHasVertexNormal = false;			}
+	void ReleaseCog(void)						{ fHasCog = false;					}						
+	void ReleaseBoundingBox(void)				{ fHasBoundingBox = false;			}		
+	void ReleaseBoundingSphere(void)			{ fHasBoundingSphere = false;			}				
+	void ReleaseVertexNeighborVertex(void)		{ fHasVertexNeighborVertex = false;	}
+
+	// property flag
+protected:
+	bool fHasFaceNormal;			// =true
+	bool fHasFaceArea;				// =true
+	bool fHasVertexNormal;			// =true
+	bool fHasCog;					// =false
+	bool fHasBoundingBox;			// =false
+	bool fHasBoundingSphere;		// =false
+	bool fHasVertexNeighborVertex;	// =false
+
+public:
+	// 요청이 되었는가
+// 	bool HasVertices()					{	return (bool)vertex.size();		}
+// 	bool HasFacets()					{	return (bool)facet.size();			}
+// 	bool HasVertexColor()				{	return (bool)vertex_color.size();	}
+
+	bool HasFacetNormal()				{	return fHasFaceNormal;			}
+	bool HasFacetArea()					{	return fHasFaceArea;			}
+	bool HasVertexNormal()				{	return fHasVertexNormal;		}
+	bool HasVertexNeighboringVertex()	{	return fHasVertexNormal;		}
+	bool HasCog()						{	return fHasCog;					}
+	bool HasBoundingBox()				{	return fHasBoundingBox;			}
+	bool HasBoundingSphere()			{	return fHasVertexNeighborVertex;}
+
+	// 현재 계산이 되어있는가
+	bool IsAvaliableVertices()					{	return (bool)vertex.size();		}
+	bool IsAvaliableFacets()					{	return (bool)facet.size();			}
+	bool IsAvaliableVertexColor()				{	return (bool)vertex_color.size();	}
+
+	bool IsAvaliableFacetArea()					{	return (bool)facet_area.size();	}
+	bool IsAvaliableFacetNormal()				{	return (bool)facet_normal.size();	}
+	bool IsAvaliableVertexNormal()				{	return (bool)vertex_normal.size();	}
+	bool IsAvaliableVertexNeighboringVertex()	{	return (bool)vertex_neighboring_vertex.size();	}
+	bool IsAvaliableCog()						{	return (bool)!(cog[0] == DBL_MAX && cog[1] == DBL_MAX && cog[2] == DBL_MAX);	}
+	//bool IsBoundingBox()				{	return (bool)bounding}
+	bool IsAvaliableBoundingSphere()			{	return (bool)bounding_sphere_rad != 0.0;	}
 
 public:
 	void Add(const double* p);
@@ -112,28 +159,4 @@ public:
 	double GetVertexZ(unsigned i);
 	void GetFacet(unsigned i, size_t* f);
 
-	// property flag
-protected:
-	bool fValidFaceNormal;	// true
-	bool fValidFaceArea;		// true
-	bool fValidVertexNormal;	// true
-	bool fValidCog;			// false
-	bool fValidBoundingBox;	// false
-	bool fValidBoundingSphere;// false
-	bool fValidVertexNeighborVertex;
-
-	// Accessors (TODO)
-public:
-	bool HasVertices()					{	(bool)vertex.size();		}
-	bool HasFacets()					{	(bool)facet.size();			}
-	bool HasVertexColor()				{	(bool)vertex_color.size();	}
-
-	bool HasFacetArea()					{	(bool)facet_area.size();	}
-	bool HasFacetNormal()				{	(bool)facet_normal.size();	}
-	bool HasVertexNormal()				{	(bool)vertex_normal.size();	}
-	bool HasVertexNeighboringVertex()	{	(bool)vertex_neighboring_vertex.size();	}
-	bool HasCog()						{	(bool)!(cog[0] == cog[1] == cog[2] == 0.0);	}
-	//bool HasBoundingBox()				{	(bool)bounding}
-	bool HasBoundingSphere()			{	(bool)bounding_sphere_rad != 0.0;	}
 };
-

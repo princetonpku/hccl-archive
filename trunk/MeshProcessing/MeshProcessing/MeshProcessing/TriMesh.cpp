@@ -4,10 +4,10 @@
 #include <numeric>
 #include "VectorAlgebra.h"
 
-
-#include <assimp.hpp>
-#include <aiScene.h>
-#include <aiPostProcess.h>
+//#include <assimp.hpp>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 
 static bool AssimpImport(CTriMesh* triMesh, const char* pFile)
@@ -84,18 +84,19 @@ static bool AssimpImport(CTriMesh* triMesh, const char* pFile)
 
 static bool AssimpExport(CTriMesh* triMesh, const char* pFile) //.dae, .obj, .stl, .ply
 {
-	Assimp::Exporter exporter;
+	//Assimp::Exporter exporter;
 	//
+	return false;
 }
 
 CTriMesh::CTriMesh(void)
-	: fValidVertexNormal(true)
-	, fValidFaceNormal(true)
-	, fValidFaceArea(true)
-	, fValidCog(false)
-	, fValidBoundingBox(false)
-	, fValidBoundingSphere(false)
-	, fValidVertexNeighborVertex(false)
+	: fHasVertexNormal(true)
+	, fHasFaceNormal(true)
+	, fHasFaceArea(true)
+	, fHasCog(false)
+	, fHasBoundingBox(false)
+	, fHasBoundingSphere(false)
+	, fHasVertexNeighborVertex(false)
 {
 }
 
@@ -140,25 +141,25 @@ void CTriMesh::UpdateProperties(void)
 	std::iota(ind.begin(), ind.end(), 0);
 	std::vector<size_t> facet_cnt_per_vertex;
 
-	if (fValidFaceNormal || fValidVertexNormal)
+	if (fHasFaceNormal || fHasVertexNormal)
 	{
 		facet_normal.clear();
 		facet_normal.resize(facet.size());
 	}
-	if (fValidFaceArea)
+	if (fHasFaceArea)
 	{
 		facet_area.clear();
 		facet_area.resize(nFacet);
 	}
-	
-	if (fValidVertexNormal)
+
+	if (fHasVertexNormal)
 	{
 		vertex_normal.clear();
 		vertex_normal.resize(vertex.size());
 		facet_cnt_per_vertex.resize(nVertex, 0);
 	}
 
-	if (fValidVertexNeighborVertex || fValidVertexNormal)
+	if (fHasVertexNeighborVertex || fHasVertexNormal)
 	{
 		vertex_neighboring_vertex.clear();
 		vertex_neighboring_vertex.resize(nVertex);
@@ -168,14 +169,14 @@ void CTriMesh::UpdateProperties(void)
 	double area;
 	int f0, f1, f2;
 	std::for_each(ind.begin(), ind.begin() + nFacet, [&](size_t& i){
-		if (fValidFaceNormal || fValidFaceArea || fValidVertexNormal)
+		if (fHasFaceNormal || fHasFaceArea || fHasVertexNormal)
 		{
 			f0 = 3*i, f1 = 3*i+1, f2 = 3*i+2;
-	// 		for(int k = 0; k < 3; k++)
-	// 		{
-	// 			v1[k] = vertex[3*facet[f1] + k] - vertex[3*facet[f0] + k];
-	// 			v2[k] = vertex[3*facet[f2] + k] - vertex[3*facet[f0] + k];
-	// 		}
+			// 		for(int k = 0; k < 3; k++)
+			// 		{
+			// 			v1[k] = vertex[3*facet[f1] + k] - vertex[3*facet[f0] + k];
+			// 			v2[k] = vertex[3*facet[f2] + k] - vertex[3*facet[f0] + k];
+			// 		}
 			v1[0] = vertex[3*facet[f1] + 0] - vertex[3*facet[f0] + 0];
 			v1[1] = vertex[3*facet[f1] + 1] - vertex[3*facet[f0] + 1];
 			v1[2] = vertex[3*facet[f1] + 2] - vertex[3*facet[f0] + 2];
@@ -187,15 +188,15 @@ void CTriMesh::UpdateProperties(void)
 			area = vNorm3d(&facet_normal[f0]);
 		}
 
-		if (fValidFaceNormal)
+		if (fHasFaceNormal)
 		{
 			vDivScalar3d(&facet_normal[f0], area);
 		}
 
-		if (fValidFaceArea)
+		if (fHasFaceArea)
 			facet_area[i] = area / 2.0;	// 이게 맞는듯?
-		
-		if (fValidVertexNormal)
+
+		if (fHasVertexNormal)
 		{
 			vAdd3d(&vertex_normal[3*facet[f0]], &facet_normal[f0]);
 			vAdd3d(&vertex_normal[3*facet[f1]], &facet_normal[f0]);
@@ -206,7 +207,7 @@ void CTriMesh::UpdateProperties(void)
 			facet_cnt_per_vertex[*(&facet[f2])]++;
 		}
 
-		if (fValidVertexNeighborVertex)
+		if (fHasVertexNeighborVertex)
 		{
 			vertex_neighboring_vertex[ 1*facet[f0] ].push_back(facet[f1]);
 			vertex_neighboring_vertex[ 1*facet[f0] ].push_back(facet[f2]);
@@ -230,18 +231,18 @@ void CTriMesh::UpdateProperties(void)
 
 	bounding_sphere_rad = 0.0;
 
-	cog[0] = cog[1] = cog[2] = 0.0;
+	cog[0] = cog[1] = cog[2] = DBL_MAX;
 
 	double n;
-	
+
 	std::for_each(ind.begin(), ind.begin() + nVertex, [&](size_t& i){
-		if (fValidVertexNormal)
+		if (fHasVertexNormal)
 			vDivScalar3d(&vertex_normal[3*i], facet_cnt_per_vertex[i]);
-	
-		if (fValidCog)
+
+		if (fHasCog)
 			vAdd3d(cog, &vertex[3*i]);
 
-		if (fValidBoundingBox)
+		if (fHasBoundingBox)
 		{
 			for(int k = 0; k < 3; k++)
 			{
@@ -250,23 +251,23 @@ void CTriMesh::UpdateProperties(void)
 			}
 		}
 
-		if (fValidBoundingSphere)
+		if (fHasBoundingSphere)
 		{
 			n = vNormSquared3d(&vertex[3*i]);
 			bounding_sphere_rad = bounding_sphere_rad > n ? bounding_sphere_rad : n;
 		}
 
-		if (fValidVertexNeighborVertex)
+		if (fHasVertexNeighborVertex)
 		{
 			std::sort(vertex_neighboring_vertex[i].begin(), vertex_neighboring_vertex[i].end());
 			vertex_neighboring_vertex[i].resize(std::unique(vertex_neighboring_vertex[i].begin(), vertex_neighboring_vertex[i].end()) - vertex_neighboring_vertex[i].begin());
 		}
 	});
-	
-	if (fValidCog)
+
+	if (fHasCog)
 		vDivScalar3d(cog, nVertex);
 
-	if (fValidBoundingSphere)
+	if (fHasBoundingSphere)
 		bounding_sphere_rad = sqrtf(bounding_sphere_rad);
 }
 
@@ -302,7 +303,7 @@ void CTriMesh::UpdateFacetNormal(void)
 		vDivScalar3d(&facet_normal[f0], area);
 	});
 
-	fValidFaceNormal = true;
+	fHasFaceNormal = true;
 }
 
 void CTriMesh::UpdateFacetArea(void)
@@ -327,12 +328,12 @@ void CTriMesh::UpdateFacetArea(void)
 		v2[2] = vertex[3*facet[f2] + 2] - vertex[3*facet[f0] + 2];
 
 		// facet normal
-		vCross3d(v1, v2, &normal);
-		facet_area[i] = vNorm3d(&normal);
+		vCross3d(v1, v2, normal);
+		facet_area[i] = vNorm3d(normal);
 		facet_area[i] /= 2.0;
 	});
-	
-	fValidFaceArea = true;
+
+	fHasFaceArea = true;
 }
 
 void CTriMesh::UpdateVertexNeighboringVertex(void)
@@ -355,16 +356,17 @@ void CTriMesh::UpdateVertexNeighboringVertex(void)
 		vertex_neighboring_vertex[ 1*facet[f2] ].push_back(facet[f1]);
 	});
 
-	fValidVertexNeighborVertex = true;
+	fHasVertexNeighborVertex = true;
 }
 
 void CTriMesh::UpdateVertexNormal(void)
 {
-	if (!fValidFaceNormal)
+	if (!fHasFaceNormal)
 		return;
 
 	vertex_normal.clear();
 	vertex_normal.resize(vertex.size()/3);
+	std::vector<size_t> facet_cnt_per_vertex;
 
 	std::vector<size_t> ind(facet.size()/3);
 	std::iota(ind.begin(), ind.end(), 0);
@@ -386,26 +388,26 @@ void CTriMesh::UpdateVertexNormal(void)
 	ind.resize(vertex.size()/3);
 	std::iota(ind.begin(), ind.end(), 0);
 
-	std::for_each(ind.begin(), ind.begin() + nVertex, [&](size_t& i){
+	std::for_each(ind.begin(), ind.begin() + vertex.size(), [&](size_t& i){
 		vDivScalar3d(&vertex_normal[3*i], facet_cnt_per_vertex[i]);
 	});
 
-	fValidVertexNormal = true;
+	fHasVertexNormal = true;
 }
 
 void CTriMesh::UpdateCog(void)
 {
-	cog[0] = cog[1] = cog[2] = 0.0;
+	cog[0] = cog[1] = cog[2] = DBL_MAX;
 
 	size_t ind = 0;
 
- 	std::for_each(vertex.begin(), vertex.end(), [&](double& vtx){
+	std::for_each(vertex.begin(), vertex.end(), [&](double& vtx){
 		cog[ind++%3] = vtx;
- 	});
-	
+	});
+
 	vDivScalar3d(cog, vertex.size()/3);
 
-	fValidCog = true;
+	fHasCog = true;
 }
 
 void CTriMesh::UpdateBoundingSphere(void)
@@ -424,7 +426,7 @@ void CTriMesh::UpdateBoundingSphere(void)
 	});
 	bounding_sphere_rad = sqrtf(bounding_sphere_rad);
 
-	fValidBoundingSphere = true;
+	fHasBoundingSphere = true;
 }
 void CTriMesh::UpdateBoundingBox(void)
 {
@@ -452,7 +454,7 @@ void CTriMesh::UpdateBoundingBox(void)
 		}
 	});
 
-	fValidBoundingSphere = true;
+	fHasBoundingSphere = true;
 }
 
 void CTriMesh::GetCog(double* _cog)
@@ -612,16 +614,4 @@ void CTriMesh::GetFacet( unsigned i, size_t* f )
 	f[0] = facet[3*i+0];
 	f[1] = facet[3*i+1];
 	f[2] = facet[3*i+2];
-}
-
-
-
-bool CTriMesh::HasFacetArea()
-{
-	return 
-}
-
-bool CTriMesh::HasFacetNormal()
-{
-	return 
 }
