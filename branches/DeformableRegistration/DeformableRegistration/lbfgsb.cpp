@@ -34,7 +34,7 @@ void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g, const
 	int m = (x.gethighbound() - x.getlowbound() + 1)/12;
 
 	// initialize g()
-	for(int i = g.getlowbound(); i < g.gethighbound(); ++i)
+	for(int i = g.getlowbound(); i <= g.gethighbound(); ++i)
 		g(i) = 0;
 
 	for(int i = 0; i < m; i++)
@@ -111,9 +111,9 @@ void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g, const
 		}
 	}
 	// e_con
-	for (int i = 0; i<viewer.selected_idx.size(); ++i)
+	for (int i = 0; i<viewer.selected_vertex_idx.size(); ++i)
 	{
-		int v_idx = viewer.selected_idx[i];
+		int v_idx = viewer.selected_vertex_idx[i];
 		Vector3d v_tilda;
 		Vector3d v = cast_to_Vector3d(viewer.templ.point(viewer.templ.vertex_handle(v_idx)));
 
