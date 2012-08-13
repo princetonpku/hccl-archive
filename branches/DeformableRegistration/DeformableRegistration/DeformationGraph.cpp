@@ -180,7 +180,7 @@ void DeformationGraph::DestroyKDTree(void)
 	}
 }
 
-void DeformationGraph::GetNeighbors(int i, std::vector<int>& idx)
+void DeformationGraph::GetNeighbors(int i, std::vector<int>& idx) const
 {
 	idx = nodes_neighboring_nodes[i];
 }

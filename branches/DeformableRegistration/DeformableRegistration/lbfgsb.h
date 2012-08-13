@@ -28,12 +28,11 @@ quote at least one of the references given below:
 #include "ap.h"
 //#include "ialglib.h"
 
-class DeformationGraph;
-
+class Viewer;
 /*-----------------------------------------------
 This routines must be defined by you:
 -----------------------------------------------*/
-void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g, ap::real_1d_array& t, const DeformationGraph& dgraph);
+void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g, ap::real_1d_array& t, const Viewer& viewer);
 
 /*************************************************************************
 The  subroutine  minimizes  the  function  F(x) of N arguments with simple
@@ -124,6 +123,7 @@ and it isn't necessary to allocate it in the FuncGrad subroutine.
 void lbfgsbminimize(const int& n,
      const int& m,
      ap::real_1d_array& x,
+	 const Viewer& viewer,
      const double& epsg,
      const double& epsf,
      const double& epsx,

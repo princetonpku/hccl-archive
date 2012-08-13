@@ -25,44 +25,171 @@ quote at least one of the references given below:
 // #include <stdafx.h>
 // #include "stdafx.h"
 #include "lbfgsb.h"
-#include "DeformationGraph.h"
+#include "Viewer.h"
 
-void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g, const DeformationGraph& dgraph)
+void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g, const Viewer& viewer)
 {
 	f = 0.0;
+	double gkx, gky, gkz, gjx, gjy, gjz, tkx, tky, tkz, tjx, tjy, tjz, r1, r2, r3, r4, r5, r6, r7, r8, r9;
 	int m = (x.gethighbound() - x.getlowbound() + 1)/12;
-	for(int i = 0; i < m; i++)
+
+	// initialize g()
+	for(int i = g.getlowbound(); i < g.gethighbound(); ++i)
+		g(i) = 0;
+
+// 	for(int i = 0; i < m; i++)
+// 	{
+// 		// e_rot
+// 		f += (x(12*i+1)*x(12*i+1)+x(12*i+4)*x(12*i+4)+x(12*i+7)*x(12*i+7)-1)*(x(12*i+1)*x(12*i+1)+x(12*i+4)*x(12*i+4)+x(12*i+7)*x(12*i+7)-1)
+// 			+(x(12*i+2)*x(12*i+2)+x(12*i+5)*x(12*i+5)+x(12*i+8)*x(12*i+8)-1)*(x(12*i+2)*x(12*i+2)+x(12*i+5)*x(12*i+5)+x(12*i+8)*x(12*i+8)-1)
+// 			+(x(12*i+3)*x(12*i+3)+x(12*i+6)*x(12*i+6)+x(12*i+9)*x(12*i+9)-1)*(x(12*i+3)*x(12*i+3)+x(12*i+6)*x(12*i+6)+x(12*i+9)*x(12*i+9)-1)
+// 			+(x(12*i+1)*x(12*i+2)+x(12*i+4)*x(12*i+5)+x(12*i+7)*x(12*i+8)-1)*(x(12*i+1)*x(12*i+2)+x(12*i+4)*x(12*i+5)+x(12*i+7)*x(12*i+8)-1)
+// 			+(x(12*i+1)*x(12*i+3)+x(12*i+4)*x(12*i+6)+x(12*i+7)*x(12*i+9)-1)*(x(12*i+1)*x(12*i+3)+x(12*i+4)*x(12*i+6)+x(12*i+7)*x(12*i+9)-1)
+// 			+(x(12*i+2)*x(12*i+3)+x(12*i+5)*x(12*i+6)+x(12*i+8)*x(12*i+9)-1)*(x(12*i+2)*x(12*i+3)+x(12*i+5)*x(12*i+6)+x(12*i+8)*x(12*i+9)-1);
+// 
+// 		g(12*i+1) += 4*x(12*i+1)*(x(12*i+1)*x(12*i+1) + x(12*i+4)*x(12*i+4) + x(12*i+7)*x(12*i+7) - 1) + 2*x(12*i+2)*(x(12*i+1)*x(12*i+2) + x(12*i+4)*x(12*i+5) + x(12*i+7)*x(12*i+8)) + 2*x(12*i+3)*(x(12*i+1)*x(12*i+3) + x(12*i+4)*x(12*i+6) + x(12*i+7)*x(12*i+9));
+// 		g(12*i+2) += 4*x(12*i+2)*(x(12*i+2)*x(12*i+2) + x(12*i+5)*x(12*i+5) + x(12*i+8)*x(12*i+8) - 1) + 2*x(12*i+1)*(x(12*i+1)*x(12*i+2) + x(12*i+4)*x(12*i+5) + x(12*i+7)*x(12*i+8)) + 2*x(12*i+3)*(x(12*i+2)*x(12*i+3) + x(12*i+5)*x(12*i+6) + x(12*i+8)*x(12*i+9));
+// 		g(12*i+3) += 4*x(12*i+3)*(x(12*i+3)*x(12*i+3) + x(12*i+6)*x(12*i+6) + x(12*i+9)*x(12*i+9) - 1) + 2*x(12*i+1)*(x(12*i+1)*x(12*i+3) + x(12*i+4)*x(12*i+6) + x(12*i+7)*x(12*i+9)) + 2*x(12*i+2)*(x(12*i+2)*x(12*i+3) + x(12*i+5)*x(12*i+6) + x(12*i+8)*x(12*i+9));
+// 		g(12*i+4) += 4*x(12*i+4)*(x(12*i+1)*x(12*i+1) + x(12*i+4)*x(12*i+4) + x(12*i+7)*x(12*i+7) - 1) + 2*x(12*i+5)*(x(12*i+1)*x(12*i+2) + x(12*i+4)*x(12*i+5) + x(12*i+7)*x(12*i+8)) + 2*x(12*i+6)*(x(12*i+1)*x(12*i+3) + x(12*i+4)*x(12*i+6) + x(12*i+7)*x(12*i+9));
+// 		g(12*i+5) += 4*x(12*i+2)*(x(12*i+2)*x(12*i+2) + x(12*i+5)*x(12*i+5) + x(12*i+8)*x(12*i+8) - 1) + 2*x(12*i+4)*(x(12*i+1)*x(12*i+2) + x(12*i+4)*x(12*i+5) + x(12*i+7)*x(12*i+8)) + 2*x(12*i+6)*(x(12*i+2)*x(12*i+3) + x(12*i+5)*x(12*i+6) + x(12*i+8)*x(12*i+9));
+// 		g(12*i+6) += 4*x(12*i+6)*(x(12*i+3)*x(12*i+3) + x(12*i+6)*x(12*i+6) + x(12*i+9)*x(12*i+9) - 1) + 2*x(12*i+4)*(x(12*i+1)*x(12*i+3) + x(12*i+4)*x(12*i+6) + x(12*i+7)*x(12*i+9)) + 2*x(12*i+5)*(x(12*i+2)*x(12*i+3) + x(12*i+5)*x(12*i+6) + x(12*i+8)*x(12*i+9));
+// 		g(12*i+7) += 4*x(12*i+7)*(x(12*i+1)*x(12*i+1) + x(12*i+4)*x(12*i+4) + x(12*i+7)*x(12*i+7) - 1) + 2*x(12*i+8)*(x(12*i+1)*x(12*i+2) + x(12*i+4)*x(12*i+5) + x(12*i+7)*x(12*i+8)) + 2*x(12*i+9)*(x(12*i+1)*x(12*i+3) + x(12*i+4)*x(12*i+6) + x(12*i+7)*x(12*i+9));
+// 		g(12*i+8) += 4*x(12*i+2)*(x(12*i+2)*x(12*i+2) + x(12*i+5)*x(12*i+5) + x(12*i+8)*x(12*i+8) - 1) + 2*x(12*i+7)*(x(12*i+1)*x(12*i+2) + x(12*i+4)*x(12*i+5) + x(12*i+7)*x(12*i+8)) + 2*x(12*i+9)*(x(12*i+2)*x(12*i+3) + x(12*i+5)*x(12*i+6) + x(12*i+8)*x(12*i+9));
+// 		g(12*i+9) += 4*x(12*i+9)*(x(12*i+3)*x(12*i+3) + x(12*i+6)*x(12*i+6) + x(12*i+9)*x(12*i+9) - 1) + 2*x(12*i+7)*(x(12*i+1)*x(12*i+3) + x(12*i+4)*x(12*i+6) + x(12*i+7)*x(12*i+9)) + 2*x(12*i+8)*(x(12*i+2)*x(12*i+3) + x(12*i+5)*x(12*i+6) + x(12*i+8)*x(12*i+9));
+// 
+// 		// e_reg
+// 		gjx = viewer.graph.nodes[i].X();
+// 		gjy = viewer.graph.nodes[i].Y();
+// 		gjz = viewer.graph.nodes[i].Z();
+// 
+// 		tjx = x(12*i+10);
+// 		tjy = x(12*i+11);
+// 		tjz = x(12*i+12);
+// 
+// 		r1 = x(12*i+1);
+// 		r2 = x(12*i+2);
+// 		r3 = x(12*i+3);
+// 		r4 = x(12*i+4);
+// 		r5 = x(12*i+5);
+// 		r6 = x(12*i+6);
+// 		r7 = x(12*i+7);
+// 		r8 = x(12*i+8);
+// 		r9 = x(12*i+9);
+// 
+// 		std::vector<int> nidx;
+// 		viewer.graph.GetNeighbors(i, nidx);
+// 		for (int j = 0; j<nidx.size(); ++j)
+// 		{
+// 			gkx = viewer.graph.nodes[nidx[j]].X();
+// 			gky = viewer.graph.nodes[nidx[j]].Y();
+// 			gkz = viewer.graph.nodes[nidx[j]].Z();
+// 			tkx = x(12*nidx[j]+10);
+// 			tky = x(12*nidx[j]+11);
+// 			tkz = x(12*nidx[j]+12);
+// 
+// 			double a,b,c;
+// 			a = (gkx - gjx - tjx + tkx + r1*(gjx - gkx) + r2*(gjy - gky) + r3*(gjz - gkz));
+// 			b = (gky - gjy - tjy + tky + r4*(gjx - gkx) + r5*(gjy - gky) + r6*(gjz - gkz));
+// 			c = (gkz - gjz - tjz + tkz + r7*(gjx - gkx) + r8*(gjy - gky) + r9*(gjz - gkz));
+// 			f += a*a + b*b + c*c;
+// 
+// 			g(12*i+1) += 2*(gjx - gkx)*(gkx - gjx - tjx + tkx + r1*(gjx - gkx) + r2*(gjy - gky) + r3*(gjz - gkz));
+// 			g(12*i+2) += 2*(gjy - gky)*(gkx - gjx - tjx + tkx + r1*(gjx - gkx) + r2*(gjy - gky) + r3*(gjz - gkz));
+// 			g(12*i+3) += 2*(gjz - gkz)*(gkx - gjx - tjx + tkx + r1*(gjx - gkx) + r2*(gjy - gky) + r3*(gjz - gkz));
+// 			g(12*i+4) += 2*(gjx - gkx)*(gky - gjy - tjy + tky + r4*(gjx - gkx) + r5*(gjy - gky) + r6*(gjz - gkz));
+// 			g(12*i+5) += 2*(gjy - gky)*(gky - gjy - tjy + tky + r4*(gjx - gkx) + r5*(gjy - gky) + r6*(gjz - gkz));
+// 			g(12*i+6) += 2*(gjz - gkz)*(gky - gjy - tjy + tky + r4*(gjx - gkx) + r5*(gjy - gky) + r6*(gjz - gkz));
+// 			g(12*i+7) += 2*(gjx - gkx)*(gkz - gjz - tjz + tkz + r7*(gjx - gkx) + r8*(gjy - gky) + r9*(gjz - gkz));
+// 			g(12*i+8) += 2*(gjy - gky)*(gkz - gjz - tjz + tkz + r7*(gjx - gkx) + r8*(gjy - gky) + r9*(gjz - gkz));
+// 			g(12*i+9) += 2*(gjz - gkz)*(gkz - gjz - tjz + tkz + r7*(gjx - gkx) + r8*(gjy - gky) + r9*(gjz - gkz));
+// 			g(12*i+10) += 2*gjx - 2*gkx + 2*tjx - 2*tkx - 2*r1*(gjx - gkx) - 2*r2*(gjy - gky) - 2*r3*(gjz - gkz);
+// 			g(12*i+11) += 2*gjy - 2*gky + 2*tjy - 2*tky - 2*r4*(gjx - gkx) - 2*r5*(gjy - gky) - 2*r6*(gjz - gkz);
+// 			g(12*i+12) += 2*gjz - 2*gkz + 2*tjz - 2*tkz - 2*r7*(gjx - gkx) - 2*r8*(gjy - gky) - 2*r9*(gjz - gkz);
+// 			g(12*nidx[j]+10) += 2*gkx - 2*gjx - 2*tjx + 2*tkx + 2*r1*(gjx - gkx) + 2*r2*(gjy - gky) + 2*r3*(gjz - gkz);
+// 			g(12*nidx[j]+11) += 2*gky - 2*gjy - 2*tjy + 2*tky + 2*r4*(gjx - gkx) + 2*r5*(gjy - gky) + 2*r6*(gjz - gkz);
+// 			g(12*nidx[j]+12) += 2*gkz - 2*gjz - 2*tjz + 2*tkz + 2*r7*(gjx - gkx) + 2*r8*(gjy - gky) + 2*r9*(gjz - gkz);
+// 		}
+// 	}
+	// e_con
+	for (int i = 0; i<viewer.selected_idx.size(); ++i)
 	{
-		// e_rot
-		f += (x(12*i+1)*x(12*i+1)+x(12*i+4)*x(12*i+4)+x(12*i+7)*x(12*i+7)-1)*(x(12*i+1)*x(12*i+1)+x(12*i+4)*x(12*i+4)+x(12*i+7)*x(12*i+7)-1)
-			+(x(12*i+2)*x(12*i+2)+x(12*i+5)*x(12*i+5)+x(12*i+8)*x(12*i+8)-1)*(x(12*i+2)*x(12*i+2)+x(12*i+5)*x(12*i+5)+x(12*i+8)*x(12*i+8)-1)
-			+(x(12*i+3)*x(12*i+3)+x(12*i+6)*x(12*i+6)+x(12*i+9)*x(12*i+9)-1)*(x(12*i+3)*x(12*i+3)+x(12*i+6)*x(12*i+6)+x(12*i+9)*x(12*i+9)-1)
-			+(x(12*i+1)*x(12*i+2)+x(12*i+4)*x(12*i+5)+x(12*i+7)*x(12*i+8)-1)*(x(12*i+1)*x(12*i+2)+x(12*i+4)*x(12*i+5)+x(12*i+7)*x(12*i+8)-1)
-			+(x(12*i+1)*x(12*i+3)+x(12*i+4)*x(12*i+6)+x(12*i+7)*x(12*i+9)-1)*(x(12*i+1)*x(12*i+3)+x(12*i+4)*x(12*i+6)+x(12*i+7)*x(12*i+9)-1)
-			+(x(12*i+2)*x(12*i+3)+x(12*i+5)*x(12*i+6)+x(12*i+8)*x(12*i+9)-1)*(x(12*i+2)*x(12*i+3)+x(12*i+5)*x(12*i+6)+x(12*i+8)*x(12*i+9)-1);
+		int v_idx = viewer.selected_idx[i];
+		Vector3d v_tilda;
+		Vector3d v = cast_to_Vector3d(viewer.templ.point(viewer.templ.vertex_handle(v_idx)));
 
-		g(12*i+1) = 4*x(12*i+1)*(x(12*i+1)*x(12*i+1) + x(12*i+4)*x(12*i+4) + x(12*i+7)*x(12*i+7) - 1) + 2*x(12*i+2)*(x(12*i+1)*x(12*i+2) + x(12*i+4)*x(12*i+5) + x(12*i+7)*x(12*i+8)) + 2*x(12*i+3)*(x(12*i+1)*x(12*i+3) + x(12*i+4)*x(12*i+6) + x(12*i+7)*x(12*i+9));
-		g(12*i+2) = 4*x(12*i+2)*(x(12*i+2)*x(12*i+2) + x(12*i+5)*x(12*i+5) + x(12*i+8)*x(12*i+8) - 1) + 2*x(12*i+1)*(x(12*i+1)*x(12*i+2) + x(12*i+4)*x(12*i+5) + x(12*i+7)*x(12*i+8)) + 2*x(12*i+3)*(x(12*i+2)*x(12*i+3) + x(12*i+5)*x(12*i+6) + x(12*i+8)*x(12*i+9));
-		g(12*i+3) = 4*x(12*i+3)*(x(12*i+3)*x(12*i+3) + x(12*i+6)*x(12*i+6) + x(12*i+9)*x(12*i+9) - 1) + 2*x(12*i+1)*(x(12*i+1)*x(12*i+3) + x(12*i+4)*x(12*i+6) + x(12*i+7)*x(12*i+9)) + 2*x(12*i+2)*(x(12*i+2)*x(12*i+3) + x(12*i+5)*x(12*i+6) + x(12*i+8)*x(12*i+9));
-		g(12*i+4) = 4*x(12*i+4)*(x(12*i+1)*x(12*i+1) + x(12*i+4)*x(12*i+4) + x(12*i+7)*x(12*i+7) - 1) + 2*x(12*i+5)*(x(12*i+1)*x(12*i+2) + x(12*i+4)*x(12*i+5) + x(12*i+7)*x(12*i+8)) + 2*x(12*i+6)*(x(12*i+1)*x(12*i+3) + x(12*i+4)*x(12*i+6) + x(12*i+7)*x(12*i+9));
-		g(12*i+5) = 4*x(12*i+2)*(x(12*i+2)*x(12*i+2) + x(12*i+5)*x(12*i+5) + x(12*i+8)*x(12*i+8) - 1) + 2*x(12*i+4)*(x(12*i+1)*x(12*i+2) + x(12*i+4)*x(12*i+5) + x(12*i+7)*x(12*i+8)) + 2*x(12*i+6)*(x(12*i+2)*x(12*i+3) + x(12*i+5)*x(12*i+6) + x(12*i+8)*x(12*i+9));
-		g(12*i+6) = 4*x(12*i+6)*(x(12*i+3)*x(12*i+3) + x(12*i+6)*x(12*i+6) + x(12*i+9)*x(12*i+9) - 1) + 2*x(12*i+4)*(x(12*i+1)*x(12*i+3) + x(12*i+4)*x(12*i+6) + x(12*i+7)*x(12*i+9)) + 2*x(12*i+5)*(x(12*i+2)*x(12*i+3) + x(12*i+5)*x(12*i+6) + x(12*i+8)*x(12*i+9));
-		g(12*i+7) = 4*x(12*i+7)*(x(12*i+1)*x(12*i+1) + x(12*i+4)*x(12*i+4) + x(12*i+7)*x(12*i+7) - 1) + 2*x(12*i+8)*(x(12*i+1)*x(12*i+2) + x(12*i+4)*x(12*i+5) + x(12*i+7)*x(12*i+8)) + 2*x(12*i+9)*(x(12*i+1)*x(12*i+3) + x(12*i+4)*x(12*i+6) + x(12*i+7)*x(12*i+9));
-		g(12*i+8) = 4*x(12*i+2)*(x(12*i+2)*x(12*i+2) + x(12*i+5)*x(12*i+5) + x(12*i+8)*x(12*i+8) - 1) + 2*x(12*i+7)*(x(12*i+1)*x(12*i+2) + x(12*i+4)*x(12*i+5) + x(12*i+7)*x(12*i+8)) + 2*x(12*i+9)*(x(12*i+2)*x(12*i+3) + x(12*i+5)*x(12*i+6) + x(12*i+8)*x(12*i+9));
-		g(12*i+9) = 4*x(12*i+9)*(x(12*i+3)*x(12*i+3) + x(12*i+6)*x(12*i+6) + x(12*i+9)*x(12*i+9) - 1) + 2*x(12*i+7)*(x(12*i+1)*x(12*i+3) + x(12*i+4)*x(12*i+6) + x(12*i+7)*x(12*i+9)) + 2*x(12*i+8)*(x(12*i+2)*x(12*i+3) + x(12*i+5)*x(12*i+6) + x(12*i+8)*x(12*i+9));
-
-		// e_reg
-		for (int j = 0; j<; ++j)
+		for (int j = 0; j<viewer.k; ++j)
 		{
+			int node_idx = viewer.k_nearest_idx[v_idx][j];
+
+			r1 = x(12*node_idx+1);
+			r2 = x(12*node_idx+2);
+			r3 = x(12*node_idx+3);
+			r4 = x(12*node_idx+4);
+			r5 = x(12*node_idx+5);
+			r6 = x(12*node_idx+6);
+			r7 = x(12*node_idx+7);
+			r8 = x(12*node_idx+8);
+			r9 = x(12*node_idx+9);
+
+			Vector3d t(x(12*node_idx+10), x(12*node_idx+11), x(12*node_idx+12));
+
+			double w = viewer.weight_value[v_idx][j];
+			Vector3d gj = viewer.graph.nodes[node_idx];
+			Vector3d dvg = v-gj;
+			Vector3d rvg(r1*dvg.X()+r2*dvg.Y()+r3*dvg.Z(), r4*dvg.X()+r5*dvg.Y()+r6*dvg.Z(), r7*dvg.X()+r8*dvg.Y()+r9*dvg.Z());
+
+			v_tilda += w*(rvg + gj + t);
 		}
 
+		f += 100*NormSquared(v_tilda - viewer.moved_point[i]);
 
-		g(12*i+10) = 2*i*x(i);
-		g(12*i+11) = 2*i*x(i);
-		g(12*i+12) = 2*i*x(i);
+		for (int j = 0; j<viewer.k; ++j)
+		{
+			int node_idx = viewer.k_nearest_idx[v_idx][j];
+			double w = viewer.weight_value[v_idx][j];
+
+			g(12*node_idx+10) += w*2*(v_tilda-viewer.moved_point[i]).X();
+			g(12*node_idx+11) += w*2*(v_tilda-viewer.moved_point[i]).Y();
+			g(12*node_idx+12) += w*2*(v_tilda-viewer.moved_point[i]).Z();
+
+			r1 = x(12*node_idx+1);
+			r2 = x(12*node_idx+2);
+			r3 = x(12*node_idx+3);
+			r4 = x(12*node_idx+4);
+			r5 = x(12*node_idx+5);
+			r6 = x(12*node_idx+6);
+			r7 = x(12*node_idx+7);
+			r8 = x(12*node_idx+8);
+			r9 = x(12*node_idx+9);
+
+			Vector3d t(x(12*node_idx+10), x(12*node_idx+11), x(12*node_idx+12));
+			Vector3d gj = viewer.graph.nodes[node_idx];
+			Vector3d dvg = v-gj;
+			Vector3d rvg(r1*dvg.X()+r2*dvg.Y()+r3*dvg.Z(), r4*dvg.X()+r5*dvg.Y()+r6*dvg.Z(), r7*dvg.X()+r8*dvg.Y()+r9*dvg.Z());
+
+			double a = 2*w;
+			double v1[3];
+			v1[0] = w*(r1*rvg.X()+r2*rvg.Y()+r3*rvg.Z()+gj.X()+t.X())- viewer.moved_point[i].X();
+			v1[1] = w*(r4*rvg.X()+r5*rvg.Y()+r6*rvg.Z()+gj.Y()+t.Y())- viewer.moved_point[i].Y();
+			v1[2] = w*(r7*rvg.X()+r8*rvg.Y()+r9*rvg.Z()+gj.Z()+t.Z())- viewer.moved_point[i].Z();
+			double v2[3];
+			v2[0] = 2*w*dvg.X();
+			v2[1] = 2*w*dvg.Y();
+			v2[2] = 2*w*dvg.Z();
+
+			g(12*node_idx+1) = v1[0]*v2[0];
+			g(12*node_idx+2) = v1[0]*v2[1];
+			g(12*node_idx+3) = v1[0]*v2[2];
+			g(12*node_idx+4) = v1[1]*v2[0];
+			g(12*node_idx+5) = v1[1]*v2[1];
+			g(12*node_idx+6) = v1[1]*v2[2];
+			g(12*node_idx+7) = v1[2]*v2[0];
+			g(12*node_idx+8) = v1[2]*v2[1];
+			g(12*node_idx+9) = v1[2]*v2[2];
+		}
 	}
 
-
+	printf("ff = %lf\n", f);
 }
 
 static void lbfgsbactive(const int& n,
@@ -381,8 +508,10 @@ and it isn't necessary to allocate it in the FuncGrad subroutine.
 void lbfgsbminimize(const int& n,
      const int& m,
      ap::real_1d_array& x,
-	 const DeformationGraph& dgaph,		// add deformation graph class
-     const double& epsg,
+	 const Viewer& viewer,				// add viewer
+// 	 const DeformationGraph& dgaph,		// add deformation graph class
+//      const CTriMesh& mesh,				// add mesh
+	 const double& epsg,
      const double& epsf,
      const double& epsx,
      const int& maxits,
@@ -551,7 +680,7 @@ void lbfgsbminimize(const int& n,
     // Compute f0 and g0.
     //
     ap::vmove(&xold(1), &x(1), ap::vlen(1,n));
-    funcgrad(x, f, g, dgaph);
+    funcgrad(x, f, g, viewer);
     nfgv = 1;
     
     //
@@ -710,7 +839,7 @@ void lbfgsbminimize(const int& n,
             {
                 break;
             }
-            funcgrad(x, f, g, dgaph);
+            funcgrad(x, f, g, viewer);
         }
         if( internalinfo!=0 )
         {
