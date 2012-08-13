@@ -33,6 +33,9 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
+    <Filter Include="LBFGS">
+      <UniqueIdentifier>{eff0ce67-4f6a-4eb2-a13d-2638add93ba8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -70,6 +73,12 @@
     </ClCompile>
     <ClCompile Include="glPrimitives.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ap.cpp">
+      <Filter>LBFGS</Filter>
+    </ClCompile>
+    <ClCompile Include="lbfgsb.cpp">
+      <Filter>LBFGS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -128,6 +137,15 @@
     </ClInclude>
     <ClInclude Include="glPrimitives.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ap.h">
+      <Filter>LBFGS</Filter>
+    </ClInclude>
+    <ClInclude Include="apvt.h">
+      <Filter>LBFGS</Filter>
+    </ClInclude>
+    <ClInclude Include="lbfgsb.h">
+      <Filter>LBFGS</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
