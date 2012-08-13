@@ -46,12 +46,14 @@ public:
 	std::vector<std::vector<int>> k_nearest_idx;
 	std::vector<std::vector<double>> weight_value;
 
-	std::vector<Vector3d> moved_node;
+	std::vector<Vector3d> result_translation;
+	std::vector<std::vector<double>> result_rotation;
 
-	int k; // for k-nearest nodes of deformation graph
+	int k_nearest; // for k-nearest nodes of deformation graph
 
-	void InitOptimize();
-	void Deform();
+	void InitOptimization();
+	void Optimization();
+	void Deform(const CTriMesh& origin, CTriMesh& mesh, DeformationGraph& dgraph);
 };
 
 #endif // VIEWER_H

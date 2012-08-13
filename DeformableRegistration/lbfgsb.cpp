@@ -117,7 +117,7 @@ void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g, const
 		Vector3d v_tilda;
 		Vector3d v = cast_to_Vector3d(viewer.templ.point(viewer.templ.vertex_handle(v_idx)));
 
-		for (int j = 0; j<viewer.k; ++j)
+		for (int j = 0; j<viewer.k_nearest; ++j)
 		{
 			int node_idx = viewer.k_nearest_idx[v_idx][j];
 
@@ -143,7 +143,7 @@ void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g, const
 
 		f += 100*NormSquared(v_tilda - viewer.moved_point[i]);
 
-		for (int j = 0; j<viewer.k; ++j)
+		for (int j = 0; j<viewer.k_nearest; ++j)
 		{
 			int node_idx = viewer.k_nearest_idx[v_idx][j];
 			double w = viewer.weight_value[v_idx][j];
