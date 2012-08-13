@@ -52,6 +52,7 @@ void DeformableRegistration::OnFileOpenTemplate()
 // 	char* filename = byteName.data();
 // 	//sprintf(filename, "%s", file.toAscii().data());
 	ui.view->templ.Clear();
+	ui.view->graph.Clear();
 	ui.view->templ.Read(file.toStdString().c_str());
 	//	ui.view->templ.UpdatePauly();
 

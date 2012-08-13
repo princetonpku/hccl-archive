@@ -19,7 +19,15 @@ DeformationGraph::DeformationGraph(const CTriMesh* _mesh)
 
 DeformationGraph::~DeformationGraph(void)
 {
+	Clear();
+}
+
+void DeformationGraph::Clear(void)
+{
 	DestroyKDTree();
+	mesh = NULL;
+	nodes.clear();
+	edges.clear();
 }
 
 void DeformationGraph::SetMesh(const CTriMesh* _mesh)

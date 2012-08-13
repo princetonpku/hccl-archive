@@ -27,11 +27,8 @@ void Viewer::init()
 
 void Viewer::draw()
 {
-	glEnable(GL_BLEND);
-	glColor3ub(255, 190, 100);
-	templ.RenderSmooth();
- 	glColor3ub(50, 50, 50);
-//	templ.RenderWireframe();
+	glEnable(GL_POINT_SMOOTH);
+	glEnable(GL_LINE_SMOOTH);
 
 	//glDisable(GL_DEPTH_TEST);
 	glColor3ub(0,0,0);
@@ -41,8 +38,21 @@ void Viewer::draw()
 	graph.Render();
 	//glEnable(GL_DEPTH_TEST);
 
+	glDisable(GL_POINT_SMOOTH);
+	glDisable(GL_LINE_SMOOTH);
+
+
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glColor4ub(255, 190, 100, 200);
+	templ.RenderSmooth();
+	glColor3ub(50, 50, 50);
+	//	templ.RenderWireframe();
 //	templ.RenderPoints();
 //	templ.RenderNodes();
  	glColor3ub(128, 128, 200);
 	target.RenderSmooth();
+	glDisable(GL_BLEND);
 }
