@@ -77,6 +77,10 @@ void Viewer::draw()
 
 	templ.RenderSmooth();
 
+	glColor3ub(100, 190, 255);
+
+	target.RenderSmooth();
+
 	{		
 		double r = templ.GetBoundingSphereRadius();
 		for(size_t i = 0; i < selected_vertex_idx.size(); i++)
@@ -301,7 +305,9 @@ void Viewer::InitOptimization()
 
 	// building graph
 	graph.SetMesh(&templ);
-	graph.BuildGraph(min(300.0/templ.n_vertices(), 1.0), 2);
+
+	graph.BuildGraph(min(150.0/templ.n_vertices(), 1.0), 2);
+
 
 	// the number of nodes which influence each vertex
 	k_nearest = 4;
@@ -330,11 +336,16 @@ void Viewer::InitOptimization()
 			weight_value[i][j] /= sum;
 	}
 
+	graph.draw_nodes.resize(graph.nodes.size());
+	for (int i =0 ; i<result_translation.size(); ++i)
+		graph.draw_nodes[i] = graph.nodes[i];
+
 	std::cout<< (clock()-start)/double(CLOCKS_PER_SEC) << std::endl;
 }
 
 void Viewer::Optimization()
 {
+	int start_tic = clock();
 	int n_node = graph.nodes.size();
 
 	ap::real_1d_array x;
@@ -357,7 +368,7 @@ void Viewer::Optimization()
 	}
 
 	int info = 0;
-	lbfgsbminimize(n_node*12, 7, x, *this, 0.00001, 0.00001, 0.00001, 200, nbd, lbd, ubd, info);
+	lbfgsbminimize(n_node*12, 7, x, *this, 0.0001, 0.0001, 0.0001, 200, nbd, lbd, ubd, info);
 
 	// update solution
 	result_translation.resize(n_node);
@@ -376,7 +387,7 @@ void Viewer::Optimization()
 
  	Deform(templ, target, graph);
 
-	templ = target;
+	//templ = target;
 
 // 	HCCLMesh::ConstVertexIter cvit = templ.vertices_begin();
 // 	HCCLMesh::ConstVertexIter vit = target.vertices_begin();
@@ -416,7 +427,6 @@ void Viewer::Optimization()
 // 			target.normal(vit)[i] = n_[i];
 // 		}		
 // 	}
-
 }
 
 void Viewer::Deform( const CTriMesh& origin, CTriMesh& mesh, DeformationGraph& dgraph )
@@ -445,10 +455,10 @@ void Viewer::Deform( const CTriMesh& origin, CTriMesh& mesh, DeformationGraph& d
 			int idx_node = k_nearest_idx[idx_vrtx][j];
 
 			double w = weight_value[idx_vrtx][j];
-			arma::vec g(dgraph.nodes[idx_node].val, 3);
-			g[0] = dgraph.nodes[idx_node][0];
-			g[1] = dgraph.nodes[idx_node][1];
-			g[2] = dgraph.nodes[idx_node][2];
+			arma::vec g(dgraph.draw_nodes[idx_node].val, 3);
+			g[0] = dgraph.draw_nodes[idx_node][0];
+			g[1] = dgraph.draw_nodes[idx_node][1];
+			g[2] = dgraph.draw_nodes[idx_node][2];
 
 
 			arma::vec t(result_translation[idx_node].val, 3);
@@ -479,6 +489,6 @@ void Viewer::Deform( const CTriMesh& origin, CTriMesh& mesh, DeformationGraph& d
 	// deformation graph update
 	for (int i =0 ; i<result_translation.size(); ++i)
 	{
-		dgraph.nodes[i] += result_translation[i];
+		dgraph.draw_nodes[i] = dgraph.nodes[i] + result_translation[i];
 	}
 }
