@@ -25,6 +25,10 @@ protected :
 	virtual void mousePressEvent(QMouseEvent* e);
 	virtual void mouseMoveEvent(QMouseEvent *e);
 	virtual void mouseReleaseEvent(QMouseEvent *e);
+	bool onDrag;
+	Qt::MouseButton btn_pressed;
+	qglviewer::Vec mouse_curr;
+	qglviewer::Vec mouse_prev;
 
 
 public:
@@ -33,8 +37,11 @@ public:
 	
 	DeformationGraph graph;
 
-	std::vector<int> selected_idx;
+	std::vector<int> selected_vertex_idx;
+	std::vector<int> selected_handle_idx;
 	std::vector<Vector3d> moved_point;
+
+
 	std::vector<std::vector<int>> k_nearest_idx;
 	std::vector<std::vector<double>> weight_value;
 
