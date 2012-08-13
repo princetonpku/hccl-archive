@@ -34,9 +34,10 @@ protected :
 public:
 	CTriMesh templ;
 	CTriMesh target;
-	
 	DeformationGraph graph;
 
+
+	bool onRealTimeDeformation;
 	std::vector<int> selected_vertex_idx;
 	std::vector<int> selected_handle_idx;
 	std::vector<Vector3d> moved_point;
