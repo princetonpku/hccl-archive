@@ -28,6 +28,7 @@ void DeformationGraph::Clear(void)
 	mesh = NULL;
 	nodes.clear();
 	edges.clear();
+	nodes_neighboring_nodes.clear();
 }
 
 void DeformationGraph::SetMesh(const CTriMesh* _mesh)
@@ -94,6 +95,12 @@ void DeformationGraph::BuildGraph(double sampling_rate/* = 0.2*/, int k/* = 4*/)
 	QueryPerformanceCounter(&end);
 	microsec = (double)((end.QuadPart-start.QuadPart)/(ticksPerSecond.QuadPart/1000000));
 	printf("%d.%dms\n", microsec/1000, microsec%1000);
+
+	nodes_neighboring_nodes.resize(nodes.size());
+	std::for_each(edges.begin(), edges.end(), [&](Vector2i& e){
+		nodes_neighboring_nodes[e[0]].push_back(e[1]);
+		nodes_neighboring_nodes[e[1]].push_back(e[0]);
+	});
 }
 
 void DeformationGraph::FindClosestPoint(Vector3d ref, int* idx, int n/* = 1*/, Vector3d* pt/* = NULL*/) const
@@ -171,6 +178,11 @@ void DeformationGraph::DestroyKDTree(void)
 		delete kdtree;
 		kdtree = NULL;
 	}
+}
+
+void DeformationGraph::GetNeighbors(int i, std::vector<int>& idx)
+{
+	idx = nodes_neighboring_nodes[i];
 }
 
 void DeformationGraph::Render(void)

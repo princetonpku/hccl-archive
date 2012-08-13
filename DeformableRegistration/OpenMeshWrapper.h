@@ -64,6 +64,8 @@ typedef KDTree::KDTree<3, IndexedPoint, std::pointer_to_binary_function<IndexedP
 
 #define TM_SAMPLE_UNIFORM_DART 0x0001
 
+static Vector3d cast_to_Vector3d(const HCCLMesh::Point& pt) { return Vector3d(pt[0], pt[1], pt[2]); }
+//static Vector3f cast_to_Vector3f(const HCCLMesh::Point& pt) { return Vector3f(pt[0], pt[1], pt[2]); }
 
 class CTriMesh : public HCCLMesh
 {
