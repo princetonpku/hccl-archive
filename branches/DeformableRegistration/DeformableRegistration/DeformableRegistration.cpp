@@ -33,6 +33,15 @@ void DeformableRegistration::OnFileNew()
 {
 	ui.view->templ.clear();
 	ui.view->target.clear();
+	ui.view->graph.Clear();
+	ui.view->onRealTimeDeformation = false;
+	ui.view->selected_vertex_idx.clear();
+	ui.view->selected_handle_idx.clear();
+	ui.view->moved_point.clear();
+	ui.view->k_nearest_idx.clear();
+	ui.view->weight_value.clear();
+	ui.view->result_translation.clear();
+	ui.view->result_rotation.clear();
 }
 
 void DeformableRegistration::OnFileOpenTemplate()
@@ -119,9 +128,14 @@ void DeformableRegistration::OnToolsDecimate()
 // 	ui.view->graph.SetMesh(&(ui.view->templ));
 // 	ui.view->graph.BuildGraph( min(300.0/ui.view->templ.n_vertices(), 1.0) );
 
-	ui.view->InitOptimize();
+// <<<<<<< .mine
+// 	ui.view->InitOptimization();
+// 	ui.view->Optimization();
+// =======
+	ui.view->InitOptimization();
 	ui.view->onRealTimeDeformation = true;
 	//ui.view->Deform();
+//>>>>>>> .r153
 }
 
 void DeformableRegistration::OnToolsSample_Random()
