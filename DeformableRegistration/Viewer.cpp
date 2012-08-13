@@ -49,6 +49,20 @@ void Viewer::draw()
 	graph.Render();
 	//glEnable(GL_DEPTH_TEST);
 
+	glBegin(GL_POINTS);
+	glColor3ub(255, 50, 50);
+	glPointSize(15.0);
+	for(int i = 0; i < moved_node.size(); i++)
+		glVertex3d(graph.nodes[i].X()+moved_node[i].X(), graph.nodes[i].Y()+moved_node[i].Y(), graph.nodes[i].Z()+moved_node[i].Z());
+	glEnd();
+
+	glBegin(GL_POINTS);
+	glColor3ub(0, 50, 255);
+	glPointSize(20.0);
+	for(int i = 0; i < moved_point.size(); i++)
+		glVertex3d(moved_point[i].X(), moved_point[i].Y(), moved_point[i].Z());
+	glEnd();
+
 	glDisable(GL_POINT_SMOOTH);
 	glDisable(GL_LINE_SMOOTH);
 
@@ -57,22 +71,24 @@ void Viewer::draw()
 	glEnable(GL_LIGHTING);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glColor4ub(255, 190, 100, 200);
+// 	glColor4ub(255, 190, 100, 200);
+	glColor3ub(255, 190, 100);
+
 	templ.RenderSmooth();
 
-	{
-		glColor3ub(255,0,0);
+	{		
 		for(size_t i = 0; i < selected_idx.size(); i++)
 		{
 			glPushMatrix();
 			glTranslatev(cast_to_Vector3d(templ.point(templ.vertex_handle(selected_idx[i]))));
-			DrawSphere(0.1);
+			glColor3ub(255,0,0);
+			DrawSphere(0.5);
+			glColor4ub(100,190,255,200);
+			DrawBox(10,10,10);
 			glPopMatrix();
 		}
 	}
 
-// 
-// 
 // 	//	templ.RenderWireframe();
 // //	templ.RenderPoints();
 // //	templ.RenderNodes();
@@ -83,25 +99,27 @@ void Viewer::draw()
 
 void Viewer::drawWithNames()
 {
+	for(size_t i = 0; i < selected_idx.size(); i++)
+	{
+		glPushName(-i-1);
+		glPushMatrix();
+		glTranslatev(cast_to_Vector3d(templ.point(templ.vertex_handle(selected_idx[i]))));
+		DrawBox(10,10,10);
+		glPopMatrix();
+		glPopName();
+	}
+
 	HCCLMesh::ConstFaceIter fIt(templ.faces_begin()), fEnd(templ.faces_end());
 	HCCLMesh::ConstFaceVertexIter fvIt;
 	for(; fIt != fEnd; ++fIt)
 	{
 		glPushName(fIt.handle().idx());
 		glBegin(GL_TRIANGLES);
-		fvIt = templ.cfv_iter(fIt.handle());
-		HCCLMesh::Point pt = templ.point(fvIt.handle());
-		HCCLMesh::Point n = templ.normal(fvIt.handle());
-		glNormal3d(n[0], n[1], n[2]);
-		glVertex3d(pt[0], pt[1], pt[2]);
-		pt = templ.point((--fvIt).handle());
-		n = templ.normal(fvIt.handle());
-		glNormal3d(n[0], n[1], n[2]);
-		glVertex3d(pt[0], pt[1], pt[2]);
-		pt = templ.point((--fvIt).handle());
-		n = templ.normal(fvIt.handle());
-		glNormal3d(n[0], n[1], n[2]);
-		glVertex3d(pt[0], pt[1], pt[2]);
+		fvIt = templ.cfv_iter(fIt);
+		glNormal3dv(templ.normal(fIt).data());
+		glVertex3dv(templ.point(fvIt.handle()).data());
+		glVertex3dv(templ.point((--fvIt).handle()).data());
+		glVertex3dv(templ.point((--fvIt).handle()).data());
 		glEnd();
 		glPopName();
 	}
@@ -111,12 +129,15 @@ void Viewer::mousePressEvent(QMouseEvent* e)
 {
 	if ((e->button() == Qt::LeftButton) )
 	{
-		if(e->modifiers() != Qt::CTRL)
-			selected_idx.clear();
+// 		if(e->modifiers() != Qt::CTRL)
+// 		{
+// 			selected_idx.clear();
+//			moved_point.clear();
+// 		}
 
 		QGLViewer::mousePressEvent(e);
 		int sel_facet = selectedName();
-
+		std::cout<< "selected facet : "<< sel_facet << std::endl;
 		if(sel_facet >= 0 && templ.n_faces())
 		{
 			HCCLMesh::ConstFaceVertexIter fvit = templ.cfv_iter(templ.face_handle(sel_facet));
@@ -126,6 +147,7 @@ void Viewer::mousePressEvent(QMouseEvent* e)
 			HCCLMesh::Point pt;
 			qglviewer::Vec pt_;
 			qglviewer::Vec s;
+						
 			pt = templ.point(fvit);
 			pt_[0] = pt[0];		pt_[1] = pt[1];		pt_[2] = pt[2];
 			s = camera()->projectedCoordinatesOf(pt_);
@@ -149,8 +171,8 @@ void Viewer::mousePressEvent(QMouseEvent* e)
 				min_val = (s[0] - e->x())*(s[0] - e->x()) + (s[1] - e->y())*(s[1] - e->y());
 				min_idx = fvit.handle().idx();
 			}
-
 			selected_idx.push_back(min_idx);
+			moved_point.push_back(cast_to_Vector3d(templ.point(templ.vertex_handle(min_idx))));
 		}
 // 		mouse_prev = Vec(e->x(), e->y(), 0);
 // 		mouse_prev_unproj = camera()->unprojectedCoordinatesOf(mouse_prev);
@@ -241,4 +263,73 @@ void Viewer::mouseReleaseEvent(QMouseEvent *e)
 {
 	//btn_pressed = Qt::NoButton;
 	QGLViewer::mouseReleaseEvent(e);
+}
+
+
+#include "lbfgsb.h"
+void Viewer::InitOptimize()
+{
+	// building graph
+	graph.SetMesh(&templ);
+	graph.BuildGraph(min(300.0/templ.n_vertices(), 1.0));
+
+
+	// the number of nodes which influence each vertex
+	k = 4;
+	weight_value.resize(templ.n_vertices(), vector<double>(k+1));
+	k_nearest_idx.resize(templ.n_vertices(), vector<int>(k+1));
+
+	// get weight values of each vertex
+	int start = clock();
+ #pragma omp parallel for
+	for (int i = 0; i<weight_value.size(); ++i)
+	{		
+		Vector3d vertex(templ.point(templ.vertex_handle(i))[0], templ.point(templ.vertex_handle(i))[1], templ.point(templ.vertex_handle(i))[2]);
+		graph.FindClosestPoint(vertex , k_nearest_idx[i].data(), k+1);
+		
+		for (int j = 0; j<k+1; ++j)
+			weight_value[i][j] = Norm(vertex - graph.nodes[k_nearest_idx[i][j]]);
+
+		double sum = 0;
+		for (int j = 0; j<k; ++j)
+		{
+			double temp = 1-weight_value[i][j]/weight_value[i][k];
+			weight_value[i][j] = temp*temp;
+			sum += weight_value[i][j];
+		}
+		for (int j = 0; j<k; ++j)
+			weight_value[i][j] /= sum;
+	}
+
+	std::cout<< (clock()-start)/double(CLOCKS_PER_SEC) << std::endl;
+
+	moved_node = graph.nodes;
+	moved_point[0].SetX(moved_point[0].X()+20);
+}
+
+void Viewer::Deform()
+{
+	int n_node = graph.nodes.size();
+
+	ap::real_1d_array x;
+	ap::integer_1d_array nbd;
+	ap::real_1d_array lbd, ubd;	
+	x.setbounds(1, n_node*12);
+	nbd.setbounds(1, n_node*12);
+	lbd.setbounds(1, n_node*12);
+	ubd.setbounds(1, n_node*12);
+
+	for(int i = 1; i <= n_node*12; i++)
+	{
+		x(i) = 0;
+		nbd(i) = 0;
+		lbd(i) = 0.0;
+		ubd(i) = 0.0;
+	}
+	int info = 0;
+	lbfgsbminimize(n_node*12, 7, x, *this, 0.001, 0.001, 0.001, 5, nbd, lbd, ubd, info);
+
+	for(int i = 0; i < n_node; ++i)
+		moved_node[i] = Vector3d(x(12*i+10), x(12*i+11), x(12*i+12));
+
 }

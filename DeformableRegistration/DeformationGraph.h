@@ -39,11 +39,12 @@ protected:
 
 // Accessors
 public:
-	void GetNeighbors(int i, std::vector<int>& idx);
+	void GetNeighbors(int i, std::vector<int>& idx) const;
 
 protected:
 	const CTriMesh* mesh;
 
+public:
 	std::vector<Vector3d> nodes;
 	std::vector<Vector2i> edges;
 	std::vector<std::vector<int>> nodes_neighboring_nodes;

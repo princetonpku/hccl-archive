@@ -34,6 +34,16 @@ public:
 	DeformationGraph graph;
 
 	std::vector<int> selected_idx;
+	std::vector<Vector3d> moved_point;
+	std::vector<std::vector<int>> k_nearest_idx;
+	std::vector<std::vector<double>> weight_value;
+
+	std::vector<Vector3d> moved_node;
+
+	int k; // for k-nearest nodes of deformation graph
+
+	void InitOptimize();
+	void Deform();
 };
 
 #endif // VIEWER_H

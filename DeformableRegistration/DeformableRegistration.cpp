@@ -116,8 +116,11 @@ void DeformableRegistration::OnToolsDecimate()
 // 	setCursor(Qt::ArrowCursor);
 // 	ui.view->updateGL();
 
-	ui.view->graph.SetMesh(&(ui.view->templ));
-	ui.view->graph.BuildGraph( min(300.0/ui.view->templ.n_vertices(), 1.0) );
+// 	ui.view->graph.SetMesh(&(ui.view->templ));
+// 	ui.view->graph.BuildGraph( min(300.0/ui.view->templ.n_vertices(), 1.0) );
+
+	ui.view->InitOptimize();
+	ui.view->Deform();
 }
 
 void DeformableRegistration::OnToolsSample_Random()
