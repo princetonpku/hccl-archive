@@ -42,12 +42,14 @@ struct HCCLTraits : public OpenMesh::DefaultTraits
 	};
 
 	VertexAttributes (
+		OpenMesh::Attributes::Status |
 		OpenMesh::Attributes::Normal |
 		OpenMesh::Attributes::Color);
-
 	FaceAttributes (
+		OpenMesh::Attributes::Status |
 		OpenMesh::Attributes::Normal |
 		OpenMesh::Attributes::Color);
+	EdgeAttributes(OpenMesh::Attributes::Status);
 
 };
 typedef OpenMesh::TriMesh_ArrayKernelT<HCCLTraits> HCCLMesh;
@@ -115,6 +117,7 @@ public:
 public:
 	void SampleRandom(int nSamples, std::vector<Vector3d>& samples) const;	
 	void SampleUniform(int nSamples, std::vector<Vector3d>& samples, uint nFlag = TM_SAMPLE_UNIFORM_DART) const;
+	//void SampleEx(int nSamples, std::vector<Vector3d>& samples) const;
 
 // Find closest point via KD-Tree search
 public:

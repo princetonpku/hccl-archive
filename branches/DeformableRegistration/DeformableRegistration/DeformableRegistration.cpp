@@ -116,7 +116,7 @@ void DeformableRegistration::OnToolsDecimate()
 // 	ui.view->updateGL();
 
 	ui.view->graph.SetMesh(&(ui.view->templ));
-	ui.view->graph.BuildGraph(300/(double)(ui.view->templ.n_vertices()));
+	ui.view->graph.BuildGraph( min(300.0/ui.view->templ.n_vertices(), 1.0) );
 }
 
 void DeformableRegistration::OnToolsSample_Random()
