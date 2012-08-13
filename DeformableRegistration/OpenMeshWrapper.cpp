@@ -233,7 +233,6 @@ void CTriMesh::SampleRandom(int nSamples, std::vector<Vector3d>& samples) const
 	std::vector<int> vtxIdxList;
 	std::vector<int> vtxSelect(nSamples);
 
-	//vtxIdxList.resize(n_vertices());
 	vtxIdxList.resize(n_vertices());
 	std::iota(vtxIdxList.begin(), vtxIdxList.end(), 0);				// Generate a vertex index list (Non-zero base indexing)
 
@@ -250,8 +249,9 @@ void CTriMesh::SampleRandom(int nSamples, std::vector<Vector3d>& samples) const
 	{
 		if(cnt==vtxSelect[idxCnt])
 		{
-			temp = point(vit);
-			samples[idxCnt] = Vector3d(&temp[0]);
+			HCCLMesh::Point pt = point(vit);
+			samples[idxCnt] = Vector3d(pt[0], pt[1], pt[2]);
+		
 			idxCnt++;
 			if(idxCnt==nSamples)
 				break;
@@ -354,9 +354,85 @@ void CTriMesh::SampleUniform(int nSamples, std::vector<Vector3d>& samples, uint 
 	std::cout << (e_tic - s_tic)/(double)CLOCKS_PER_SEC << "sec"<< std::endl;
 }
 
+// void CTriMesh::SampleEx(int nSamples, std::vector<Vector3d>& samples) const
+// {
+// 	CTriMesh mcopy(*this);
+// 
+// 	int idx[2];
+// 	
+// 	std::vector< std::pair<double, int> > dist;
+// 	dist.reserve(mcopy.n_vertices());
+// 
+// 	for(int i = 0; i < n_vertices() - nSamples; i++)
+// 	{
+// 		dist.resize(0);
+// 		mcopy.BuildKDTree();
+// 		std::for_each(mcopy.vertices_begin(), mcopy.vertices_end(), [&](const HCCLMesh::VertexHandle& vh){
+// 			HCCLMesh::Point pt = mcopy.point(vh);
+// 			mcopy.FindClosestPoint(Vector3d(pt[0], pt[1], pt[2]), idx, 2);
+// 			HCCLMesh::Point cl = mcopy.point(mcopy.vertex_handle(idx[1]));
+// 			dist.push_back( std::pair<double, int>((pt - cl).sqrnorm(), idx[1]) );
+// 		});
+// 		std::sort(dist.begin(), dist.end(), [&](std::pair<double, int>& p, std::pair<double, int>& q)->bool{
+// 			return (p.first < q.first);
+// 		});
+// 
+// 		mcopy.delete_vertex( mcopy.vertex_handle(dist[0].second), true );
+// 		mcopy.garbage_collection();
+// 	}
+// 
+// 	samples.resize(mcopy.n_vertices());
+// 	for(int i = 0; i < mcopy.n_vertices(); i++)
+// 	{
+// 		HCCLMesh::Point pt = mcopy.point(mcopy.vertex_handle(i));
+// 		samples[i] = Vector3d(pt[0], pt[1], pt[2]);
+// 	}
+// 
+// 
+// 
+// 
+// 
+// 
+// 
+// // 	std::vector<int> toErase;
+// // 	toErase.reserve(n_vertices() - nSamples);
+// // 	for(int i = 0; i < dist.size(); i++)
+// // 	{
+// // 		if( std::find(toErase.begin(), toErase.end(), dist[i].second) == toErase.end() )
+// // 		{
+// // 			toErase.push_back(dist[i].second);
+// // 			if(toErase.size() == n_vertices() - nSamples)
+// // 				break;
+// // 		}
+// // 	}
+// // 	std::sort(toErase.begin(), toErase.end());
+// // 
+// // 	std::vector<int> total_idx(n_vertices());
+// // 	std::iota(total_idx.begin(), total_idx.end(), 0);
+// // 
+// // 	std::vector<int> sampled_idx(dist.size() + toErase.size());
+// // 	std::vector<int>::iterator it = std::set_difference(total_idx.begin(), total_idx.end(), toErase.begin(), toErase.end(), sampled_idx.begin());
+// // 	sampled_idx.erase(it, sampled_idx.end());
+// // 
+// // 	samples.resize(sampled_idx.size());
+// // 	for(size_t i = 0; i < sampled_idx.size(); i++)
+// // 	{
+// // 		HCCLMesh::Point pt = point(vertex_handle(sampled_idx[i]));
+// // 		samples[i] = Vector3d(pt[0], pt[1], pt[2]);
+// // 	}
+// 
+// // 	for(int i = 0; i < toErase.size(); i++)					// transform으로 바꾸자
+// // 		toErase.push_back(dist[i].second);
+// // 	std::sort(toErase.begin(), toErase.end());
+// // 	std::vector<int>::iterator it = std::unique(toErase.begin(), toErase.end());
+// // 	toErase.erase(it, toErase.end());
+// 
+// }
+
 inline double tac( IndexedPoint indexed_pt, size_t k ) { return indexed_pt.first[k]; }
 void CTriMesh::BuildKDTree(void)
 {
+	DestroyKDTree();
 	kdtree = new HCCLKDTree(std::ptr_fun(tac));
 	std::for_each(vertices_begin(), vertices_end(), [&](const HCCLMesh::VertexHandle& vh){
 		kdtree->insert(IndexedPoint(point(vh), vh.idx()));
