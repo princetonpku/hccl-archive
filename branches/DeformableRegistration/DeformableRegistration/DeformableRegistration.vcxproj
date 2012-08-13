@@ -103,6 +103,7 @@
     <ClCompile Include="GeneratedFiles\Release\moc_Viewer.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="glPrimitives.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OpenMeshWrapper.cpp" />
     <ClCompile Include="VectorAlgebra.cpp" />
@@ -139,6 +140,7 @@
     <ClInclude Include="function.hpp" />
     <ClInclude Include="GeneratedFiles\ui_Decimate.h" />
     <ClInclude Include="GeneratedFiles\ui_DeformableRegistration.h" />
+    <ClInclude Include="glPrimitives.h" />
     <ClInclude Include="iterator.hpp" />
     <ClInclude Include="kdtree.hpp" />
     <ClInclude Include="node.hpp" />

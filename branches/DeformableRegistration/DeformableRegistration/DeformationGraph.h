@@ -37,11 +37,16 @@ protected:
 	void BuildKDTree(void);
 	void DestroyKDTree(void);
 
+// Accessors
+public:
+	void GetNeighbors(int i, std::vector<int>& idx);
+
 protected:
 	const CTriMesh* mesh;
 
 	std::vector<Vector3d> nodes;
 	std::vector<Vector2i> edges;
+	std::vector<std::vector<int>> nodes_neighboring_nodes;
 
 	DG_KDTree* kdtree;
 };

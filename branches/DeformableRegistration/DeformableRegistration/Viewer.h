@@ -20,15 +20,20 @@ public:
 protected :
 	virtual void init();
 	virtual void draw();
+	virtual void drawWithNames();
 
-	void drawSkeleton(void);
-	void drawLandmarks(void);
+	virtual void mousePressEvent(QMouseEvent* e);
+	virtual void mouseMoveEvent(QMouseEvent *e);
+	virtual void mouseReleaseEvent(QMouseEvent *e);
+
 
 public:
 	CTriMesh templ;
 	CTriMesh target;
 	
 	DeformationGraph graph;
+
+	std::vector<int> selected_idx;
 };
 
 #endif // VIEWER_H
