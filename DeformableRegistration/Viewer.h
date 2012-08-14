@@ -4,7 +4,6 @@
 #include <QGLViewer/qglviewer.h>
 
 #include <vector>
-using namespace std;
 
 #include "OpenMeshWrapper.h"
 #include "DeformationGraph.h"

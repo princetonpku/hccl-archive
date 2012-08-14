@@ -1,9 +1,14 @@
 #include "Viewer.h"
+
 #include <QMouseEvent>
 #include <limits>
+
 #include "glPrimitives.h"
-#include <armadillo>
 #include "DeformableRegistration.h"
+
+#include <armadillo>
+
+using namespace std;
 
 Viewer::Viewer(QWidget *parent) : QGLViewer(parent)
 	, btn_pressed(Qt::NoButton)
@@ -63,11 +68,6 @@ void Viewer::draw()
 		glDisable(GL_POINT_SMOOTH);
 		glDisable(GL_LINE_SMOOTH);
 	}
-
-
-
-
-
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_BLEND);
@@ -142,6 +142,7 @@ void Viewer::drawWithNames()
 		glEnd();
 		glPopName();
 	}
+	glEnable(GL_CULL_FACE);
 
 }
 
@@ -311,12 +312,10 @@ void Viewer::mouseReleaseEvent(QMouseEvent *e)
 #include "lbfgsb.h"
 void Viewer::InitOptimization()
 {
-	target = templ;
-
 	// building graph
 	graph.SetMesh(&templ);
 
-	graph.BuildGraph(min(300.0/templ.n_vertices(), 1.0), 3);
+	graph.BuildGraph(min(300.0/templ.n_vertices(), 1.0), 2);
 
 	// the number of nodes which influence each vertex
 	nearest_k = 4;
@@ -324,8 +323,8 @@ void Viewer::InitOptimization()
 	k_nearest_idx.resize(templ.n_vertices(), vector<int>(nearest_k+1));
 
 	// get weight values of each vertex
-	int start = clock();
- #pragma omp parallel for
+	int start_tic = clock();
+//  #pragma omp parallel for
 	for (int i = 0; i<weight_value.size(); ++i)
 	{		
 		Vector3d vertex(templ.point(templ.vertex_handle(i))[0], templ.point(templ.vertex_handle(i))[1], templ.point(templ.vertex_handle(i))[2]);
@@ -344,12 +343,9 @@ void Viewer::InitOptimization()
 		for (int j = 0; j<nearest_k; ++j)
 			weight_value[i][j] /= sum;
 	}
+	graph.draw_nodes = graph.nodes;
 
-	graph.draw_nodes.resize(graph.nodes.size());
-	for (int i =0 ; i<graph.draw_nodes.size(); ++i)
-		graph.draw_nodes[i] = graph.nodes[i];
-
-	std::cout<< (clock()-start)/double(CLOCKS_PER_SEC) << std::endl;
+	printf("set k-nearest node and weight values : %f sec\n", (clock()-start_tic)/double(CLOCKS_PER_SEC));	
 }
 
 void Viewer::RunOptimization()
@@ -367,10 +363,7 @@ void Viewer::RunOptimization()
 
 	for(int i = 1; i <= n_node*12; i++)
 	{
-		if(i%12 == 1 || i%12 == 5 || i%12 == 9)
-			x(i) = 1;
-		else
-			x(i) = 0;
+		x(i) = (i%12 == 1 || i%12 == 5 || i%12 == 9) ? 1 : 0;
 		nbd(i) = 0;
 		lbd(i) = 0.0;
 		ubd(i) = 0.0;
@@ -378,22 +371,22 @@ void Viewer::RunOptimization()
 
 	int info = 0;
 
-	lbfgsbminimize(n_node*12, 5, x, graph, templ, selected_vertex_idx, moved_point, k_nearest_idx, weight_value, 0.00001, 0.00001, 0.00001, 100, nbd, lbd, ubd, info);
+	lbfgsbminimize(n_node*12, 5, x, graph, templ, selected_vertex_idx, moved_point, k_nearest_idx, weight_value, 0.00001, 0.00001, 0.00001, 200, nbd, lbd, ubd, info);
 
 	// update solution
 	result_translation.resize(n_node);
 	result_rotation.resize(n_node, vector<double>(9));
+
+// #pragma parallel for
 	for(int i = 0; i < n_node; ++i)
 	{
 		result_translation[i] = Vector3d(x(12*i+10), x(12*i+11), x(12*i+12));
 		for (int j = 0; j < 9; ++j)
 			result_rotation[i][j] = x(12*i+j+1);
 	}
-
-	cout<< "done!" <<endl;
-
-
  	Deform(templ, target, graph);
+
+// 	printf("time for one iteration : %f sec\n", (clock()-start_tic)/double(CLOCKS_PER_SEC));
 }
 
 void Viewer::Deform( const CTriMesh& ori, CTriMesh& mesh, DeformationGraph& dgraph )
@@ -402,6 +395,7 @@ void Viewer::Deform( const CTriMesh& ori, CTriMesh& mesh, DeformationGraph& dgra
 	HCCLMesh::VertexIter vit = mesh.vertices_begin();
 
 	// mesh update
+// #pragma parallel for
 	for (; cvit!=ori.vertices_end(); ++cvit, ++vit)
 	{
 		int idx_vrtx = cvit.handle().idx();
@@ -448,8 +442,5 @@ void Viewer::Deform( const CTriMesh& ori, CTriMesh& mesh, DeformationGraph& dgra
 	mesh.update_normals();
 
 	// deformation graph update
-	for (int i =0 ; i<result_translation.size(); ++i)
-	{
-		dgraph.draw_nodes[i] = dgraph.nodes[i] + result_translation[i];
-	}
+	std::transform(graph.nodes.begin(), graph.nodes.end(), result_translation.begin(), dgraph.draw_nodes.begin(), [](const Vector3d& a, const Vector3d& b){return a+b;});
 }

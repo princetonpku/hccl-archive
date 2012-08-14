@@ -110,7 +110,6 @@
     <ClCompile Include="lbfgsb.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="OpenMeshWrapper.cpp" />
-    <ClCompile Include="VectorAlgebra.cpp" />
     <ClCompile Include="Viewer.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -153,7 +152,6 @@
     <ClInclude Include="node.hpp" />
     <ClInclude Include="OpenMeshWrapper.h" />
     <ClInclude Include="region.hpp" />
-    <ClInclude Include="VectorAlgebra.h" />
     <ClInclude Include="VectorQuaternion.h" />
     <CustomBuild Include="Viewer.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>

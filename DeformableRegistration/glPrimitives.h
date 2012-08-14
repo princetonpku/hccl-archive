@@ -1,12 +1,5 @@
 #pragma once
 
-#ifdef QT_OPENGL_LIB
-#include <qgl.h>
-#else
-#include <gl/GL.h>
-#include <gl/GLU.h>
-#endif
-
 #include "VectorQuaternion.h"
 
 void glNormalv(Vector3d vec);
@@ -20,7 +13,7 @@ void DrawEllipse(double r1, double r2, unsigned int segments = 10);
 // 3D Drawings
 void DrawArrow(double length, double thickness);
 void DrawAxis(Vector3d length);
-void DrawGrid(GLfloat fExtent, GLfloat fStep);
+void DrawGrid(float fExtent, float fStep);
 void DrawCylinder(double r, double height, unsigned int segments = 10);
 void DrawEllipCylinder(double r1, double r2, double height, unsigned int segments = 10);
 void DrawCone(double r, double height, unsigned int segments = 10);

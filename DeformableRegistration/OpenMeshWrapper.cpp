@@ -1,10 +1,15 @@
 #include "OpenMeshWrapper.h"
 
+#ifdef QT_OPENGL_LIB
+#include <qgl.h>
+#else
+#include <gl/GL.h>
+#include <gl/GLU.h>
+#endif
 
 #include <algorithm>
 #include <numeric>
 #include <limits>
-
 
 //#include <armadillo>
 #include <OpenMesh/Tools/Decimater/DecimaterT.hh>
