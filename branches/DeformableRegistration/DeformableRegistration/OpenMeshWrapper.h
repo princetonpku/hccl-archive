@@ -2,14 +2,6 @@
 #define HCCL_OPENMESHWRAPPER_H_
 
 #include <vector>
-
-#ifdef QT_OPENGL_LIB
-#include <qgl.h>
-#else
-#include <gl/GL.h>
-#include <gl/GLU.h>
-#endif
-
 #include "VectorQuaternion.h"
 
 // OpenMesh
@@ -80,15 +72,15 @@ public:
 public:
 	bool Read(std::string strFilePath);
 	bool Write(std::string strFilePath) const;
-
+		
 // OpenGL Display
 public:
-	void Render(GLenum nMethod, GLuint nFlag) const;				// TODO: flag 구현할 것
+	void Render(unsigned int nMethod, unsigned int nFlag) const;				// TODO: flag 구현할 것
 //protected:
-	void RenderPoints(GLuint nFlag = 0) const;
-	void RenderWireframe(GLuint nFlag = 0) const;
-	void RenderFlat(GLuint nFlag = 0) const;
-	void RenderSmooth(GLuint nFlag = 0) const;
+	void RenderPoints(unsigned int nFlag = 0) const;
+	void RenderWireframe(unsigned int nFlag = 0) const;
+	void RenderFlat(unsigned int nFlag = 0) const;
+	void RenderSmooth(unsigned int nFlag = 0) const;
 
 	// TODO
 // 	void Draw_BoundingBox(void);				// TODO: bounding box 및 sphere도 trait으로 넣자T

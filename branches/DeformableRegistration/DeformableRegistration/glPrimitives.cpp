@@ -1,5 +1,12 @@
 #include "glPrimitives.h"
 
+#ifdef QT_OPENGL_LIB
+#include <qgl.h>
+#else
+#include <gl/GL.h>
+#include <gl/GLU.h>
+#endif
+
 void glNormalv(Vector3d vec) { glNormal3d(vec[0], vec[1], vec[2]); }
 void glTranslatev(Vector3d vec) { glTranslated(vec[0], vec[1], vec[2]); }
 void glRotatev(double ang, Vector3d vec) { glRotated(ang, vec[0], vec[1], vec[2]); }
@@ -56,7 +63,7 @@ void DrawAxis(Vector3d length)
 }
 
 
-void DrawGrid(GLfloat fExtent, GLfloat fStep)
+void DrawGrid( float fExtent, float fStep )
 {
 	// Grid Lines
 	glBegin(GL_LINES);

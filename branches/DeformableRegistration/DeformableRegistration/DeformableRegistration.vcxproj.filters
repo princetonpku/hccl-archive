@@ -36,6 +36,9 @@
     <Filter Include="LBFGS">
       <UniqueIdentifier>{eff0ce67-4f6a-4eb2-a13d-2638add93ba8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="K-d Tree">
+      <UniqueIdentifier>{3e2221ff-f686-4897-b7ff-dbf5a92e073f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -52,9 +55,6 @@
     </ClCompile>
     <ClCompile Include="GeneratedFiles\qrc_DeformableRegistration.cpp">
       <Filter>Generated Files</Filter>
-    </ClCompile>
-    <ClCompile Include="VectorAlgebra.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Viewer.cpp">
       <Filter>Source Files</Filter>
@@ -102,9 +102,6 @@
     <ClInclude Include="GeneratedFiles\ui_DeformableRegistration.h">
       <Filter>Generated Files</Filter>
     </ClInclude>
-    <ClInclude Include="VectorAlgebra.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="VectorQuaternion.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -113,24 +110,6 @@
     </ClInclude>
     <ClInclude Include="GeneratedFiles\ui_Decimate.h">
       <Filter>Generated Files</Filter>
-    </ClInclude>
-    <ClInclude Include="allocator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="region.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="function.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="iterator.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="kdtree.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="node.hpp">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DeformationGraph.h">
       <Filter>Header Files</Filter>
@@ -146,6 +125,24 @@
     </ClInclude>
     <ClInclude Include="lbfgsb.h">
       <Filter>LBFGS</Filter>
+    </ClInclude>
+    <ClInclude Include="kdtree.hpp">
+      <Filter>K-d Tree</Filter>
+    </ClInclude>
+    <ClInclude Include="iterator.hpp">
+      <Filter>K-d Tree</Filter>
+    </ClInclude>
+    <ClInclude Include="node.hpp">
+      <Filter>K-d Tree</Filter>
+    </ClInclude>
+    <ClInclude Include="region.hpp">
+      <Filter>K-d Tree</Filter>
+    </ClInclude>
+    <ClInclude Include="function.hpp">
+      <Filter>K-d Tree</Filter>
+    </ClInclude>
+    <ClInclude Include="allocator.hpp">
+      <Filter>K-d Tree</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
