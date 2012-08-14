@@ -9,13 +9,14 @@ using namespace std;
 #include "OpenMeshWrapper.h"
 #include "DeformationGraph.h"
 
-
+class DeformableRegistration;
 class Viewer : public QGLViewer
 {
     Q_OBJECT
 
 public:
-    Viewer(QWidget *parent = 0);
+	Viewer(QWidget *parent = 0);
+	DeformableRegistration* pParentDlg;
 
 protected :
 	virtual void init();
@@ -30,14 +31,13 @@ protected :
 	qglviewer::Vec mouse_curr;
 	qglviewer::Vec mouse_prev;
 
-
 public:
 	CTriMesh templ;
 	CTriMesh target;
 	DeformationGraph graph;
 
 
-	bool onRealTimeDeformation;
+	bool onEmbededDeformation;
 	std::vector<int> selected_vertex_idx;
 	std::vector<int> selected_handle_idx;
 	std::vector<Vector3d> moved_point;

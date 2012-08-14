@@ -6,6 +6,7 @@ DeformableRegistration::DeformableRegistration(QWidget *parent, Qt::WFlags flags
 	: QMainWindow(parent, flags)
 {
 	ui.setupUi(this);
+	ui.view->pParentDlg = this;
 	ui.horizontalLayout->setContentsMargins(0, 0, 0, 0);
 
 	connect(ui.actionNew, SIGNAL(triggered()), this, SLOT(OnFileNew()));
@@ -19,7 +20,7 @@ DeformableRegistration::DeformableRegistration(QWidget *parent, Qt::WFlags flags
 	connect(ui.actionRANDOM, SIGNAL(triggered()), this, SLOT(OnToolsSample_Random()));
 	connect(ui.actionQuadricFitting, SIGNAL(triggered()), this, SLOT(OnToolsSample_Quad()));
 	connect(ui.actionDartThrowing, SIGNAL(triggered()), this, SLOT(OnToolsSample_Uniform_Dart()));
-
+	connect(ui.actionEmbededDeformation, SIGNAL(triggered()), this, SLOT(OnToolsEmbededDeformation()));
 	srand((unsigned)time(NULL));			// 매번 다른 random number 생성을 위해
 	
 }
@@ -34,7 +35,7 @@ void DeformableRegistration::OnFileNew()
 	ui.view->templ.clear();
 	ui.view->target.clear();
 	ui.view->graph.Clear();
-	ui.view->onRealTimeDeformation = false;
+	ui.view->onEmbededDeformation = false;
 	ui.view->selected_vertex_idx.clear();
 	ui.view->selected_handle_idx.clear();
 	ui.view->moved_point.clear();
@@ -120,22 +121,10 @@ void DeformableRegistration::OnFileExit()
 
 void DeformableRegistration::OnToolsDecimate()
 {
-// 	setCursor(Qt::WaitCursor);
-// 	ui.view->templ.Decimate(0.7);
-// 	setCursor(Qt::ArrowCursor);
-// 	ui.view->updateGL();
-
-// 	ui.view->graph.SetMesh(&(ui.view->templ));
-// 	ui.view->graph.BuildGraph( min(300.0/ui.view->templ.n_vertices(), 1.0) );
-
-// <<<<<<< .mine
-// 	ui.view->InitOptimization();
-// 	ui.view->Optimization();
-// =======
-	ui.view->InitOptimization();
-	ui.view->onRealTimeDeformation = true;
-	//ui.view->Deform();
-//>>>>>>> .r153
+	setCursor(Qt::WaitCursor);
+	ui.view->templ.Decimate(0.7);
+	setCursor(Qt::ArrowCursor);
+	ui.view->updateGL();
 }
 
 void DeformableRegistration::OnToolsSample_Random()
@@ -161,4 +150,19 @@ void DeformableRegistration::OnToolsSample_Quad()
 void DeformableRegistration::OnToolsSample_Uniform_Dart()
 {
 	//ui.view->templ.SampleUniform(2000, TM_SAMPLE_UNIFORM_DART);
+}
+
+void DeformableRegistration::OnToolsEmbededDeformation()
+{
+	ui.view->InitOptimization();
+	ui.view->onEmbededDeformation = true;
+	ui.view->target = ui.view->templ;
+	ui.actionTemplateVisible->setChecked(false);
+	ui.actionTargetVisible->setChecked(true);
+	ui.view->updateGL();
+}
+
+void DeformableRegistration::OnViewDeformationGraph()
+{
+	ui.view->updateGL();
 }

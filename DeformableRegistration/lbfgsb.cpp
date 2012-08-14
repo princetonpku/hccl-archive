@@ -110,6 +110,8 @@ void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g, const
 			g(12*nidx[j]+12) += 10*(2*gkz - 2*gjz - 2*tjz + 2*tkz + 2*r7*(gjx - gkx) + 2*r8*(gjy - gky) + 2*r9*(gjz - gkz));
 		}
 	}
+
+
 	// e_con
 	for (int i = 0; i<viewer.selected_vertex_idx.size(); ++i)
 	{

@@ -65,8 +65,53 @@
     </widget>
     <addaction name="actionDecimate"/>
     <addaction name="menuSampling"/>
+    <addaction name="actionEmbededDeformation"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <widget class="QMenu" name="menuProjection">
+     <property name="title">
+      <string>Projection</string>
+     </property>
+     <addaction name="actionPerspective"/>
+     <addaction name="actionOrthogonal"/>
+    </widget>
+    <widget class="QMenu" name="menuTemplateMesh">
+     <property name="title">
+      <string>Template Mesh</string>
+     </property>
+     <addaction name="actionSolid"/>
+     <addaction name="actionWireframe"/>
+     <addaction name="actionFlat"/>
+     <addaction name="actionSmooth"/>
+     <addaction name="separator"/>
+     <addaction name="actionTemplateVisible"/>
+     <addaction name="separator"/>
+     <addaction name="actionTransparent"/>
+    </widget>
+    <widget class="QMenu" name="menuTarget_Mesh">
+     <property name="title">
+      <string>Target Mesh</string>
+     </property>
+     <addaction name="actionPoints"/>
+     <addaction name="actionWireframe_2"/>
+     <addaction name="actionFlat_2"/>
+     <addaction name="actionSmooth_2"/>
+     <addaction name="separator"/>
+     <addaction name="actionTargetVisible"/>
+     <addaction name="separator"/>
+     <addaction name="actionTransparent_2"/>
+    </widget>
+    <addaction name="menuProjection"/>
+    <addaction name="separator"/>
+    <addaction name="menuTemplateMesh"/>
+    <addaction name="menuTarget_Mesh"/>
+    <addaction name="actionDeformationGraph"/>
    </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuView"/>
    <addaction name="menuCommon_Tools"/>
    <addaction name="menuHaoLi2008"/>
   </widget>
@@ -127,6 +172,121 @@
   <action name="actionDartThrowing">
    <property name="text">
     <string>Dart_Throwing</string>
+   </property>
+  </action>
+  <action name="actionEmbededDeformation">
+   <property name="text">
+    <string>Embeded Deformation</string>
+   </property>
+  </action>
+  <action name="actionPerspective">
+   <property name="text">
+    <string>Perspective</string>
+   </property>
+  </action>
+  <action name="actionOrthogonal">
+   <property name="text">
+    <string>Orthogonal</string>
+   </property>
+  </action>
+  <action name="actionSolid">
+   <property name="text">
+    <string>Points</string>
+   </property>
+  </action>
+  <action name="actionWireframe">
+   <property name="text">
+    <string>Wireframe</string>
+   </property>
+  </action>
+  <action name="actionFlat">
+   <property name="text">
+    <string>Flat</string>
+   </property>
+  </action>
+  <action name="actionSmooth">
+   <property name="text">
+    <string>Smooth</string>
+   </property>
+  </action>
+  <action name="actionVisible">
+   <property name="text">
+    <string>Show</string>
+   </property>
+  </action>
+  <action name="actionTemplateVisible">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Visible</string>
+   </property>
+  </action>
+  <action name="actionTransparent">
+   <property name="text">
+    <string>Transparent...</string>
+   </property>
+  </action>
+  <action name="actionPoints">
+   <property name="text">
+    <string>Points</string>
+   </property>
+  </action>
+  <action name="actionWireframe_2">
+   <property name="text">
+    <string>Wireframe</string>
+   </property>
+  </action>
+  <action name="actionFlat_2">
+   <property name="text">
+    <string>Flat</string>
+   </property>
+  </action>
+  <action name="actionSmooth_2">
+   <property name="text">
+    <string>Smooth</string>
+   </property>
+  </action>
+  <action name="actionShow">
+   <property name="text">
+    <string>Show</string>
+   </property>
+  </action>
+  <action name="actionTargetVisible">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Visible</string>
+   </property>
+  </action>
+  <action name="actionTransparent_2">
+   <property name="text">
+    <string>Transparent...</string>
+   </property>
+  </action>
+  <action name="actionShow_2">
+   <property name="text">
+    <string>Show</string>
+   </property>
+  </action>
+  <action name="actionHide_3">
+   <property name="text">
+    <string>Hide</string>
+   </property>
+  </action>
+  <action name="actionDeformationGraph">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Deformation Graph</string>
    </property>
   </action>
  </widget>

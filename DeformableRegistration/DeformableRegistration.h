@@ -12,7 +12,7 @@ public:
 	DeformableRegistration(QWidget *parent = 0, Qt::WFlags flags = 0);
 	~DeformableRegistration();
 
-private:
+//private:	// юс╫ц
 	Ui::DeformableRegistrationClass ui;
 
 private slots:
@@ -27,6 +27,9 @@ private slots:
 	void OnToolsSample_Random();		// Random Sampling
 	void OnToolsSample_Quad();		// Sampling by Quadric Fitting
 	void OnToolsSample_Uniform_Dart();		// Sampling by user-defined distance
+	void OnToolsEmbededDeformation();
+
+	void OnViewDeformationGraph();
 
 };
 
