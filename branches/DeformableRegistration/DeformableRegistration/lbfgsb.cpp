@@ -25,13 +25,33 @@ quote at least one of the references given below:
 // #include <stdafx.h>
 // #include "stdafx.h"
 #include "lbfgsb.h"
-#include "Viewer.h"
+#include "VectorQuaternion.h"
+#include "DeformationGraph.h"
+#include "OpenMeshWrapper.h"
 
-void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g, const Viewer& viewer)
+// Assuming R = [x1 x4 x7]  t = [x10]
+//              [x2 x5 x8]      [x11]
+//              [x3 x6 x9]      [x12]
+void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g,
+	const DeformationGraph& graph,
+	const CTriMesh& mesh,
+	std::vector<int>& constraint_idx,
+	std::vector<Vector3d>& constraints,
+	std::vector<std::vector<int>>& nearest_nodes,
+	std::vector<std::vector<double>>& node_weights
+	)
 {
 	f = 0.0;
 	double gkx, gky, gkz, gjx, gjy, gjz, tkx, tky, tkz, tjx, tjy, tjz, r1, r2, r3, r4, r5, r6, r7, r8, r9;
 	int m = (x.gethighbound() - x.getlowbound() + 1)/12;
+
+	double Erot = 0.0;
+	double Ereg = 0.0;
+	double Econ = 0.0;
+	
+	double alpha = 1.0;
+	double beta = 10.0;
+	double gamma = 100.0;
 
 	// initialize g()
 	for(int i = g.getlowbound(); i <= g.gethighbound(); ++i)
@@ -39,164 +59,106 @@ void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g, const
 
 	for(int i = 0; i < m; i++)
 	{
-		// e_rot
-		f += (x(12*i+1)*x(12*i+1)+x(12*i+4)*x(12*i+4)+x(12*i+7)*x(12*i+7)-1)*(x(12*i+1)*x(12*i+1)+x(12*i+4)*x(12*i+4)+x(12*i+7)*x(12*i+7)-1)
-			+(x(12*i+2)*x(12*i+2)+x(12*i+5)*x(12*i+5)+x(12*i+8)*x(12*i+8)-1)*(x(12*i+2)*x(12*i+2)+x(12*i+5)*x(12*i+5)+x(12*i+8)*x(12*i+8)-1)
-			+(x(12*i+3)*x(12*i+3)+x(12*i+6)*x(12*i+6)+x(12*i+9)*x(12*i+9)-1)*(x(12*i+3)*x(12*i+3)+x(12*i+6)*x(12*i+6)+x(12*i+9)*x(12*i+9)-1)
-			+(x(12*i+1)*x(12*i+2)+x(12*i+4)*x(12*i+5)+x(12*i+7)*x(12*i+8))*(x(12*i+1)*x(12*i+2)+x(12*i+4)*x(12*i+5)+x(12*i+7)*x(12*i+8))
-			+(x(12*i+1)*x(12*i+3)+x(12*i+4)*x(12*i+6)+x(12*i+7)*x(12*i+9))*(x(12*i+1)*x(12*i+3)+x(12*i+4)*x(12*i+6)+x(12*i+7)*x(12*i+9))
-			+(x(12*i+2)*x(12*i+3)+x(12*i+5)*x(12*i+6)+x(12*i+8)*x(12*i+9))*(x(12*i+2)*x(12*i+3)+x(12*i+5)*x(12*i+6)+x(12*i+8)*x(12*i+9));
+		// E_rot
+		double c1c1 = x(12*i+1)*x(12*i+1) + x(12*i+2)*x(12*i+2) + x(12*i+3)*x(12*i+3);
+		double c2c2 = x(12*i+4)*x(12*i+4) + x(12*i+5)*x(12*i+5) + x(12*i+6)*x(12*i+6);
+		double c3c3 = x(12*i+7)*x(12*i+7) + x(12*i+8)*x(12*i+8) + x(12*i+9)*x(12*i+9);
+		double c1c2 = x(12*i+1)*x(12*i+4) + x(12*i+2)*x(12*i+5) + x(12*i+3)*x(12*i+6);
+		double c1c3 = x(12*i+1)*x(12*i+7) + x(12*i+2)*x(12*i+8) + x(12*i+3)*x(12*i+9);
+		double c2c3 = x(12*i+4)*x(12*i+7) + x(12*i+5)*x(12*i+8) + x(12*i+6)*x(12*i+9);
 
-		g(12*i+1) += 4*x(12*i+1)*(x(12*i+1)*x(12*i+1) + x(12*i+4)*x(12*i+4) + x(12*i+7)*x(12*i+7) - 1) + 2*x(12*i+2)*(x(12*i+1)*x(12*i+2) + x(12*i+4)*x(12*i+5) + x(12*i+7)*x(12*i+8)) + 2*x(12*i+3)*(x(12*i+1)*x(12*i+3) + x(12*i+4)*x(12*i+6) + x(12*i+7)*x(12*i+9));
-		g(12*i+2) += 4*x(12*i+2)*(x(12*i+2)*x(12*i+2) + x(12*i+5)*x(12*i+5) + x(12*i+8)*x(12*i+8) - 1) + 2*x(12*i+1)*(x(12*i+1)*x(12*i+2) + x(12*i+4)*x(12*i+5) + x(12*i+7)*x(12*i+8)) + 2*x(12*i+3)*(x(12*i+2)*x(12*i+3) + x(12*i+5)*x(12*i+6) + x(12*i+8)*x(12*i+9));
-		g(12*i+3) += 4*x(12*i+3)*(x(12*i+3)*x(12*i+3) + x(12*i+6)*x(12*i+6) + x(12*i+9)*x(12*i+9) - 1) + 2*x(12*i+1)*(x(12*i+1)*x(12*i+3) + x(12*i+4)*x(12*i+6) + x(12*i+7)*x(12*i+9)) + 2*x(12*i+2)*(x(12*i+2)*x(12*i+3) + x(12*i+5)*x(12*i+6) + x(12*i+8)*x(12*i+9));
-		g(12*i+4) += 4*x(12*i+4)*(x(12*i+1)*x(12*i+1) + x(12*i+4)*x(12*i+4) + x(12*i+7)*x(12*i+7) - 1) + 2*x(12*i+5)*(x(12*i+1)*x(12*i+2) + x(12*i+4)*x(12*i+5) + x(12*i+7)*x(12*i+8)) + 2*x(12*i+6)*(x(12*i+1)*x(12*i+3) + x(12*i+4)*x(12*i+6) + x(12*i+7)*x(12*i+9));
-		g(12*i+5) += 4*x(12*i+2)*(x(12*i+2)*x(12*i+2) + x(12*i+5)*x(12*i+5) + x(12*i+8)*x(12*i+8) - 1) + 2*x(12*i+4)*(x(12*i+1)*x(12*i+2) + x(12*i+4)*x(12*i+5) + x(12*i+7)*x(12*i+8)) + 2*x(12*i+6)*(x(12*i+2)*x(12*i+3) + x(12*i+5)*x(12*i+6) + x(12*i+8)*x(12*i+9));
-		g(12*i+6) += 4*x(12*i+6)*(x(12*i+3)*x(12*i+3) + x(12*i+6)*x(12*i+6) + x(12*i+9)*x(12*i+9) - 1) + 2*x(12*i+4)*(x(12*i+1)*x(12*i+3) + x(12*i+4)*x(12*i+6) + x(12*i+7)*x(12*i+9)) + 2*x(12*i+5)*(x(12*i+2)*x(12*i+3) + x(12*i+5)*x(12*i+6) + x(12*i+8)*x(12*i+9));
-		g(12*i+7) += 4*x(12*i+7)*(x(12*i+1)*x(12*i+1) + x(12*i+4)*x(12*i+4) + x(12*i+7)*x(12*i+7) - 1) + 2*x(12*i+8)*(x(12*i+1)*x(12*i+2) + x(12*i+4)*x(12*i+5) + x(12*i+7)*x(12*i+8)) + 2*x(12*i+9)*(x(12*i+1)*x(12*i+3) + x(12*i+4)*x(12*i+6) + x(12*i+7)*x(12*i+9));
-		g(12*i+8) += 4*x(12*i+2)*(x(12*i+2)*x(12*i+2) + x(12*i+5)*x(12*i+5) + x(12*i+8)*x(12*i+8) - 1) + 2*x(12*i+7)*(x(12*i+1)*x(12*i+2) + x(12*i+4)*x(12*i+5) + x(12*i+7)*x(12*i+8)) + 2*x(12*i+9)*(x(12*i+2)*x(12*i+3) + x(12*i+5)*x(12*i+6) + x(12*i+8)*x(12*i+9));
-		g(12*i+9) += 4*x(12*i+9)*(x(12*i+3)*x(12*i+3) + x(12*i+6)*x(12*i+6) + x(12*i+9)*x(12*i+9) - 1) + 2*x(12*i+7)*(x(12*i+1)*x(12*i+3) + x(12*i+4)*x(12*i+6) + x(12*i+7)*x(12*i+9)) + 2*x(12*i+8)*(x(12*i+2)*x(12*i+3) + x(12*i+5)*x(12*i+6) + x(12*i+8)*x(12*i+9));
+		Erot += c1c2*c1c2 + c1c3*c1c3 + c2c3*c2c3 + (c1c1-1)*(c1c1-1) + (c2c2-1)*(c2c2-1) + (c3c3-1)*(c3c3-1);
 
-		// e_reg
-		gjx = viewer.graph.nodes[i].X();
-		gjy = viewer.graph.nodes[i].Y();
-		gjz = viewer.graph.nodes[i].Z();
+		g(12*i+1) += alpha*(2*c1c2*x(12*i+4) + 2*c1c3*x(12*i+7) + 4*(c1c1-1)*x(12*i+1));
+		g(12*i+2) += alpha*(2*c1c2*x(12*i+5) + 2*c1c3*x(12*i+8) + 4*(c1c1-1)*x(12*i+2));
+		g(12*i+3) += alpha*(2*c1c2*x(12*i+6) + 2*c1c3*x(12*i+9) + 4*(c1c1-1)*x(12*i+3));
+		g(12*i+4) += alpha*(2*c1c2*x(12*i+1) + 2*c2c3*x(12*i+7) + 4*(c2c2-1)*x(12*i+4));
+		g(12*i+5) += alpha*(2*c1c2*x(12*i+2) + 2*c2c3*x(12*i+8) + 4*(c2c2-1)*x(12*i+5));
+		g(12*i+6) += alpha*(2*c1c2*x(12*i+3) + 2*c2c3*x(12*i+9) + 4*(c2c2-1)*x(12*i+6));
+		g(12*i+7) += alpha*(2*c1c3*x(12*i+1) + 2*c2c3*x(12*i+4) + 4*(c3c3-1)*x(12*i+7));
+		g(12*i+8) += alpha*(2*c1c3*x(12*i+2) + 2*c2c3*x(12*i+5) + 4*(c3c3-1)*x(12*i+8));
+		g(12*i+9) += alpha*(2*c1c3*x(12*i+3) + 2*c2c3*x(12*i+6) + 4*(c3c3-1)*x(12*i+9));
 
-		tjx = x(12*i+10);
-		tjy = x(12*i+11);
-		tjz = x(12*i+12);
 
-		r1 = x(12*i+1);
-		r2 = x(12*i+2);
-		r3 = x(12*i+3);
-		r4 = x(12*i+4);
-		r5 = x(12*i+5);
-		r6 = x(12*i+6);
-		r7 = x(12*i+7);
-		r8 = x(12*i+8);
-		r9 = x(12*i+9);
-
-		std::vector<int> nidx;
-		viewer.graph.GetNeighbors(i, nidx);
-		for (int j = 0; j<nidx.size(); ++j)
+		// E_reg
+		std::vector<int> nei;	graph.GetNeighbors(i, nei);
+		double gj[3] = {graph.nodes[i][0], graph.nodes[i][1], graph.nodes[i][2]};
+		double sig_reg[3];
+		for(size_t k = 0; k < nei.size(); k++)
 		{
-			gkx = viewer.graph.nodes[nidx[j]].X();
-			gky = viewer.graph.nodes[nidx[j]].Y();
-			gkz = viewer.graph.nodes[nidx[j]].Z();
-			tkx = x(12*nidx[j]+10);
-			tky = x(12*nidx[j]+11);
-			tkz = x(12*nidx[j]+12);
+			double gk[3] = {graph.nodes[nei[k]][0], graph.nodes[nei[k]][1], graph.nodes[nei[k]][2]};
 
-			double a,b,c;
-			a = (gkx - gjx - tjx + tkx + r1*(gjx - gkx) + r2*(gjy - gky) + r3*(gjz - gkz));
-			b = (gky - gjy - tjy + tky + r4*(gjx - gkx) + r5*(gjy - gky) + r6*(gjz - gkz));
-			c = (gkz - gjz - tjz + tkz + r7*(gjx - gkx) + r8*(gjy - gky) + r9*(gjz - gkz));
-			f += 10*(a*a + b*b + c*c);
+			// sig_reg = Rj(gk-gj) + gj + tj - (gk + tk)
+			sig_reg[0] = x(12*i+1)*(gk[0]-gj[0]) + x(12*i+4)*(gk[1] - gj[1]) + x(12*i+7)*(gk[2] - gj[2]);		// sig_reg = Rj(gk-gj)
+			sig_reg[1] = x(12*i+2)*(gk[0]-gj[0]) + x(12*i+5)*(gk[1] - gj[1]) + x(12*i+8)*(gk[2] - gj[2]);
+			sig_reg[2] = x(12*i+3)*(gk[0]-gj[0]) + x(12*i+6)*(gk[1] - gj[1]) + x(12*i+9)*(gk[2] - gj[2]);
+			sig_reg[0] += gj[0] + x(12*i+10) - gk[0] - x(12*nei[k]+10);											// sig_reg += gj + tj - (gk + tk)
+			sig_reg[1] += gj[1] + x(12*i+11) - gk[1] - x(12*nei[k]+11);
+			sig_reg[2] += gj[2] + x(12*i+12) - gk[2] - x(12*nei[k]+12);
 
-			g(12*i+1) += 10*(2*(gjx - gkx)*(gkx - gjx - tjx + tkx + r1*(gjx - gkx) + r2*(gjy - gky) + r3*(gjz - gkz)));
-			g(12*i+2) += 10*(2*(gjy - gky)*(gkx - gjx - tjx + tkx + r1*(gjx - gkx) + r2*(gjy - gky) + r3*(gjz - gkz)));
-			g(12*i+3) += 10*(2*(gjz - gkz)*(gkx - gjx - tjx + tkx + r1*(gjx - gkx) + r2*(gjy - gky) + r3*(gjz - gkz)));
-			g(12*i+4) += 10*(2*(gjx - gkx)*(gky - gjy - tjy + tky + r4*(gjx - gkx) + r5*(gjy - gky) + r6*(gjz - gkz)));
-			g(12*i+5) += 10*(2*(gjy - gky)*(gky - gjy - tjy + tky + r4*(gjx - gkx) + r5*(gjy - gky) + r6*(gjz - gkz)));
-			g(12*i+6) += 10*(2*(gjz - gkz)*(gky - gjy - tjy + tky + r4*(gjx - gkx) + r5*(gjy - gky) + r6*(gjz - gkz)));
-			g(12*i+7) += 10*(2*(gjx - gkx)*(gkz - gjz - tjz + tkz + r7*(gjx - gkx) + r8*(gjy - gky) + r9*(gjz - gkz)));
-			g(12*i+8) += 10*(2*(gjy - gky)*(gkz - gjz - tjz + tkz + r7*(gjx - gkx) + r8*(gjy - gky) + r9*(gjz - gkz)));
-			g(12*i+9) += 10*(2*(gjz - gkz)*(gkz - gjz - tjz + tkz + r7*(gjx - gkx) + r8*(gjy - gky) + r9*(gjz - gkz)));
-			g(12*i+10) += 10*(2*gjx - 2*gkx + 2*tjx - 2*tkx - 2*r1*(gjx - gkx) - 2*r2*(gjy - gky) - 2*r3*(gjz - gkz));
-			g(12*i+11) += 10*(2*gjy - 2*gky + 2*tjy - 2*tky - 2*r4*(gjx - gkx) - 2*r5*(gjy - gky) - 2*r6*(gjz - gkz));
-			g(12*i+12) += 10*(2*gjz - 2*gkz + 2*tjz - 2*tkz - 2*r7*(gjx - gkx) - 2*r8*(gjy - gky) - 2*r9*(gjz - gkz));
-			g(12*nidx[j]+10) += 10*(2*gkx - 2*gjx - 2*tjx + 2*tkx + 2*r1*(gjx - gkx) + 2*r2*(gjy - gky) + 2*r3*(gjz - gkz));
-			g(12*nidx[j]+11) += 10*(2*gky - 2*gjy - 2*tjy + 2*tky + 2*r4*(gjx - gkx) + 2*r5*(gjy - gky) + 2*r6*(gjz - gkz));
-			g(12*nidx[j]+12) += 10*(2*gkz - 2*gjz - 2*tjz + 2*tkz + 2*r7*(gjx - gkx) + 2*r8*(gjy - gky) + 2*r9*(gjz - gkz));
+			Ereg += sig_reg[0]*sig_reg[0] + sig_reg[1]*sig_reg[1] + sig_reg[2]*sig_reg[2];				// use alpha_jk = 1.0
+
+			g(12*i+1) += beta*2*sig_reg[0]*(gk[0]-gj[0]);
+			g(12*i+2) += beta*2*sig_reg[1]*(gk[0]-gj[0]);
+			g(12*i+3) += beta*2*sig_reg[2]*(gk[0]-gj[0]);
+			g(12*i+4) += beta*2*sig_reg[0]*(gk[1]-gj[1]);
+			g(12*i+5) += beta*2*sig_reg[1]*(gk[1]-gj[1]);
+			g(12*i+6) += beta*2*sig_reg[2]*(gk[1]-gj[1]);
+			g(12*i+7) += beta*2*sig_reg[0]*(gk[2]-gj[2]);
+			g(12*i+8) += beta*2*sig_reg[1]*(gk[2]-gj[2]);
+			g(12*i+9) += beta*2*sig_reg[2]*(gk[2]-gj[2]);
+			g(12*i+10) += beta*2*sig_reg[0];
+			g(12*i+11) += beta*2*sig_reg[1];
+			g(12*i+12) += beta*2*sig_reg[2];
+			g(12*nei[k]+10) -= beta*2*sig_reg[0];
+			g(12*nei[k]+11) -= beta*2*sig_reg[1];
+			g(12*nei[k]+12) -= beta*2*sig_reg[2];
 		}
 	}
 
-
-	// e_con
-	for (int i = 0; i<viewer.selected_vertex_idx.size(); ++i)
+	// E_con
+	for(size_t l = 0; l < constraint_idx.size(); l++)
 	{
-		int v_idx = viewer.selected_vertex_idx[i];
-		Vector3d v_tilda;
-		Vector3d v = cast_to_Vector3d(viewer.templ.point(viewer.templ.vertex_handle(v_idx)));
+		int index_l = constraint_idx[l];
 
-		for (int j = 0; j<viewer.k_nearest; ++j)
+		Vector3d vi_tilde(0.0, 0.0, 0.0);
+		Vector3d vi = cast_to_Vector3d( mesh.point(mesh.vertex_handle(index_l)) );
+		Vector3d ql = constraints[l];
+
+		for(size_t k = 0; k < nearest_nodes[index_l].size(); k++)
 		{
-			int node_idx = viewer.k_nearest_idx[v_idx][j];
+			int j = nearest_nodes[index_l][k];
+			double wj = node_weights[index_l][k];
+			Vector3d gj = graph.nodes[j];
 
-			r1 = x(12*node_idx+1);
-			r2 = x(12*node_idx+2);
-			r3 = x(12*node_idx+3);
-			r4 = x(12*node_idx+4);
-			r5 = x(12*node_idx+5);
-			r6 = x(12*node_idx+6);
-			r7 = x(12*node_idx+7);
-			r8 = x(12*node_idx+8);
-			r9 = x(12*node_idx+9);
-
-			Vector3d t(x(12*node_idx+10), x(12*node_idx+11), x(12*node_idx+12));
-
-			double w = viewer.weight_value[v_idx][j];
-			Vector3d gj = viewer.graph.nodes[node_idx];
-			Vector3d dvg = v-gj;
-			Vector3d rvg(r1*dvg.X()+r2*dvg.Y()+r3*dvg.Z(), r4*dvg.X()+r5*dvg.Y()+r6*dvg.Z(), r7*dvg.X()+r8*dvg.Y()+r9*dvg.Z());
-
-			v_tilda += w*(rvg + gj + t);
+			vi_tilde[0] += wj*(x(12*j+1)*(vi[0] - gj[0]) + x(12*j+4)*(vi[1] - gj[1]) + x(12*j+7)*(vi[2] - gj[2]) + gj[0] + x(12*j+10));
+			vi_tilde[1] += wj*(x(12*j+2)*(vi[0] - gj[0]) + x(12*j+5)*(vi[1] - gj[1]) + x(12*j+8)*(vi[2] - gj[2]) + gj[1] + x(12*j+11));
+			vi_tilde[2] += wj*(x(12*j+3)*(vi[0] - gj[0]) + x(12*j+6)*(vi[1] - gj[1]) + x(12*j+9)*(vi[2] - gj[2]) + gj[2] + x(12*j+12));
 		}
+		Econ += (vi_tilde - ql).NormSquared();
 
-		f += 100*NormSquared(v_tilda - viewer.moved_point[i]);
-
-		for (int j = 0; j<viewer.k_nearest; ++j)
+		for(size_t k = 0; k < nearest_nodes[index_l].size(); k++)
 		{
-			int node_idx = viewer.k_nearest_idx[v_idx][j];
-			double w = viewer.weight_value[v_idx][j];
+			int j = nearest_nodes[index_l][k];
+			double wj = node_weights[index_l][k];
+			Vector3d gj = graph.nodes[j];
 
-			g(12*node_idx+10) += 100*w*2*(v_tilda-viewer.moved_point[i]).X();
-			g(12*node_idx+11) += 100*w*2*(v_tilda-viewer.moved_point[i]).Y();
-			g(12*node_idx+12) += 100*w*2*(v_tilda-viewer.moved_point[i]).Z();
-
-// 			printf("x : %.4lf %.4lf %.4lf\n", x(12*node_idx+10), x(12*node_idx+11), x(12*node_idx+12));
-// 			printf("g : %.4lf %.4lf %.4lf\n", g(12*node_idx+10), g(12*node_idx+11), g(12*node_idx+12));
-
-			r1 = x(12*node_idx+1);
-			r2 = x(12*node_idx+2);
-			r3 = x(12*node_idx+3);
-			r4 = x(12*node_idx+4);
-			r5 = x(12*node_idx+5);
-			r6 = x(12*node_idx+6);
-			r7 = x(12*node_idx+7);
-			r8 = x(12*node_idx+8);
-			r9 = x(12*node_idx+9);
-
-			Vector3d t(x(12*node_idx+10), x(12*node_idx+11), x(12*node_idx+12));
-			Vector3d gj = viewer.graph.nodes[node_idx];
-			Vector3d dvg = v-gj;
-			Vector3d rvg(r1*dvg.X()+r2*dvg.Y()+r3*dvg.Z(), r4*dvg.X()+r5*dvg.Y()+r6*dvg.Z(), r7*dvg.X()+r8*dvg.Y()+r9*dvg.Z());
-
-			double a = 2*w;
-			double v1[3];
-			v1[0] = w*(r1*rvg.X()+r2*rvg.Y()+r3*rvg.Z()+gj.X()+t.X())- viewer.moved_point[i].X();
-			v1[1] = w*(r4*rvg.X()+r5*rvg.Y()+r6*rvg.Z()+gj.Y()+t.Y())- viewer.moved_point[i].Y();
-			v1[2] = w*(r7*rvg.X()+r8*rvg.Y()+r9*rvg.Z()+gj.Z()+t.Z())- viewer.moved_point[i].Z();
-			double v2[3];
-			v2[0] = 2*w*dvg.X();
-			v2[1] = 2*w*dvg.Y();
-			v2[2] = 2*w*dvg.Z();
-
-			g(12*node_idx+1) += v1[0]*v2[0];
-			g(12*node_idx+2) += v1[0]*v2[1];
-			g(12*node_idx+3) += v1[0]*v2[2];
-			g(12*node_idx+4) += v1[1]*v2[0];
-			g(12*node_idx+5) += v1[1]*v2[1];
-			g(12*node_idx+6) += v1[1]*v2[2];
-			g(12*node_idx+7) += v1[2]*v2[0];
-			g(12*node_idx+8) += v1[2]*v2[1];
-			g(12*node_idx+9) += v1[2]*v2[2];
-
-//			printf("%.4lf %.4lf %.4lf\n", rvg.X() , rvg.Y(), rvg.Z());
+			g(12*j+1) += gamma*2*(vi_tilde[0] - ql[0])*wj*(vi[0] - gj[0]);
+			g(12*j+2) += gamma*2*(vi_tilde[1] - ql[1])*wj*(vi[0] - gj[0]);
+			g(12*j+3) += gamma*2*(vi_tilde[2] - ql[2])*wj*(vi[0] - gj[0]);
+			g(12*j+4) += gamma*2*(vi_tilde[0] - ql[0])*wj*(vi[1] - gj[1]);
+			g(12*j+5) += gamma*2*(vi_tilde[1] - ql[1])*wj*(vi[1] - gj[1]);
+			g(12*j+6) += gamma*2*(vi_tilde[2] - ql[2])*wj*(vi[1] - gj[1]);
+			g(12*j+7) += gamma*2*(vi_tilde[0] - ql[0])*wj*(vi[2] - gj[2]);
+			g(12*j+8) += gamma*2*(vi_tilde[1] - ql[1])*wj*(vi[2] - gj[2]);
+			g(12*j+9) += gamma*2*(vi_tilde[2] - ql[2])*wj*(vi[2] - gj[2]);
+			g(12*j+10) += gamma*2*(vi_tilde[0] - ql[0])*wj;
+			g(12*j+11) += gamma*2*(vi_tilde[1] - ql[1])*wj;
+			g(12*j+12) += gamma*2*(vi_tilde[2] - ql[2])*wj;
 		}
 	}
 
-//	printf("f1 = %lf\n", f);
+	f = alpha*Erot + beta*Ereg + gamma*Econ;
 }
 
 static void lbfgsbactive(const int& n,
@@ -514,10 +476,13 @@ and it isn't necessary to allocate it in the FuncGrad subroutine.
 *************************************************************************/
 void lbfgsbminimize(const int& n,
      const int& m,
-     ap::real_1d_array& x,
-	 const Viewer& viewer,				// add viewer
-// 	 const DeformationGraph& dgaph,		// add deformation graph class
-//      const CTriMesh& mesh,				// add mesh
+	 ap::real_1d_array& x,
+	 const DeformationGraph& graph,
+	 const CTriMesh& mesh,
+	 std::vector<int>& constraint_idx,
+	 std::vector<Vector3d>& constraints,
+	 std::vector<std::vector<int>>& nearest_nodes,
+	 std::vector<std::vector<double>>& node_weights,
 	 const double& epsg,
      const double& epsf,
      const double& epsx,
@@ -687,7 +652,7 @@ void lbfgsbminimize(const int& n,
     // Compute f0 and g0.
     //
     ap::vmove(&xold(1), &x(1), ap::vlen(1,n));
-    funcgrad(x, f, g, viewer);
+	funcgrad(x, f, g, graph, mesh, constraint_idx, constraints, nearest_nodes, node_weights);
     nfgv = 1;
     
     //
@@ -845,8 +810,8 @@ void lbfgsbminimize(const int& n,
             if( internalinfo!=0||iback>=20||task!=1 )
             {
                 break;
-            }
-            funcgrad(x, f, g, viewer);
+			}
+			funcgrad(x, f, g, graph, mesh, constraint_idx, constraints, nearest_nodes, node_weights);
         }
         if( internalinfo!=0 )
         {

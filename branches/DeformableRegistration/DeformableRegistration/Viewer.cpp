@@ -198,7 +198,7 @@ void Viewer::mouseMoveEvent(QMouseEvent *e)
 					moved_point[i] += Vector3d(displacement.x, displacement.y, displacement.z);
 				}
 			}
-			Optimization();
+			RunOptimization();
 			onDrag = true;
 			mouse_prev = mouse_curr;
 			updateGL();
@@ -316,12 +316,12 @@ void Viewer::InitOptimization()
 	// building graph
 	graph.SetMesh(&templ);
 
-	graph.BuildGraph(min(150.0/templ.n_vertices(), 1.0), 2);
+	graph.BuildGraph(min(300.0/templ.n_vertices(), 1.0), 3);
 
 	// the number of nodes which influence each vertex
-	k_nearest = 4;
-	weight_value.resize(templ.n_vertices(), vector<double>(k_nearest+1));
-	k_nearest_idx.resize(templ.n_vertices(), vector<int>(k_nearest+1));
+	nearest_k = 4;
+	weight_value.resize(templ.n_vertices(), vector<double>(nearest_k+1));
+	k_nearest_idx.resize(templ.n_vertices(), vector<int>(nearest_k+1));
 
 	// get weight values of each vertex
 	int start = clock();
@@ -329,19 +329,19 @@ void Viewer::InitOptimization()
 	for (int i = 0; i<weight_value.size(); ++i)
 	{		
 		Vector3d vertex(templ.point(templ.vertex_handle(i))[0], templ.point(templ.vertex_handle(i))[1], templ.point(templ.vertex_handle(i))[2]);
-		graph.FindClosestPoint(vertex , k_nearest_idx[i].data(), k_nearest+1);
+		graph.FindClosestPoint(vertex , k_nearest_idx[i].data(), nearest_k+1);
 		
-		for (int j = 0; j<k_nearest+1; ++j)
+		for (int j = 0; j<nearest_k+1; ++j)
 			weight_value[i][j] = Norm(vertex - graph.nodes[k_nearest_idx[i][j]]);
 
 		double sum = 0;
-		for (int j = 0; j<k_nearest; ++j)
+		for (int j = 0; j<nearest_k; ++j)
 		{
-			double temp = 1-weight_value[i][j]/weight_value[i][k_nearest];
+			double temp = 1-weight_value[i][j]/weight_value[i][nearest_k];
 			weight_value[i][j] = temp*temp;
 			sum += weight_value[i][j];
 		}
-		for (int j = 0; j<k_nearest; ++j)
+		for (int j = 0; j<nearest_k; ++j)
 			weight_value[i][j] /= sum;
 	}
 
@@ -352,7 +352,7 @@ void Viewer::InitOptimization()
 	std::cout<< (clock()-start)/double(CLOCKS_PER_SEC) << std::endl;
 }
 
-void Viewer::Optimization()
+void Viewer::RunOptimization()
 {
 	int start_tic = clock();
 	int n_node = graph.nodes.size();
@@ -378,7 +378,7 @@ void Viewer::Optimization()
 
 	int info = 0;
 
-	lbfgsbminimize(n_node*12, 7, x, *this, 0.0001, 0.0001, 0.0001, 200, nbd, lbd, ubd, info);
+	lbfgsbminimize(n_node*12, 5, x, graph, templ, selected_vertex_idx, moved_point, k_nearest_idx, weight_value, 0.00001, 0.00001, 0.00001, 100, nbd, lbd, ubd, info);
 
 	// update solution
 	result_translation.resize(n_node);
@@ -386,97 +386,50 @@ void Viewer::Optimization()
 	for(int i = 0; i < n_node; ++i)
 	{
 		result_translation[i] = Vector3d(x(12*i+10), x(12*i+11), x(12*i+12));
-		for (int j = 0; j<9; ++j)
-		{
+		for (int j = 0; j < 9; ++j)
 			result_rotation[i][j] = x(12*i+j+1);
-		}
 	}
 
 	cout<< "done!" <<endl;
 
 
  	Deform(templ, target, graph);
-
-	//templ = target;
-
-// 	HCCLMesh::ConstVertexIter cvit = templ.vertices_begin();
-// 	HCCLMesh::ConstVertexIter vit = target.vertices_begin();
-// 
-// 
-// 	for (; cvit!=templ.vertices_end(); ++cvit, ++vit)
-// 	{
-// 		int idx_vrtx = cvit.handle().idx(); 		
-// 
-// 		arma::vec  v_;
-// 		arma::vec  v(templ.point(cvit).data(), 3);
-// 
-// 		arma::vec  n_;
-// 		arma::vec  n(templ.normal(cvit).data(), 3);		
-// 
-// 		for (int i = 0; i<k_nearest; ++i)
-// 		{
-// 			int idx_node = k_nearest_idx[idx_vrtx][k_nearest];
-// 
-// 			double w = weight_value[idx_vrtx][k_nearest];
-// 			arma::vec g(graph.nodes[idx_node].val, 3); 
-// 			arma::vec t(result_translation[idx_node].val, 3);
-// 
-// 			arma::mat R = arma::trans(arma::mat(result_rotation[idx_node].data(), 3, 3));
-// 			arma::vec d = v-g;
-// 			arma::vec rd;
-// 			
-// 			rd = R*d;		
-// 			v_ += w*(rd+g+t);
-// 			arma::mat iRt = arma::trans(arma::inv(R));
-// 			n_ += w*(iRt*n);
-// 		}
-// 
-// 		for (int i = 0; i<3; ++i)
-// 		{
-// 			target.point(vit)[i] = v_[i];
-// 			target.normal(vit)[i] = n_[i];
-// 		}		
-// 	}
 }
 
-void Viewer::Deform( const CTriMesh& origin, CTriMesh& mesh, DeformationGraph& dgraph )
+void Viewer::Deform( const CTriMesh& ori, CTriMesh& mesh, DeformationGraph& dgraph )
 {
-	HCCLMesh::ConstVertexIter cvit = origin.vertices_begin();
+	HCCLMesh::ConstVertexIter cvit = ori.vertices_begin();
 	HCCLMesh::VertexIter vit = mesh.vertices_begin();
 
 	// mesh update
-	for (; cvit!=origin.vertices_end(); ++cvit, ++vit)
+	for (; cvit!=ori.vertices_end(); ++cvit, ++vit)
 	{
 		int idx_vrtx = cvit.handle().idx();
 
 		arma::vec  v_(3);
 		v_[0] = v_[1] = v_[2] = 0;
 		arma::vec  v(3);
-		HCCLMesh::Point tem = origin.point(cvit);
+		HCCLMesh::Point tem = ori.point(cvit);
 		v[0] = tem[0];
 		v[1] = tem[1];
 		v[2] = tem[2];
 
-// 		arma::vec  n_;
-// 		arma::vec  n(origin.normal(cvit).data(), 3);		
-
-		for (int j = 0; j<k_nearest; ++j)
+		for (int j = 0; j<nearest_k; ++j)
 		{
 			int idx_node = k_nearest_idx[idx_vrtx][j];
 
 			double w = weight_value[idx_vrtx][j];
-			arma::vec g(dgraph.draw_nodes[idx_node].val, 3);
-			g[0] = dgraph.draw_nodes[idx_node][0];
-			g[1] = dgraph.draw_nodes[idx_node][1];
-			g[2] = dgraph.draw_nodes[idx_node][2];
-
+			arma::vec g(dgraph.nodes[idx_node].val, 3);
+			g[0] = dgraph.nodes[idx_node][0];
+			g[1] = dgraph.nodes[idx_node][1];
+			g[2] = dgraph.nodes[idx_node][2];
 
 			arma::vec t(result_translation[idx_node].val, 3);
 			t[0] = result_translation[idx_node][0];
 			t[1] = result_translation[idx_node][1];
 			t[2] = result_translation[idx_node][2];
 
-			arma::mat R = arma::trans(arma::mat(result_rotation[idx_node].data(), 3, 3));
+			arma::mat R = /*arma::trans*/(arma::mat(result_rotation[idx_node].data(), 3, 3));
 
 			arma::vec d = v-g;
 			arma::vec rd;
