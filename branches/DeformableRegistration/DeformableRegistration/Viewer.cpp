@@ -3,11 +3,12 @@
 #include <limits>
 #include "glPrimitives.h"
 #include <armadillo>
+#include "DeformableRegistration.h"
 
 Viewer::Viewer(QWidget *parent) : QGLViewer(parent)
 	, btn_pressed(Qt::NoButton)
 	, onDrag(false)
-	, onRealTimeDeformation(false)
+	, onEmbededDeformation(false)
 {
 }
 
@@ -30,6 +31,7 @@ void Viewer::init()
 
 	glClearColor(1.f, 1.f, 1.f, 1.f);
 
+	camera()->setType(qglviewer::Camera::ORTHOGRAPHIC);
 	
 	setSceneRadius(100.0);
 
@@ -44,42 +46,50 @@ void Viewer::init()
 
 void Viewer::draw()
 {
-	glHint(GL_POINT_SMOOTH_HINT, GL_NICEST );
-	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-	glEnable(GL_POINT_SMOOTH);
-	glEnable(GL_LINE_SMOOTH);
+	if(pParentDlg->ui.actionDeformationGraph->isChecked())
+	{
+		glHint(GL_POINT_SMOOTH_HINT, GL_NICEST );
+		glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+		glEnable(GL_POINT_SMOOTH);
+		glEnable(GL_LINE_SMOOTH);
 
-	glColor3ub(50, 50, 50);
-	//glDisable(GL_DEPTH_TEST);
-	glColor3ub(0,0,0);
-	glPointSize(10.0);
-	glLineWidth(2.0);
-	glEnable(GL_DEPTH_TEST);
-	graph.Render();
-	//glEnable(GL_DEPTH_TEST);
+		glColor3ub(50, 50, 50);
+		glColor3ub(0,0,0);
+		glPointSize(10.0);
+		glLineWidth(2.0);
+		glEnable(GL_DEPTH_TEST);
+		graph.Render();
 
-// 	glBegin(GL_POINTS);
-// 	glColor3ub(255, 50, 50);
-// 	glPointSize(15.0);
-// 	for(int i = 0; i < result_translation.size(); i++)
-// 		glVertex3d(graph.nodes[i].X()+result_translation[i].X(), graph.nodes[i].Y()+result_translation[i].Y(), graph.nodes[i].Z()+result_translation[i].Z());
-// 	glEnd();
+		glDisable(GL_POINT_SMOOTH);
+		glDisable(GL_LINE_SMOOTH);
+	}
 
-	glDisable(GL_POINT_SMOOTH);
-	glDisable(GL_LINE_SMOOTH);
+
+
+
 
 
 	glEnable(GL_LIGHTING);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-// 	glColor4ub(255, 190, 100, 200);
-	glColor3ub(255, 190, 100);
 
-	templ.RenderSmooth();
+	// Draw Template Mesh
+	if(pParentDlg->ui.actionTemplateVisible->isChecked())
+	{
+		// 	glColor4ub(255, 190, 100, 200);
+		glColor3ub(255, 190, 100);
+		templ.RenderSmooth();
+	}
 
-	glColor3ub(100, 190, 255);
-
-	target.RenderSmooth();
+	// Draw Target Mesh
+	if(pParentDlg->ui.actionTargetVisible->isChecked())
+	{
+		if(onEmbededDeformation)
+			glColor3ub(255, 190, 100);
+		else
+			glColor3ub(100, 190, 255);
+		target.RenderSmooth();
+	}
 
 	{		
 		double r = templ.GetBoundingSphereRadius();
@@ -118,17 +128,17 @@ void Viewer::drawWithNames()
 		glPopMatrix();
 		glPopName();
 	}
-	HCCLMesh::ConstFaceIter fIt(templ.faces_begin()), fEnd(templ.faces_end());
+	HCCLMesh::ConstFaceIter fIt(target.faces_begin()), fEnd(target.faces_end());
 	HCCLMesh::ConstFaceVertexIter fvIt;
 	for(; fIt != fEnd; ++fIt)
 	{
 		glPushName(fIt.handle().idx());
 		glBegin(GL_TRIANGLES);
-		fvIt = templ.cfv_iter(fIt);
-		glNormal3dv(templ.normal(fIt).data());
-		glVertex3dv(templ.point(fvIt.handle()).data());
-		glVertex3dv(templ.point((--fvIt).handle()).data());
-		glVertex3dv(templ.point((--fvIt).handle()).data());
+		fvIt = target.cfv_iter(fIt);
+		glNormal3dv(target.normal(fIt).data());
+		glVertex3dv(target.point(fvIt.handle()).data());
+		glVertex3dv(target.point((--fvIt).handle()).data());
+		glVertex3dv(target.point((--fvIt).handle()).data());
 		glEnd();
 		glPopName();
 	}
@@ -137,7 +147,7 @@ void Viewer::drawWithNames()
 
 void Viewer::mousePressEvent(QMouseEvent* e)
 {
-	if ((e->button() == Qt::LeftButton) && onRealTimeDeformation)
+	if ((e->button() == Qt::LeftButton) && onEmbededDeformation)
 	{
 		QGLViewer::mousePressEvent(e);
 		int sel_facet = selectedName();
@@ -161,7 +171,7 @@ void Viewer::mousePressEvent(QMouseEvent* e)
 				}
 			}
 		}
-		mouse_prev = qglviewer::Vec(e->x(), e->y(), 0.5);
+		mouse_prev = qglviewer::Vec(e->x(), e->y(), 0);
 		btn_pressed = Qt::LeftButton;
 	}
 	else
@@ -172,11 +182,11 @@ void Viewer::mousePressEvent(QMouseEvent* e)
 
 void Viewer::mouseMoveEvent(QMouseEvent *e)
 {
-	if(btn_pressed == Qt::LeftButton && onRealTimeDeformation)
+	if(btn_pressed == Qt::LeftButton && onEmbededDeformation)
 	{
 		if(selected_handle_idx.size())
 		{
-			mouse_curr = qglviewer::Vec(e->x(), e->y(), 0.5);
+			mouse_curr = qglviewer::Vec(e->x(), e->y(), 0);
 			qglviewer::Vec mouse_prev_unproj = camera()->unprojectedCoordinatesOf(mouse_prev);
 			qglviewer::Vec mouse_curr_unproj = camera()->unprojectedCoordinatesOf(mouse_curr);
 			qglviewer::Vec displacement = mouse_curr_unproj - mouse_prev_unproj;
@@ -185,7 +195,7 @@ void Viewer::mouseMoveEvent(QMouseEvent *e)
 			{
 				if(std::find(selected_handle_idx.begin(), selected_handle_idx.end(), i) != selected_handle_idx.end())
 				{
-					moved_point[i] += Vector3d(displacement.x, displacement.y, 0.0);
+					moved_point[i] += Vector3d(displacement.x, displacement.y, displacement.z);
 				}
 			}
 			Optimization();
@@ -200,7 +210,7 @@ void Viewer::mouseMoveEvent(QMouseEvent *e)
 void Viewer::mouseReleaseEvent(QMouseEvent *e)
 {
 
-	if ((e->button() == Qt::LeftButton) && !onDrag && onRealTimeDeformation)
+	if ((e->button() == Qt::LeftButton) && !onDrag && onEmbededDeformation)
 	{
 		QGLViewer::mousePressEvent(e);
 		int sel_facet = selectedName();
@@ -308,7 +318,6 @@ void Viewer::InitOptimization()
 
 	graph.BuildGraph(min(150.0/templ.n_vertices(), 1.0), 2);
 
-
 	// the number of nodes which influence each vertex
 	k_nearest = 4;
 	weight_value.resize(templ.n_vertices(), vector<double>(k_nearest+1));
@@ -337,7 +346,7 @@ void Viewer::InitOptimization()
 	}
 
 	graph.draw_nodes.resize(graph.nodes.size());
-	for (int i =0 ; i<result_translation.size(); ++i)
+	for (int i =0 ; i<graph.draw_nodes.size(); ++i)
 		graph.draw_nodes[i] = graph.nodes[i];
 
 	std::cout<< (clock()-start)/double(CLOCKS_PER_SEC) << std::endl;
@@ -368,6 +377,7 @@ void Viewer::Optimization()
 	}
 
 	int info = 0;
+
 	lbfgsbminimize(n_node*12, 7, x, *this, 0.0001, 0.0001, 0.0001, 200, nbd, lbd, ubd, info);
 
 	// update solution
@@ -408,7 +418,7 @@ void Viewer::Optimization()
 // 			int idx_node = k_nearest_idx[idx_vrtx][k_nearest];
 // 
 // 			double w = weight_value[idx_vrtx][k_nearest];
-// 			arma::vec g(graph.nodes[idx_node].val, 3);
+// 			arma::vec g(graph.nodes[idx_node].val, 3); 
 // 			arma::vec t(result_translation[idx_node].val, 3);
 // 
 // 			arma::mat R = arma::trans(arma::mat(result_rotation[idx_node].data(), 3, 3));
@@ -466,9 +476,7 @@ void Viewer::Deform( const CTriMesh& origin, CTriMesh& mesh, DeformationGraph& d
 			t[1] = result_translation[idx_node][1];
 			t[2] = result_translation[idx_node][2];
 
-
 			arma::mat R = arma::trans(arma::mat(result_rotation[idx_node].data(), 3, 3));
-
 
 			arma::vec d = v-g;
 			arma::vec rd;
