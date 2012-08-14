@@ -49,11 +49,11 @@ public:
 	std::vector<Vector3d> result_translation;
 	std::vector<std::vector<double>> result_rotation;
 
-	int k_nearest; // for k-nearest nodes of deformation graph
+	int nearest_k; // for k-nearest nodes of deformation graph
 
 	void InitOptimization();
-	void Optimization();
-	void Deform(const CTriMesh& origin, CTriMesh& mesh, DeformationGraph& dgraph);
+	void RunOptimization();
+	void Deform(const CTriMesh& ori, CTriMesh& mesh, DeformationGraph& dgraph);
 };
 
 #endif // VIEWER_H

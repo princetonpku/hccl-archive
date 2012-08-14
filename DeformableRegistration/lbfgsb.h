@@ -28,11 +28,20 @@ quote at least one of the references given below:
 #include "ap.h"
 //#include "ialglib.h"
 
-class Viewer;
+class DeformationGraph;
+class CTriMesh;
+template <class T> class Vector3;
 /*-----------------------------------------------
 This routines must be defined by you:
 -----------------------------------------------*/
-void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g, ap::real_1d_array& t, const Viewer& viewer);
+void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g,
+	const DeformationGraph& graph,
+	const CTriMesh& mesh,
+	std::vector<int>& constraint_idx,
+	std::vector<Vector3<double>>& constraints,
+	std::vector<std::vector<int>>& nearest_nodes,
+	std::vector<std::vector<double>>& node_weights
+	);
 
 /*************************************************************************
 The  subroutine  minimizes  the  function  F(x) of N arguments with simple
@@ -122,8 +131,13 @@ and it isn't necessary to allocate it in the FuncGrad subroutine.
 *************************************************************************/
 void lbfgsbminimize(const int& n,
      const int& m,
-     ap::real_1d_array& x,
-	 const Viewer& viewer,
+	 ap::real_1d_array& x,
+	 const DeformationGraph& graph,
+	 const CTriMesh& mesh,
+	 std::vector<int>& constraint_idx,
+	 std::vector<Vector3<double>>& constraints,
+	 std::vector<std::vector<int>>& nearest_nodes,
+	 std::vector<std::vector<double>>& node_weights,
      const double& epsg,
      const double& epsf,
      const double& epsx,
