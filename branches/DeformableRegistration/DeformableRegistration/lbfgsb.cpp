@@ -35,8 +35,7 @@ quote at least one of the references given below:
 void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g,
 	const DeformationGraph& graph,
 	const CTriMesh& mesh,
-	std::vector<int>& constraint_idx,
-	std::vector<Vector3d>& constraints,
+	std::vector<std::pair<int, Vector3<double>>>& constraints,
 	std::vector<std::vector<int>>& nearest_nodes,
 	std::vector<std::vector<double>>& node_weights
 	)
@@ -117,13 +116,13 @@ void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g,
 	}
 
 	// E_con
-	for(size_t l = 0; l < constraint_idx.size(); l++)
+	for(size_t l = 0; l < constraints.size(); l++)
 	{
-		int index_l = constraint_idx[l];
+		int index_l = constraints[l].first;
 
 		Vector3d vi_tilde(0.0, 0.0, 0.0);
 		Vector3d vi = cast_to_Vector3d( mesh.point(mesh.vertex_handle(index_l)) );
-		Vector3d ql = constraints[l];
+		Vector3d ql = constraints[l].second;
 
 		for(size_t k = 0; k < nearest_nodes[index_l].size(); k++)
 		{
@@ -479,8 +478,7 @@ void lbfgsbminimize(const int& n,
 	 ap::real_1d_array& x,
 	 const DeformationGraph& graph,
 	 const CTriMesh& mesh,
-	 std::vector<int>& constraint_idx,
-	 std::vector<Vector3d>& constraints,
+	 std::vector<std::pair<int, Vector3<double>>>& constraints,
 	 std::vector<std::vector<int>>& nearest_nodes,
 	 std::vector<std::vector<double>>& node_weights,
 	 const double& epsg,
@@ -652,7 +650,7 @@ void lbfgsbminimize(const int& n,
     // Compute f0 and g0.
     //
     ap::vmove(&xold(1), &x(1), ap::vlen(1,n));
-	funcgrad(x, f, g, graph, mesh, constraint_idx, constraints, nearest_nodes, node_weights);
+	funcgrad(x, f, g, graph, mesh, constraints, nearest_nodes, node_weights);
     nfgv = 1;
     
     //
@@ -811,7 +809,7 @@ void lbfgsbminimize(const int& n,
             {
                 break;
 			}
-			funcgrad(x, f, g, graph, mesh, constraint_idx, constraints, nearest_nodes, node_weights);
+			funcgrad(x, f, g, graph, mesh, constraints, nearest_nodes, node_weights);
         }
         if( internalinfo!=0 )
         {
