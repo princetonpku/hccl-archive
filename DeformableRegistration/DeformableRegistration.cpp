@@ -36,13 +36,10 @@ void DeformableRegistration::OnFileNew()
 	ui.view->target.clear();
 	ui.view->graph.Clear();
 	ui.view->onEmbededDeformation = false;
-	ui.view->selected_vertex_idx.clear();
-	ui.view->selected_handle_idx.clear();
-	ui.view->moved_point.clear();
+	ui.view->handles.clear();
+	ui.view->handles_selected.clear();
 	ui.view->k_nearest_idx.clear();
 	ui.view->weight_value.clear();
-	ui.view->result_translation.clear();
-	ui.view->result_rotation.clear();
 }
 
 void DeformableRegistration::OnFileOpenTemplate()

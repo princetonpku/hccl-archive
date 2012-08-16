@@ -36,6 +36,7 @@ void DeformationGraph::Clear(void)
 	nodes.clear();
 	edges.clear();
 	nodes_neighboring_nodes.clear();
+	nodes_deformed.clear();
 }
 
 void DeformationGraph::SetMesh(const CTriMesh* _mesh)
@@ -195,15 +196,15 @@ void DeformationGraph::GetNeighbors(int i, std::vector<int>& idx) const
 void DeformationGraph::Render(void)
 {
 	glBegin(GL_POINTS);
-	for(int i = 0; i < draw_nodes.size(); i++)
-		glVertex3d(draw_nodes[i].X(), draw_nodes[i].Y(), draw_nodes[i].Z());
+	for(int i = 0; i < nodes_deformed.size(); i++)
+		glVertex3d(nodes_deformed[i].X(), nodes_deformed[i].Y(), nodes_deformed[i].Z());
 	glEnd();
 
 	glBegin(GL_LINES);
 	for(int i = 0; i < edges.size(); i++)
 	{
-		glVertex3d(draw_nodes[edges[i][0]].X(), draw_nodes[edges[i][0]].Y(), draw_nodes[edges[i][0]].Z());
-		glVertex3d(draw_nodes[edges[i][1]].X(), draw_nodes[edges[i][1]].Y(), draw_nodes[edges[i][1]].Z());
+		glVertex3d(nodes_deformed[edges[i][0]].X(), nodes_deformed[edges[i][0]].Y(), nodes_deformed[edges[i][0]].Z());
+		glVertex3d(nodes_deformed[edges[i][1]].X(), nodes_deformed[edges[i][1]].Y(), nodes_deformed[edges[i][1]].Z());
 	}
 	glEnd();
 }

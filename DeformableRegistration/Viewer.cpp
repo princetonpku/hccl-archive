@@ -93,11 +93,11 @@ void Viewer::draw()
 
 	{		
 		double r = templ.GetBoundingSphereRadius();
-		for(size_t i = 0; i < selected_vertex_idx.size(); i++)
+		for(size_t i = 0; i < handles.size(); i++)
 		{
 			glPushMatrix();
-			glTranslatev(moved_point[i]);
-			if(std::find(selected_handle_idx.begin(), selected_handle_idx.end(), i) != selected_handle_idx.end())
+			glTranslatev(handles[i].second);
+			if(std::find(handles_selected.begin(), handles_selected.end(), i) != handles_selected.end())
 				glColor4ub(255,100,190,200);
 			else
 				glColor4ub(100,190,255,200);
@@ -118,12 +118,12 @@ void Viewer::drawWithNames()
 {
 	glDisable(GL_CULL_FACE);
 	double r = templ.GetBoundingSphereRadius();
-	for(size_t i = 0; i < selected_vertex_idx.size(); i++)
+	for(size_t i = 0; i < handles.size(); i++)
 	{
 		glPushName(-2-i);
 		glPushMatrix();
 		//glTranslatev(cast_to_Vector3d(templ.point(templ.vertex_handle(selected_vertex_idx[i]))));
-		glTranslatev(moved_point[i]);
+		glTranslatev(handles[i].second);
 		DrawSphere(0.03*r);
 		glPopMatrix();
 		glPopName();
@@ -156,19 +156,19 @@ void Viewer::mousePressEvent(QMouseEvent* e)
 		{
 			int n = -sel_facet-2;
 
-			if(selected_handle_idx.size() == 0)
+			if(handles_selected.size() == 0)
 			{
 				std::vector<int>::iterator it;
-				if( (it = std::find(selected_handle_idx.begin(), selected_handle_idx.end(), n)) == selected_handle_idx.end())
-					selected_handle_idx.push_back(n);
+				if( (it = std::find(handles_selected.begin(), handles_selected.end(), n)) == handles_selected.end())
+					handles_selected.push_back(n);
 			}
 			else
 			{
 				std::vector<int>::iterator it;
-				if( (it = std::find(selected_handle_idx.begin(), selected_handle_idx.end(), n)) == selected_handle_idx.end())
+				if( (it = std::find(handles_selected.begin(), handles_selected.end(), n)) == handles_selected.end())
 				{
-					selected_handle_idx.clear();
-					selected_handle_idx.push_back(n);
+					handles_selected.clear();
+					handles_selected.push_back(n);
 				}
 			}
 		}
@@ -185,18 +185,18 @@ void Viewer::mouseMoveEvent(QMouseEvent *e)
 {
 	if(btn_pressed == Qt::LeftButton && onEmbededDeformation)
 	{
-		if(selected_handle_idx.size())
+		if(handles_selected.size())
 		{
 			mouse_curr = qglviewer::Vec(e->x(), e->y(), 0);
 			qglviewer::Vec mouse_prev_unproj = camera()->unprojectedCoordinatesOf(mouse_prev);
 			qglviewer::Vec mouse_curr_unproj = camera()->unprojectedCoordinatesOf(mouse_curr);
 			qglviewer::Vec displacement = mouse_curr_unproj - mouse_prev_unproj;
 
-			for(int i = 0; i < moved_point.size(); i++)
+			for(int i = 0; i < handles.size(); i++)
 			{
-				if(std::find(selected_handle_idx.begin(), selected_handle_idx.end(), i) != selected_handle_idx.end())
+				if(std::find(handles_selected.begin(), handles_selected.end(), i) != handles_selected.end())
 				{
-					moved_point[i] += Vector3d(displacement.x, displacement.y, displacement.z);
+					handles[i].second += Vector3d(displacement.x, displacement.y, displacement.z);
 				}
 			}
 			RunOptimization();
@@ -219,20 +219,18 @@ void Viewer::mouseReleaseEvent(QMouseEvent *e)
 		{
 			if(e->modifiers() == Qt::NoModifier)
 			{
-				selected_vertex_idx.clear();
-				selected_handle_idx.clear();
-				moved_point.clear();
+				handles_selected.clear();
+				handles.clear();
 			}
 		}
 		else if(sel_facet >= 0 && sel_facet < templ.n_faces() && e->modifiers() != Qt::ALT)
 		{
 			if(e->modifiers() != Qt::CTRL)
 			{
-				selected_vertex_idx.clear();
-				selected_handle_idx.clear();
-				moved_point.clear();
+				handles_selected.clear();
+				handles.clear();
 			}
-			selected_handle_idx.clear();
+			handles_selected.clear();
 
 			HCCLMesh::ConstFaceVertexIter fvit = templ.cfv_iter(templ.face_handle(sel_facet));
 
@@ -265,8 +263,7 @@ void Viewer::mouseReleaseEvent(QMouseEvent *e)
 				min_val = (s[0] - e->x())*(s[0] - e->x()) + (s[1] - e->y())*(s[1] - e->y());
 				min_idx = fvit.handle().idx();
 			}
-			selected_vertex_idx.push_back(min_idx);
-			moved_point.push_back(cast_to_Vector3d(templ.point(templ.vertex_handle(min_idx))));
+			handles.push_back(std::pair<int, Vector3d>(min_idx, cast_to_Vector3d(templ.point(templ.vertex_handle(min_idx)))) );
 		}
 		else if(sel_facet < -1)
 		{
@@ -274,25 +271,24 @@ void Viewer::mouseReleaseEvent(QMouseEvent *e)
 
 			if(e->modifiers() == Qt::NoModifier)
 			{
-				selected_handle_idx.clear();
+				handles_selected.clear();
 			}
 			else if(e->modifiers() == Qt::ALT)
 			{
-				selected_vertex_idx.erase(selected_vertex_idx.begin() + n);
+				handles.erase(handles.begin() + n);
 				std::vector<int>::iterator it;
-				if( (it = std::find(selected_handle_idx.begin(), selected_handle_idx.end(), n)) != selected_handle_idx.end())
-					selected_handle_idx.erase(it);
+				if( (it = std::find(handles_selected.begin(), handles_selected.end(), n)) != handles_selected.end())
+					handles_selected.erase(it);
 			}
 			else
 			{
 				std::vector<int>::iterator it;
-				if( (it = std::find(selected_handle_idx.begin(), selected_handle_idx.end(), n)) != selected_handle_idx.end())
-					selected_handle_idx.erase(it);
+				if( (it = std::find(handles_selected.begin(), handles_selected.end(), n)) != handles_selected.end())
+					handles_selected.erase(it);
 				else
-					selected_handle_idx.push_back(n);
+					handles_selected.push_back(n);
 			}
 		}
-		moved_point.resize(selected_vertex_idx.size());
 		updateGL();
 	}
 
@@ -343,7 +339,7 @@ void Viewer::InitOptimization()
 		for (int j = 0; j<nearest_k; ++j)
 			weight_value[i][j] /= sum;
 	}
-	graph.draw_nodes = graph.nodes;
+	graph.nodes_deformed = graph.nodes;
 
 	printf("set k-nearest node and weight values : %f sec\n", (clock()-start_tic)/double(CLOCKS_PER_SEC));	
 }
@@ -371,11 +367,11 @@ void Viewer::RunOptimization()
 
 	int info = 0;
 
-	lbfgsbminimize(n_node*12, 5, x, graph, templ, selected_vertex_idx, moved_point, k_nearest_idx, weight_value, 0.00001, 0.00001, 0.00001, 200, nbd, lbd, ubd, info);
+	lbfgsbminimize(n_node*12, 5, x, graph, templ, handles, k_nearest_idx, weight_value, 0.00001, 0.00001, 0.00001, 200, nbd, lbd, ubd, info);
 
 	// update solution
-	result_translation.resize(n_node);
-	result_rotation.resize(n_node, vector<double>(9));
+	std::vector<Vector3d> result_translation(n_node);
+	std::vector<std::vector<double>> result_rotation(n_node, std::vector<double>(9));
 
 // #pragma parallel for
 	for(int i = 0; i < n_node; ++i)
@@ -384,12 +380,12 @@ void Viewer::RunOptimization()
 		for (int j = 0; j < 9; ++j)
 			result_rotation[i][j] = x(12*i+j+1);
 	}
- 	Deform(templ, target, graph);
+ 	Deform(templ, target, graph, result_translation, result_rotation);
 
 // 	printf("time for one iteration : %f sec\n", (clock()-start_tic)/double(CLOCKS_PER_SEC));
 }
 
-void Viewer::Deform( const CTriMesh& ori, CTriMesh& mesh, DeformationGraph& dgraph )
+void Viewer::Deform( const CTriMesh& ori, CTriMesh& mesh, DeformationGraph& dgraph, const std::vector<Vector3d>& translation, const std::vector<std::vector<double>>& rotation )
 {
 	HCCLMesh::ConstVertexIter cvit = ori.vertices_begin();
 	HCCLMesh::VertexIter vit = mesh.vertices_begin();
@@ -418,12 +414,12 @@ void Viewer::Deform( const CTriMesh& ori, CTriMesh& mesh, DeformationGraph& dgra
 			g[1] = dgraph.nodes[idx_node][1];
 			g[2] = dgraph.nodes[idx_node][2];
 
-			arma::vec t(result_translation[idx_node].val, 3);
-			t[0] = result_translation[idx_node][0];
-			t[1] = result_translation[idx_node][1];
-			t[2] = result_translation[idx_node][2];
+			arma::vec t(translation[idx_node].val, 3);
+			t[0] = translation[idx_node][0];
+			t[1] = translation[idx_node][1];
+			t[2] = translation[idx_node][2];
 
-			arma::mat R = /*arma::trans*/(arma::mat(result_rotation[idx_node].data(), 3, 3));
+			arma::mat R = /*arma::trans*/(arma::mat(rotation[idx_node].data(), 3, 3));
 
 			arma::vec d = v-g;
 			arma::vec rd;
@@ -442,5 +438,5 @@ void Viewer::Deform( const CTriMesh& ori, CTriMesh& mesh, DeformationGraph& dgra
 	mesh.update_normals();
 
 	// deformation graph update
-	std::transform(graph.nodes.begin(), graph.nodes.end(), result_translation.begin(), dgraph.draw_nodes.begin(), [](const Vector3d& a, const Vector3d& b){return a+b;});
+	std::transform(graph.nodes.begin(), graph.nodes.end(), translation.begin(), dgraph.nodes_deformed.begin(), [](const Vector3d& a, const Vector3d& b){return a+b;});
 }

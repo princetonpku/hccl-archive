@@ -35,24 +35,19 @@ public:
 	CTriMesh target;
 	DeformationGraph graph;
 
-
 	bool onEmbededDeformation;
-	std::vector<int> selected_vertex_idx;
-	std::vector<int> selected_handle_idx;
-	std::vector<Vector3d> moved_point;
 
-
-	std::vector<std::vector<int>> k_nearest_idx;
-	std::vector<std::vector<double>> weight_value;
-
-	std::vector<Vector3d> result_translation;
-	std::vector<std::vector<double>> result_rotation;
+	std::vector<std::pair<int, Vector3d>> handles;			// <handle_vertex_index, handle_constraints>
+	std::vector<int> handles_selected;
 
 	int nearest_k; // for k-nearest nodes of deformation graph
+	std::vector<std::vector<int>> k_nearest_idx;// g
+	std::vector<std::vector<double>> weight_value;// g
+
 
 	void InitOptimization();
 	void RunOptimization();
-	void Deform(const CTriMesh& ori, CTriMesh& mesh, DeformationGraph& dgraph);
+	void Deform( const CTriMesh& ori, CTriMesh& mesh, DeformationGraph& dgraph, const std::vector<Vector3d>& translation, const std::vector<std::vector<double>>& rotation );
 };
 
 #endif // VIEWER_H
