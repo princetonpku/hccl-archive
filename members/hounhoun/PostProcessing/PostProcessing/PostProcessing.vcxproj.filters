@@ -71,6 +71,9 @@
     <ClCompile Include="ImageLabel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="KinectMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="PostProcessing.h">
@@ -99,10 +102,14 @@
     <ClInclude Include="ImageLabel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="KinectMesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="QGLViewer-2.3.17.props" />
     <None Include="OpenNI.props" />
     <None Include="OpenCV-2.4.2-simple.props" />
+    <None Include="OpenMesh_2.2.props" />
   </ItemGroup>
 </Project>

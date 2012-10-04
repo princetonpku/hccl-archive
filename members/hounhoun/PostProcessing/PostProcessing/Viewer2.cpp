@@ -24,7 +24,7 @@ void Viewer2::init()
 
 void Viewer2::draw()
 {
-	glTranslated(0,0,-(plnt->near_dist+plnt->far_dist)*0.5);
+	glTranslated(0,0,z_translate);
 	glDisable(GL_LIGHTING);
 	for (int indx = 0; indx<2; ++indx)
 	{

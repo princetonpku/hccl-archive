@@ -35,9 +35,8 @@ PostProcessing::PostProcessing(QWidget *parent, Qt::WFlags flags)
 
 	Load("sample1.oni");
 	int f = 40;
-	if (ui.horizontalSlider->value()!=f) ui.horizontalSlider->setValue(f);
-	else SliderCallback(f);
-
+	ui.horizontalSlider->setValue(f);
+	SliderCallback(f);
 }
 
 PostProcessing::~PostProcessing()
@@ -95,15 +94,10 @@ void PostProcessing::SliderCallback( int f )
 			int indx_d = i+x_res;
 			int indx_da = indx_d+1;
 
- 			if (pDepthMap[i]>near_dist && pDepthMap[i]<far_dist/*&&*/
-// 				pDepthMap[indx_a]>near_dist && pDepthMap[indx_a]<far_dist&&
-// 				pDepthMap[indx_d]>near_dist && pDepthMap[indx_d]<far_dist&&
-// 				pDepthMap[indx_da]>near_dist && pDepthMap[indx_da]<far_dist
-				)
+ 			if (pDepthMap[i]>near_dist && pDepthMap[i]<far_dist)
 			{
 				int x = i%x_res;				
 				int y = i/x_res;
-// 				if (x == x_res-1 || y==y_res-1) continue;
 
 				XnPoint3D tem;	
 
@@ -113,61 +107,12 @@ void PostProcessing::SliderCallback( int f )
 				// save color data
 				tem.X = pColorMap[i].nRed; tem.Y = pColorMap[i].nGreen; tem.Z = pColorMap[i].nBlue;
 				pt_color.push_back(tem);
-
-// 				tem.X = x+1; tem.Y = y; tem.Z = pDepthMap[indx_a];
-// 				pt_projected.push_back(tem);
-// 				tem.X = pColorMap[indx_a].nRed; tem.Y = pColorMap[indx_a].nGreen; tem.Z = pColorMap[indx_a].nBlue;
-// 				pt_color.push_back(tem);
-// 
-// 				tem.X = x; tem.Y = y+1; tem.Z = pDepthMap[indx_d];
-// 				pt_projected.push_back(tem);
-// 				tem.X = pColorMap[indx_d].nRed; tem.Y = pColorMap[indx_d].nGreen; tem.Z = pColorMap[indx_d].nBlue;
-// 				pt_color.push_back(tem);
-// 
-// 				tem.X = x+1; tem.Y = y+1; tem.Z = pDepthMap[indx_da];
-// 				pt_projected.push_back(tem);
-// 				tem.X = pColorMap[indx_da].nRed; tem.Y = pColorMap[indx_da].nGreen; tem.Z = pColorMap[indx_da].nBlue;
-// 				pt_color.push_back(tem);
-// 
-// 				int n = pt_projected.size();
-// 				int t1[3] = {n-4, n-2, n-3};
-// 				int t2[3] = {n-3, n-2, n-1};
-// 
-// 				tri_indx.push_back(vector<int>(t1, t1+3));
-// 				tri_indx.push_back(vector<int>(t2, t2+3));
-
-
-
-
-
-// 				if (x != x_res-1 && y!=y_res-1)
-// 				{
-// 					int indx_a = i+1;		
-// 					int indx_d = i+x_res;
-// 					int indx_da = indx_d+1;
-// 					
-// 					if (pDepthMap[indx_a]>near_dist && pDepthMap[indx_a]<far_dist&&
-// 						pDepthMap[indx_d]>near_dist && pDepthMap[indx_d]<far_dist&&
-// 						pDepthMap[indx_da]>near_dist && pDepthMap[indx_da]<far_dist)
-// 					{
-// 
-// 						tri_indx.push_back(vector<int>(t1, t1+3));
-// 						tri_indx.push_back(vector<int>(t2, t2+3));
-// 					}					
-// 				}
-
-
 			}
 		}
 
 		pt_real.resize(pt_projected.size());
-// 		pt_real = pt_projected;
 		kinect.depth_generator.ConvertProjectiveToRealWorld(pt_projected.size(), pt_projected.data(), pt_real.data());
 
-// 		Triangulation(Rect(0,0,x_res,y_res), depthMap, pt_real, tri_indx);
-
-		ui.graphicsView_kinect->setSceneRadius((far_dist-near_dist)*0.6);
-		ui.graphicsView_kinect->showEntireScene();
 		ui.graphicsView_kinect->updateGL();
 	}
 }
@@ -203,6 +148,11 @@ void PostProcessing::Load( const char* filename )
 	x_res = outputmode.nXRes;
 	y_res = outputmode.nYRes;
 	total = x_res*y_res;
+
+	ui.graphicsView_kinect->updateGL();
+	ui.graphicsView_kinect->z_translate = -(near_dist+far_dist)*0.5;
+	ui.graphicsView_kinect->setSceneRadius((far_dist-near_dist)*0.6);
+	ui.graphicsView_kinect->showEntireScene();
 }
 
 void PostProcessing::Play()
@@ -309,6 +259,7 @@ void PostProcessing::Cut(int indx)
 		pt_real2[indx].resize(pt_projected2[indx].size());
 		kinect.depth_generator.ConvertProjectiveToRealWorld(pt_projected2[indx].size(), pt_projected2[indx].data(), pt_real2[indx].data());
 
+		ui.graphicsView_cut->z_translate = -(near_dist+far_dist)*0.5;
 		ui.graphicsView_cut->setSceneRadius((far_dist-near_dist)*0.6);
 		ui.graphicsView_cut->showEntireScene();
 		ui.graphicsView_cut->updateGL();
@@ -324,14 +275,6 @@ void PostProcessing::SliderCallback_far( int f )
 {
 	far_dist = f;
 	SliderCallback(ui.horizontalSlider->value());
-
-	ui.graphicsView_kinect->setSceneRadius((far_dist-near_dist)*0.6);
-	ui.graphicsView_kinect->showEntireScene();
-	ui.graphicsView_kinect->updateGL();
-
-	ui.graphicsView_cut->setSceneRadius((far_dist-near_dist)*0.6);
-	ui.graphicsView_cut->showEntireScene();
-	ui.graphicsView_cut->updateGL();
 }
 
 void PostProcessing::Triangulation( const cv::Rect& roi, const cv::Mat& depth_map, const std::vector<XnPoint3D>& real_pt, std::vector<std::vector<int>>& tri_indx )

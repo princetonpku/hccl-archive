@@ -24,7 +24,8 @@ void Viewer::init()
 
 void Viewer::draw()
 {
-	glTranslated(0,0,-(plnt->near_dist+plnt->far_dist)*0.5);
+	glTranslated(0,0,z_translate);
+
 	glDisable(GL_LIGHTING);
 	glBegin(GL_POINTS);	
 	for (int i = 0; i<plnt->pt_real.size(); ++i)

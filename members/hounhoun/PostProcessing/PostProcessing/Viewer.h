@@ -15,6 +15,8 @@ public:
 	void SetParentPtr(PostProcessing* ptr);
 	PostProcessing* plnt;
 
+	double z_translate;
+
 protected :
 	virtual void draw();
 	virtual void init();
