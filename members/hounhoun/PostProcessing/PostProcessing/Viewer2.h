@@ -3,9 +3,6 @@
 
 #include <QGLViewer/qglviewer.h>
 
-#include "KinectMesh.h"
-
-
 class PostProcessing;
 
 class Viewer2 : public QGLViewer
@@ -19,10 +16,6 @@ public:
 	PostProcessing* plnt;
 
 	double z_translate;
-
-
-	KinectMesh mesh1, mesh2; 
-
 
 protected :
 	virtual void draw();

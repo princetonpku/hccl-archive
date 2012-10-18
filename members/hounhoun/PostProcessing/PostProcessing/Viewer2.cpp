@@ -13,7 +13,10 @@ void Viewer2::SetParentPtr(PostProcessing* ptr)
 
 
 void Viewer2::init()
-{	
+{
+//  	glClearColor(1.f, 1.f, 1.f, 1.f);
+ 	glEnable(GL_CULL_FACE);
+
 	setSceneRadius(10000);
 	
 	camera()->setPosition(qglviewer::Vec(0,0,-3000));
@@ -21,24 +24,31 @@ void Viewer2::init()
 	camera()->setUpVector(qglviewer::Vec(0,1,0));
 }
 
+GLubyte colors[2][3] = {120, 230, 170
+						, 100, 190, 255};
 
 void Viewer2::draw()
 {
+	cv::Vec3f pts[3];
+	
 	glTranslated(0,0,z_translate);
-	glDisable(GL_LIGHTING);
 	for (int indx = 0; indx<2; ++indx)
 	{
 		if (!plnt->pt_real2[indx].empty())
 		{
-			glBegin(GL_POINTS);
-			for (int i = 0; i<plnt->pt_real2[indx].size(); ++i)
-			{
-				glColor3ub(plnt->pt_color2[indx][i].X, plnt->pt_color2[indx][i].Y, plnt->pt_color2[indx][i].Z);
-				glVertex3f(plnt->pt_real2[indx][i].X, plnt->pt_real2[indx][i].Y, plnt->pt_real2[indx][i].Z);
+			glColor3ubv(colors[indx]);
+			glBegin(GL_TRIANGLES);			
+			for (int i = 0; i<plnt->tri_indx[indx].size(); ++i)
+			{				
+				for (int j = 0; j<3; ++j)
+				{
+					int ii = plnt->tri_indx[indx][i][j];
+					pts[j] = cv::Vec3f(plnt->pt_real2[indx][ii].X, plnt->pt_real2[indx][ii].Y, plnt->pt_real2[indx][ii].Z);
+					glVertex3fv(pts[j].val);
+					glNormal3fv(plnt->vertex_normal[indx][ii].val);
+				}
 			}
 			glEnd();
-			
 		}
 	}
-	glEnable(GL_LIGHTING);
 }

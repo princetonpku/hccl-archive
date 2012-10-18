@@ -66,7 +66,7 @@ public:
 				return 1;
 			}		
 		}
-
+		
 		printf("kinect is ready.\n");
 		return 0;
 	}

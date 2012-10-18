@@ -15,7 +15,7 @@ void Viewer::SetParentPtr(PostProcessing* ptr)
 void Viewer::init()
 {	
 	setSceneRadius(10000);
-
+// 	glClearColor(1.f, 1.f, 1.f, 1.f);
 	camera()->setPosition(qglviewer::Vec(0,0,-3000));
 	camera()->lookAt(qglviewer::Vec(0,0,1));
 	camera()->setUpVector(qglviewer::Vec(0,1,0));

@@ -104,7 +104,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="ImageLabel.cpp" />
-    <ClCompile Include="KinectMesh.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PostProcessing.cpp" />
     <ClCompile Include="Viewer.cpp" />
@@ -139,7 +138,6 @@
     <ClInclude Include="GeneratedFiles\ui_PostProcessing.h" />
     <ClInclude Include="ImageLabel.h" />
     <ClInclude Include="Kinect.h" />
-    <ClInclude Include="KinectMesh.h" />
     <CustomBuild Include="Viewer2.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing Viewer2.h...</Message>
