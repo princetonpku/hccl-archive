@@ -33,6 +33,9 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
+    <Filter Include="PropertySheets">
+      <UniqueIdentifier>{131c5946-91df-48e7-ba98-630cc4786572}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -101,9 +104,17 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="QGLViewer-2.3.17.props" />
-    <None Include="OpenNI.props" />
-    <None Include="OpenCV-2.4.2-simple.props" />
-    <None Include="OpenMesh_2.2.props" />
+    <None Include="QGLViewer-2.3.17.props">
+      <Filter>PropertySheets</Filter>
+    </None>
+    <None Include="OpenCV-2.4.2-simple.props">
+      <Filter>PropertySheets</Filter>
+    </None>
+    <None Include="OpenMesh_2.2.props">
+      <Filter>PropertySheets</Filter>
+    </None>
+    <None Include="OpenNI.props">
+      <Filter>PropertySheets</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -43,17 +43,27 @@ public:
 	std::vector<cv::Point>			vertex_indx[2];
 	std::vector<cv::Vec3f>			vertex_normal[2];
 	std::vector<cv::Vec3f>			face_normal[2];
+	std::vector<int>				check_count[2];
+	
+	void GetMeshData(const cv::Mat& depthmap, std::vector<XnPoint3D>& pt_projected, std::vector<XnPoint3D>& pt_real, std::vector<std::vector<int>>& tri_indx);
+
 
 	void SaveMesh(const char* filename, const std::vector<XnPoint3D>& real, const std::vector<std::vector<int>>& tri);
 	void SaveDepthMap(const char* filename, const cv::Mat& dmap);
+	void SaveMat(const char* filename, const cv::Mat& dmap);
 	void SaveIndx(const char* filename, const std::vector<cv::Point>& v_indx);
-	void Triangulation( const cv::Rect& roi, const cv::Mat& depth_map, const std::vector<XnPoint3D>& real_pt, std::vector<std::vector<int>>& tri_indx);
-	
+	void SaveC(const char* filename, const std::vector<std::vector<cv::Mat>>& c);
+
 	void Cut(int indx);
-	void Cut_2(int indx);
+	void Cut_3(int indx);
 	void UpdateFacetNormal(int indx);
 	void UpdateVertexNormal(int indx);
 	void Smooth(int indx);
+	
+	//
+	cv::Mat pd_Xmap, pd_Ymap;
+
+	void WSLApproximation(const cv::Mat& source, cv::Mat& result, cv::Mat& pdx, cv::Mat& pdy);
 
 public slots:
 

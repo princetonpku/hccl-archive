@@ -10,8 +10,6 @@ void Viewer::SetParentPtr(PostProcessing* ptr)
 	plnt = ptr;
 }
 
-
-
 void Viewer::init()
 {	
 	setSceneRadius(10000);
@@ -39,7 +37,8 @@ void Viewer::draw()
 // 			glVertex3f(plnt->pt_real[plnt->tri_indx[i][j]].X, plnt->pt_real[plnt->tri_indx[i][j]].Y, plnt->pt_real[plnt->tri_indx[i][j]].Z);
 // 		}
 		glColor3ub(plnt->pt_color[i].X, plnt->pt_color[i].Y, plnt->pt_color[i].Z);
-		glVertex3f(plnt->pt_real[i].X, plnt->pt_real[i].Y, plnt->pt_real[i].Z);
+// 		glVertex3f(plnt->pt_real[i].X, plnt->pt_real[i].Y, plnt->pt_real[i].Z);
+		glVertex3f(plnt->pt_projected[i].X, plnt->pt_projected[i].Y, plnt->pt_projected[i].Z);
 	}
 	glEnd();
 	glEnable(GL_LIGHTING);	
