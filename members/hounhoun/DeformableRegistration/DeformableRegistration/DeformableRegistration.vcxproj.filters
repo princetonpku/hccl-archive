@@ -154,4 +154,10 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Armadillo-3.2.4.props" />
+    <None Include="OpenNI.props" />
+    <None Include="blas_win32_MT.dll" />
+    <None Include="lapack_win32_MT.dll" />
+  </ItemGroup>
 </Project>

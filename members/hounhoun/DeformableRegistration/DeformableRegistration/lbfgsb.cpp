@@ -31,11 +31,11 @@ quote at least one of the references given below:
 
 using namespace  std;
 
-// Assuming A = [x1 x4 x7] b = [x10] u = [x13] w = [x15] R = [a] t = [t1]
-//              [x2 x5 x8]     [x11]     [x14]               [b]     [t2]
-//              [x3 x6 x9]     [x12]                         [c]     [t3]
+// Assuming A = [x1 x4 x7] b = [x10] u = [x13] w = [x15]
+//              [x2 x5 x8]     [x11]     [x14]
+//              [x3 x6 x9]     [x12]
 //
-// total 15*n+6 of variables
+// total 15*n variables
 
 void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g,
 	DeformationGraph& graph,
@@ -48,8 +48,7 @@ void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g,
 	)
 {
 	// initialize
-	for(int i = g.getlowbound(); i <= g.gethighbound(); ++i)
-		g(i) = 0;
+	for(int i = g.getlowbound(); i <= g.gethighbound(); ++i) g(i) = 0;
 	f = 0.0;
 
 	int y_res = target_dmap.size();
@@ -68,10 +67,9 @@ void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g,
 	double a_fit = 0.1;
 //  	double a_fit = 20;
 
-// 	cout << a_rigid << "\t" << a_smooth << "\t" << a_conf << endl;
 
 	// the number of graph nodes
-	int n = ((x.gethighbound() - x.getlowbound() + 1)-6)/15;
+	int n = ((x.gethighbound() - x.getlowbound() + 1))/15 == graph.nodes.size() : 1;
 
 	// center of mass : com	
 	double com[3] = {mesh.cog[0], mesh.cog[1], mesh.cog[2]};	
@@ -405,8 +403,8 @@ void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g,
 	cout<<"a*E_rigid  : "<<a_rigid*E_rigid<<endl;
 	cout<<"a*E_smooth : "<<a_smooth*E_smooth<<endl;
 	cout<<"a*E_fit    : "<<a_fit*E_fit<<endl;
-	cout<<"a*E_conf   : "<<a_conf*E_conf<<endl<<endl<<endl;
-
+	cout<<"a*E_conf   : "<<a_conf*E_conf<<endl;
+	cout<<endl<<endl;
 }
 
 static void lbfgsbactive(const int& n,
@@ -1229,25 +1227,25 @@ void lbfgsbminimize(const int& n,
 
 
         if( sbgnrm<=epsg )
-//         {
+        {
 //             info = 4;
 //             return;
-//         }		
+        }		
 		ap::vmove(&xdiff(1), &xold(1), ap::vlen(1,n));
         ap::vsub(&xdiff(1), &x(1), ap::vlen(1,n));
         tf = ap::vdotproduct(&xdiff(1), &xdiff(1), ap::vlen(1,n));
         tf = sqrt(tf);
-//         if( tf<=epsx )
-//         {
+        if( tf<=epsx )
+        {
 //             info = 2;
 //             return;
-//         }
+        }
         ddum = ap::maxreal(fabs(fold), ap::maxreal(fabs(f), double(1)));
-//         if( fold-f<=epsf*ddum )
-//         {
+        if( fold-f<=epsf*ddum )
+        {
 //             info = 1;
 //             return;
-//         }
+        }
         if( iter>maxits&&maxits>0 )
         {
             info = 5;

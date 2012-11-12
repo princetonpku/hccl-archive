@@ -562,8 +562,7 @@ void Viewer::Deform( CTriMesh& mesh, DeformationGraph& dgraph )
 // #include "lbfgsb_haoli.h"
 void Viewer::InitOptimization_HaoLi()
 {
-	// data load
-	// depth map
+	// depth map data load
 	ifstream fin("target_dmap.txt");
 	fin >> xpt >> ypt >> x_res >> y_res;
 	depth_map.resize(y_res);
@@ -585,40 +584,12 @@ void Viewer::InitOptimization_HaoLi()
 	// load depth map parameters
 	LoadDepthMapParameters("indx1.txt", indx_source);
 	LoadDepthMapParameters("indx2.txt", indx_target);
-
 	LoadC("coef_map.txt", coef_map);
-
-// 	ifstream fin2("check_map.txt");
-// 	check_map.resize(y_res);
-// 	for (int i = 0; i<y_res; ++i)
-// 	{
-// 		check_map[i].resize(x_res);
-// 		for (int j = 0; j<x_res; ++j)
-// 		{
-// 			fin2 >> check_map[i][j];
-// 		}		
-// 	}
-// 	fin2.close();
-// 
-// 	int sum = 0;
-// 	table.resize(y_res);
-// 	for (int i = 0; i<y_res; ++i)
-// 	{
-// 		table[i].resize(x_res);
-// 		for (int j = 0; j<x_res; ++j)
-// 		{			
-// 			if (check_map[i][j]==0) check_map[i][j] = sum;
-// 			else sum += check_map[i][j];
-// 		}		
-// 	}
-
-
-	// building graph
 
 	graph.Clear();
 	graph.SetMesh(&templ);
 	graph.BuildGraph(min(300.0/templ.n_vertices(), 1.0), 2);
-	target.BuildKDTree();
+	n_node = graph.nodes.size();
 
 	// the number of nodes which influence each vertex
 	nearest_k = 4;
@@ -626,7 +597,6 @@ void Viewer::InitOptimization_HaoLi()
 	k_nearest_idx.resize(templ.n_vertices(), vector<int>(nearest_k+1));
 
 	// get weight values of each vertex
-	int start_tic = clock();	
 	for (int i = 0; i<weight_value.size(); ++i)
 	{
 		Vector3d vertex(templ.point(templ.vertex_handle(i))[0], templ.point(templ.vertex_handle(i))[1], templ.point(templ.vertex_handle(i))[2]);
@@ -647,18 +617,19 @@ void Viewer::InitOptimization_HaoLi()
 			weight_value[i][j] /= sum;
 	}
 	graph.draw_nodes = graph.nodes;
-	printf("set k-nearest node and weight values : %f sec\n", (clock()-start_tic)/double(CLOCKS_PER_SEC));
+	
 
-	n_node = graph.nodes.size();
+	// Init LBFGS
+
 	epsg = 0.0;
 	epsf = 0.000000001; // 10^-9
 	epsx = 0.0;
 	maxits = 1000;	
 
-	x.setbounds(1, n_node*15+6);
-	nbd.setbounds(1, n_node*15+6);
-	lbd.setbounds(1, n_node*15+6);
-	ubd.setbounds(1, n_node*15+6);
+	x.setbounds(1, n_node*15);
+	nbd.setbounds(1, n_node*15);
+	lbd.setbounds(1, n_node*15);
+	ubd.setbounds(1, n_node*15);
 
 	for(int i = 1; i <= n_node*15; ++i)
 	{
@@ -696,31 +667,12 @@ void Viewer::InitOptimization_HaoLi()
 		x(i*15+14) = indx_tem/x_res;
 	}
 
-	double pi = acos(-1.0);
-	for (int i = 1; i<=3; ++i)
-	{
-		x(15*n_node+i) = 0;
-		nbd(15*n_node+i) = 0;
-		lbd(15*n_node+i) = 0.0;
-		ubd(15*n_node+i) = 0.0;
-	}
-
-	for (int i = 3; i<=6; ++i)
-	{
-		x(15*n_node+i) = 0;
-		nbd(15*n_node+i) = 0;
-		lbd(15*n_node+i) = 0.0;
-		ubd(15*n_node+i) = 0.0;
-	}
-
 	is_hoa_initialized = true;
 }
 void Viewer::RunOptimization_HaoLi()
 {
-	int start_tic = clock();
-
 	std::vector<double> alph(3);
-	bool not_converged = true;
+	bool not_converged = true;	
 	cout << "start!!" << endl<<endl<<endl;
 	while(not_converged)
 	{
@@ -730,75 +682,67 @@ void Viewer::RunOptimization_HaoLi()
 
 		int info = 0;
 		lbfgsbminimize(n_node*15+6, 5, x, graph, templ, alph, depth_map, pdx_map, pdy_map, coef_map, this, epsg, epsf, epsx, maxits, nbd, lbd, ubd, info);
-
 		cout<<info<<endl;
-		switch (info){
-		case -2: cout<< "unknown internal error." << endl; not_converged = false;break;
-		case -1: cout<< " wrong parameters were specified." << endl; not_converged = false;break;
-		case -0: cout<< "interrupted by user." << endl; not_converged = false;break;
-		case 1: cout<< "relative function decreasing is less or equal to EpsF." << endl; not_converged = false;break;
-		case 2: cout<< "step is less or equal to EpsX." << endl; not_converged = false;break;
-		case 4: cout<< "gradient norm is less or equal to EpsG." << endl; not_converged = false;break;
-		case 5: cout<< "number of iterations exceeds MaxIts." << endl; not_converged = false;break;
-		
-		// my conditions
-		case 6: cout<< "The entire process converged" << endl; not_converged = false; break;
-		case 7:
+
+		if (info==-2)
+		{
+			cout<< "unknown internal error." << endl;
+			not_converged = false;
+		}
+		else if (info==-1)
+		{
+			cout<< "wrong parameters were specified." << endl;
+			not_converged = false;
+		}
+		else if (info==0)
+		{
+			cout<< "interrupted by user." << endl;
+			not_converged = false;
+		}
+		else if (info==1)
+		{
+			cout<< "relative function decreasing is less or equal to EpsF." << endl;
+			not_converged = false;
+		}
+		else if (info==2)
+		{
+			cout<< "step is less or equal to EpsX." << endl;
+			not_converged = false;
+		}
+		else if (info==4)
+		{
+			cout<< "gradient norm is less or equal to EpsG." << endl;
+			not_converged = false;
+		}
+		else if (info==5)
+		{
+			cout<< "number of iterations exceeds MaxIts." << endl;
+			not_converged = false;
+		}
+		else if (info==6)
+		{
+			cout<< "The entire process converged" << endl;
+			not_converged = false;
+		}
+		else if (info==7)
+		{
 			cout<< "iterative improvement" << endl;
 			cout<< "!!!!!!" << endl;
 			cout<< "!!!!!!" << endl;
 			cout<< "!!!!!!" << endl;
 
-			//////////////////////////////////////////////////////////////////////////
-			// rotation matrix parameterization									//////
-			//////////////////////////////////////////////////////////////////////////
-			int n = n_node;
-			// rotation axis
-			double e1 = cos(x(15*n+1))*cos(x(15*n+2));
-			double e2 = sin(x(15*n+1))*cos(x(15*n+2));
-			double e3 = sin(x(15*n+2));
-			// rotation angle
-			double angl = x(15*n+3);
-
-			// differential
-			double e1da = -sin(x(15*n+1))*cos(x(15*n+2));
-			double e1db = -cos(x(15*n+1))*sin(x(15*n+2));
-			double e2da = cos(x(15*n+1))*cos(x(15*n+2));
-			double e2db = -sin(x(15*n+1))*sin(x(15*n+2));
-			double e3db = cos(x(15*n+2));
-
-			double l_c = 1-cos(angl);
-			double s = sin(angl);
-			double c = cos(angl);
-
-			// row vectors of rotation matrix
-			double r1[3] = {l_c*e1*e1 + c,    l_c*e1*e2 - s*e3, l_c*e1*e3 + s*e2};
-			double r2[3] = {l_c*e1*e2 + s*e3, l_c*e2*e2 + c,    l_c*e2*e3 - s*e1};
-			double r3[3] = {l_c*e1*e1 - s*e2, l_c*e1*e2 + s*e1, l_c*e1*e3 + c};
-
-
 			double hole_value = 1000;
-			
+
 			int total = x_res*y_res;
 			for (int i = 0; i<n_node; ++i)
 			{
-				// update graph nodes
-
-				// x_hat = R(x-g)+g+t+b
-				double x_g[3] = {graph.nodes[i][0]-templ.cog[0], graph.nodes[i][1]-templ.cog[1], graph.nodes[i][2]-templ.cog[2]};	// xi-g
-				double x_hat[3];
-				x_hat[0] = r1[0]*x_g[0] + r1[1]*x_g[1] + r1[2]*x_g[2];											// R(xi-g)
-				x_hat[1] = r2[0]*x_g[0] + r2[1]*x_g[1] + r2[2]*x_g[2];
-				x_hat[2] = r3[0]*x_g[0] + r3[1]*x_g[1] + r3[2]*x_g[2];
-				x_hat[0] += templ.cog[0] + x(15*n+4) + x(15*i+10);												// R(xi-g) + g + t + b
-				x_hat[1] += templ.cog[1] + x(15*n+5) + x(15*i+11); 
-				x_hat[2] += templ.cog[2] + x(15*n+6) + x(15*i+12);
-
+				// x_hat = x+b
+				Vector3d x_hat = graph.nodes[i] + Vector3d(x(15*i+10), x(15*i+11), x(15*i+12));
 
 				// cloest point
 				int indx;
-				target_dmap.FindClosestPoint(Vector3d(x_hat), &indx);
-				Vector3d correspond_pt = target_dmap.nodes[indx];
+				Vector3d correspond_pt;
+				target_dmap.FindClosestPoint(Vector3d(x_hat), &indx, 1, &correspond_pt);
 
 				int xx = indx%x_res;
 				int yy = indx/x_res;
@@ -812,18 +756,18 @@ void Viewer::RunOptimization_HaoLi()
 					cout<<"oh no"<<endl;
 					cout<<"oh no"<<endl;
 				}
-				
+
 				cout<<i<<endl;
-				cout<<"condition 1"<<endl;
-				// condition 1 : hole value
+
+				cout<<"condition 1 : hole value"<<endl;
 				if (correspond_pt[2] > hole_value*0.9)
 				{
 					x(15*i+15) = 0;
 					continue;
 				}
-				cout<<"condition 2"<<endl;
-				// condition 2 : distance > 2cm
-				if (Norm(Vector3d(x_hat)-correspond_pt) > 20.0)
+
+				cout<<"condition 2 : distance > 2cm"<<endl;
+				if (Norm(x_hat-correspond_pt) > 20.0)
 				{
 					x(15*i+15) = 0;
 					continue;
@@ -842,25 +786,17 @@ void Viewer::RunOptimization_HaoLi()
 // 					x(15*i+15) = 0;
 // 					continue;
 // 				}
-				
-				// good correspondence
+
+				// else : good correspondence
 				x(15*i+15) = 1;
 			}
-			break;
+
 		}
 	}
 
 	cout << endl << endl <<"update solution" << endl << endl;
-
 	// update solution
 	ofstream fout("result.txt");
-	//global
-	for (int i = 0; i<6; ++i)
-	{
-		fout << x(n_node*15+i) << ", ";
-	}
-	fout << x(n_node*15+6) <<endl;
-	//local
 	for(int i = 0; i < n_node; ++i)
 	{
 		for (int j = 1; j<=14; ++j)
@@ -871,51 +807,13 @@ void Viewer::RunOptimization_HaoLi()
 	}
 	fout.close();
 
-
-	int n = n_node;
-	// rotation axis
-	double e1 = cos(x(15*n+1))*cos(x(15*n+2));
-	double e2 = sin(x(15*n+1))*cos(x(15*n+2));
-	double e3 = sin(x(15*n+2));
-	// rotation angle
-	double angl = x(15*n+3);
-
-	double l_c = 1-cos(angl);
-	double s = sin(angl);
-	double c = cos(angl);
-
-	// row vectors of rotation matrix
-	double r1[3] = {l_c*e1*e1 + c,    l_c*e1*e2 - s*e3, l_c*e1*e3 + s*e2};
-	double r2[3] = {l_c*e1*e2 + s*e3, l_c*e2*e2 + c,    l_c*e2*e3 - s*e1};
-	double r3[3] = {l_c*e1*e1 - s*e2, l_c*e1*e2 + s*e1, l_c*e1*e3 + c};
-
-
-	int count = 0;
-	for (int i = 0; i<n; ++i)
-	{
-		// update graph nodes
-
-		// x_hat = R(x-g)+g+t+b
-		double x_g[3] = {graph.nodes[i][0]-templ.cog[0], graph.nodes[i][1]-templ.cog[1], graph.nodes[i][2]-templ.cog[2]};	// xi-g
-		graph.draw_nodes[i][0] = r1[0]*x_g[0] + r1[1]*x_g[1] + r1[2]*x_g[2];											// R(xi-g)
-		graph.draw_nodes[i][1] = r2[0]*x_g[0] + r2[1]*x_g[1] + r2[2]*x_g[2];
-		graph.draw_nodes[i][2] = r3[0]*x_g[0] + r3[1]*x_g[1] + r3[2]*x_g[2];
-		graph.draw_nodes[i][0] += templ.cog[0] + x(15*n+4) + x(15*i+10);												// R(xi-g) + g + t + b
-		graph.draw_nodes[i][1] += templ.cog[1] + x(15*n+5) + x(15*i+11); 
-		graph.draw_nodes[i][2] += templ.cog[2] + x(15*n+6) + x(15*i+12);		
+	// update graph nodes
+	for (int i = 0; i<n_node; ++i)
+	{		
+		graph.draw_nodes[i][0] += x(15*i+10);
+		graph.draw_nodes[i][1] += x(15*i+11); 
+		graph.draw_nodes[i][2] += x(15*i+12);		
 	}
-	
-
-// 	result_translation.resize(n_node);
-// 	result_rotation.resize(n_node, vector<double>(9));
-// 	for(int i = 0; i < n_node; ++i)
-// 	{
-// 		result_translation[i] = Vector3d(x(15*i+10), x(15*i+11), x(15*i+12));
-// 		graph.nodes[i] += result_translation[i];
-// 
-// 		for (int j = 0; j < 9; ++j)
-// 			result_rotation[i][j] = x(15*i+j+1);
-// 	}
 	updateGL();
 }
 
