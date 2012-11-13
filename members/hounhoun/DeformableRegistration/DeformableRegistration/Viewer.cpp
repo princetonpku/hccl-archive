@@ -47,7 +47,7 @@ void Viewer::init()
 // 	glDepthFunc(GL_LEQUAL);
 // 	glAlphaFunc(GL_GREATER,0.1);
 // 	glEnable(GL_ALPHA_TEST);
-	glEnable(GL_CULL_FACE);
+// 	glEnable(GL_CULL_FACE);
 }
 
 void Viewer::draw()
@@ -107,7 +107,6 @@ void Viewer::draw()
 				double au, av, d, d1, d2, u = x(i*15+13), v = x(i*15+14);
 				au = u-int(u);
 				av = v-int(v);
-
 				if (u+1>=x_res-1 || v+1>=y_res-1)
 				{
 					d = depth_map[v][u];
@@ -141,6 +140,14 @@ void Viewer::draw()
 				DrawSphere(3);
 				glPopMatrix();
 			}
+// 			glColor4ub(120,30,180,150);
+// 			for (int i = 0; i<target_dmap.nodes.size(); ++i)
+// 			{
+// 				glPushMatrix();
+// 				glTranslatev(target_dmap.nodes[i]);
+// 				DrawSphere(1.7);
+// 				glPopMatrix();
+// 			}
 		}
 	}
 
@@ -681,7 +688,7 @@ void Viewer::RunOptimization_HaoLi()
 		alph[2] = 100;
 
 		int info = 0;
-		lbfgsbminimize(n_node*15+6, 5, x, graph, templ, alph, depth_map, pdx_map, pdy_map, coef_map, this, epsg, epsf, epsx, maxits, nbd, lbd, ubd, info);
+		lbfgsbminimize(n_node*15, 5, x, graph, templ, alph, depth_map, pdx_map, pdy_map, coef_map, this, epsg, epsf, epsx, maxits, nbd, lbd, ubd, info);
 		cout<<info<<endl;
 
 		if (info==-2)

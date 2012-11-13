@@ -69,40 +69,7 @@ void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g,
 
 
 	// the number of graph nodes
-	int n = ((x.gethighbound() - x.getlowbound() + 1))/15 == graph.nodes.size() : 1;
-
-	// center of mass : com	
-	double com[3] = {mesh.cog[0], mesh.cog[1], mesh.cog[2]};	
-	
-	
-	//////////////////////////////////////////////////////////////////////////
-	// rotation matrix parameterization									//////
-	//////////////////////////////////////////////////////////////////////////
-
-	// rotation axis
-	double e1 = cos(x(15*n+1))*cos(x(15*n+2));
-	double e2 = sin(x(15*n+1))*cos(x(15*n+2));
-	double e3 = sin(x(15*n+2));
-	// rotation angle
-	double angl = x(15*n+3);
-
-	// differential
-	double e1da = -sin(x(15*n+1))*cos(x(15*n+2));
-	double e1db = -cos(x(15*n+1))*sin(x(15*n+2));
-	double e2da = cos(x(15*n+1))*cos(x(15*n+2));
-	double e2db = -sin(x(15*n+1))*sin(x(15*n+2));
-	double e3db = cos(x(15*n+2));
-
-	double l_c = 1-cos(angl);
-	double s = sin(angl);
-	double c = cos(angl);
-
-	// row vectors of rotation matrix
-	double r1[3] = {l_c*e1*e1 + c,    l_c*e1*e2 - s*e3, l_c*e1*e3 + s*e2};
-	double r2[3] = {l_c*e1*e2 + s*e3, l_c*e2*e2 + c,    l_c*e2*e3 - s*e1};
-	double r3[3] = {l_c*e1*e1 - s*e2, l_c*e1*e2 + s*e1, l_c*e1*e3 + c};
-
-
+	int n = (((x.gethighbound() - x.getlowbound() + 1))/15 == graph.nodes.size()) ? graph.nodes.size() : 0;
 	for(int i = 0; i < n; ++i)
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -165,25 +132,14 @@ void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g,
 			g(15*nei[j]+12) -= a_smooth*2*sig_reg[2];
 		}
 
-		//////////////////////////////////////////////////////////////////////////
-		// E_conf
-		//////////////////////////////////////////////////////////////////////////
-		double conf_tem = 1-x(15*i+15)*x(15*i+15);
-
-		E_conf += conf_tem*conf_tem;
-
-		g(15*i+15) -= a_conf*4*conf_tem*x(15*i+15);
 
 		//////////////////////////////////////////////////////////////////////////
 		// E_fit
 		//////////////////////////////////////////////////////////////////////////
 		double d1, d2, d, d_du, d_dv, dp, au, av;
-// 		cout << "e_fint...";
+
 		double u = x(i*15+13);
 		double v = x(i*15+14);
-
-
-// 		cout << "1... " << int(u) <<","<<int(v)<<"..";
 
 		// bilinear interpolation
 		//////////////////////////////////////////////////////////////////////////
@@ -209,78 +165,14 @@ void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g,
 			d1 = (1-au)*pdy[int(v)][int(u)] + au*pdy[int(v)][int(u)+1];
 			d2 = (1-au)*pdy[int(v)+1][int(u)] + au*pdy[int(v)+1][int(u)+1];
 			d_dv = (1-av)*d1+av*d2;
-
 		}
 		//////////////////////////////////////////////////////////////////////////
-
-// 		cout << "2...";
-
-		double c_g[3] = {u-com[0], v-com[1], d-com[2]};	// c(ui) - g		
-		double fit_tem[3];
-		fit_tem[0] = r1[0]*c_g[0] + r1[1]*c_g[1] + r1[2]*c_g[2];	// R(c(ui)-g)
-		fit_tem[1] = r2[0]*c_g[0] + r2[1]*c_g[1] + r2[2]*c_g[2];
-		fit_tem[2] = r3[0]*c_g[0] + r3[1]*c_g[1] + r3[2]*c_g[2];
-		fit_tem[0] += com[0] + x(15*n+4);							// R(c(ui)-g) + g + t
-		fit_tem[1] += com[1] + x(15*n+5); 
-		fit_tem[2] += com[2] + x(15*n+6);
-
-		double u_ = min(x_res-1, max(0, fit_tem[0]));
-		double v_ = min(y_res-1, max(0, fit_tem[1]));
-// 		double u_ = fit_tem[0];
-// 		double v_ = fit_tem[1];
-
-
-// 		cout << "3...";
-
-		// bilinear interpolation
-		//////////////////////////////////////////////////////////////////////////
-		au = u_-int(u_);
-		av = v_-int(v_);
-		vector<double> coef(6);
-		if (u_+1>x_res-1 || v_+1>y_res-1)
-		{
-			dp = target_dmap[v_][u_];
-			for (int k = 0; k<6; ++k)
-				coef[k] = coef_map[v_][u_][k];
-		} 
-		else
-		{
-			d1 = (1-au)*target_dmap[int(v_)][int(u_)] + au*target_dmap[int(v_)][int(u_)+1];
-			d2 = (1-au)*target_dmap[int(v_)+1][int(u_)] + au*target_dmap[int(v_)+1][int(u_)+1];
-			dp = (1-av)*d1+av*d2;
-
-			for (int k = 0; k<6; ++k)
-			{
-				d1 = (1-au)*coef_map[int(v_)][int(u_)][k] + au*coef_map[int(v_)][int(u_)+1][k];
-				d2 = (1-au)*coef_map[int(v_)+1][int(u_)][k] + au*coef_map[int(v_)+1][int(u_)+1][k];
-				coef[k] = (1-av)*d1+av*d2;
-			}
-		}
-		//////////////////////////////////////////////////////////////////////////
-
-// 		cout << "4...";
-
-		double u_du = -(r1[0] + r1[2]*d_du);
-		double v_du = -(r2[0] + r2[2]*d_du);
-		double dp_du = -(coef[1]*u_du + coef[2]*v_du + coef[3]*(u_du*v_+u_*v_du) + 2*coef[4]*u_*u_du + 2*coef[5]*v_*v_du);
-
-		double u_dv = -(r1[1] + r1[2]*d_dv);
-		double v_dv = -(r2[1] + r2[2]*d_dv);
-		double dp_dv = -(coef[1]*u_dv + coef[2]*v_dv + coef[3]*(u_dv*v_+u_*v_dv) + 2*coef[4]*u_*u_dv + 2*coef[5]*v_*v_dv);
 		
-// 		double c_hat[3] = {u_, v_, target_dmap[v_][u_]};
 		double c_hat[3] = {u, v, d};
 
-
-		// x_hat = R(x-g)+g+t+b
-		double x_g[3] = {graph.nodes[i][0]-com[0], graph.nodes[i][1]-com[1], graph.nodes[i][2]-com[2]};	// xi-g
 		double x_hat[3];
-		x_hat[0] = r1[0]*x_g[0] + r1[1]*x_g[1] + r1[2]*x_g[2];											// R(xi-g)
-		x_hat[1] = r2[0]*x_g[0] + r2[1]*x_g[1] + r2[2]*x_g[2];
-		x_hat[2] = r3[0]*x_g[0] + r3[1]*x_g[1] + r3[2]*x_g[2];
-		x_hat[0] += com[0] + x(15*n+4) + x(15*i+10);													// R(xi-g) + g + t + b
-		x_hat[1] += com[1] + x(15*n+5) + x(15*i+11); 
-		x_hat[2] += com[2] + x(15*n+6) + x(15*i+12);
+		for (int j = 0; j<3; ++j)
+			x_hat[j] = graph.nodes[i][j] + x(15*i+10+j);
 
 		double xh_ch[3];
 		for (int j = 0; j<3; ++j)
@@ -293,105 +185,24 @@ void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g,
 
 		// my new
 		// x_hat - c_hat
-		// {r11(x1-g1) + r12(x2-g2) + r13(x3-g3) + g1+ t1 + bi1 - u}
-		// {r21(x1-g1) + r22(x2-g2) + r23(x3-g3) + g2+ t2 + bi2 - v}
-		// {r31(x1-g1) + r32(x2-g2) + r33(x3-g3) + g3+ t3 + bi3 - d}
+		// {x1+b1-u}
+		// {x2+b2-v}
+		// {x3+b3-d}
 		g(15*i+10) += a_fit*w_sqr*2*xh_ch[0];
 		g(15*i+11) += a_fit*w_sqr*2*xh_ch[1];
 		g(15*i+12) += a_fit*w_sqr*2*xh_ch[2];
+
 		g(15*i+13) -= a_fit*w_sqr*2*(xh_ch[0] + xh_ch[2]*d_du);
 		g(15*i+14) -= a_fit*w_sqr*2*(xh_ch[1] + xh_ch[2]*d_dv);
-		g(15*i+15) += a_fit*2*x(15*i+15)*xh_ch_norm2;
-
-		//	R = {l_c*e1*e1 + c,    l_c*e1*e2 - s*e3, l_c*e1*e3 + s*e2}
-		//		{l_c*e1*e2 + s*e3, l_c*e2*e2 + c,    l_c*e2*e3 - s*e1}
-		//		{l_c*e1*e1 - s*e2, l_c*e1*e2 + s*e1, l_c*e1*e3 + c}
-		g(15*n+1) += a_fit*w_sqr*(2*
-			(xh_ch[0]*(        (l_c*2*e1*e1da)*x_g[0] +        (l_c*(e1da*e2+e1*e2da))*x_g[1] + (l_c*e1da*e3+s*e2da)*x_g[2]))
-			+(xh_ch[1]*((l_c*(e1da*e2+e1*e2da))*x_g[0] +                (l_c*2*e2*e2da)*x_g[1] + (l_c*e2da*e3-s*e1da)*x_g[2]))
-			+(xh_ch[2]*( (l_c*2*e1*e1da-s*e2da)*x_g[0]    + (l_c*(e1da*e2+e1*e2da)+s*e1da)*x_g[1]    + (l_c*e1da*e3)*x_g[2]          )));
-		g(15*n+2) += a_fit*w_sqr*(2*
-			(xh_ch[0]*(               (l_c*2*e1*e1db)*x_g[0] + (l_c*(e1db*e2+e1*e2db)-s*e3db)*x_g[1] + (l_c*(e1db*e3+e1*e3db)+s*e2db)*x_g[2]))
-			+(xh_ch[1]*((l_c*(e1db*e2+e1*e2db)+s*e3db)*x_g[0] +                (l_c*2*e2*e2db)*x_g[1] + (l_c*(e2db*e3+e2*e3db)-s*e1db)*x_g[2]))
-			+(xh_ch[2]*(        (l_c*2*e1*e1db-s*e2db)*x_g[0]    + (l_c*(e1db*e2+e1*e2db)+s*e1db)*x_g[1]    +        (l_c*(e1db*e3+e1*e3db))*x_g[2]          )));
-
-		g(15*n+3) += a_fit*w_sqr*(2*
-			(xh_ch[0]*(   (s*e1*e1-s)*x_g[0] + (s*e1*e2-c*e3)*x_g[1] + (s*e1*e3+c*e2)*x_g[2]))
-			+(xh_ch[1]*((s*e1*e2+c*e3)*x_g[0] +    (s*e2*e2-s)*x_g[1] + (s*e2*e3-c*e1)*x_g[2]))
-			+(xh_ch[2]*((s*e1*e1-c*e2)*x_g[0]    + (s*e1*e2+c*e1)*x_g[1]    +    (s*e1*e3-s)*x_g[2]   )));
-
-		g(15*n+4) += a_fit*w_sqr*2*xh_ch[0];
-		g(15*n+5) += a_fit*w_sqr*2*xh_ch[1];
-		g(15*n+6) += a_fit*w_sqr*2*xh_ch[2];
-
-		continue;
-
-
-
-		// x_hat - c_hat
-		// {r11(x1-g1) + r12(x2-g2) + r13(x3-g3) + g1+ t1 + bi1 - (r11(ui-g1) + r12(vi-g2) + r13(d-g3) + g1 + t1)}
-		// {r21(x1-g1) + r22(x2-g2) + r23(x3-g3) + g2+ t2 + bi2 - (r21(ui-g1) + r22(vi-g2) + r23(d-g3) + g2 + t2)}
-		// {r31(x1-g1) + r32(x2-g2) + r33(x3-g3) + g3+ t3 + bi3 - d'}
-		// -->
-		// {r11(x1-g1) + r12(x2-g2) + r13(x3-g3) + bi1 - (r11(ui-g1) + r12(vi-g2) + r13(d-g3))}
-		// {r21(x1-g1) + r22(x2-g2) + r23(x3-g3) + bi2 - (r21(ui-g1) + r22(vi-g2) + r23(d-g3))}
-		// {r31(x1-g1) + r32(x2-g2) + r33(x3-g3) + g3+ t3 + bi3 - d'}
-		// -->
-		// {r11(x1-ui) + r12(x2-vi) + r13(x3-d) + bi1}
-		// {r21(x1-ui) + r22(x2-vi) + r23(x3-d) + bi2}
-		// {r31(x1-g1) + r32(x2-g2) + r33(x3-g3) + g3+ t3 + bi3 - d'}
-
-// 		cout << "5...";
-		g(15*i+10) += a_fit*w_sqr*2*xh_ch[0];
-		g(15*i+11) += a_fit*w_sqr*2*xh_ch[1];
-		g(15*i+12) += a_fit*w_sqr*2*xh_ch[2];
-
-		g(15*i+13) -= a_fit*w_sqr*2*(xh_ch[0]*u_du + xh_ch[1]*v_du + xh_ch[2]*dp_du);
-		g(15*i+14) -= a_fit*w_sqr*2*(xh_ch[0]*u_dv + xh_ch[1]*v_dv + xh_ch[2]*dp_dv);
 
 		g(15*i+15) += a_fit*2*x(15*i+15)*xh_ch_norm2;
 
-		//	R = {l_c*e1*e1 + c,    l_c*e1*e2 - s*e3, l_c*e1*e3 + s*e2}
-		//		{l_c*e1*e2 + s*e3, l_c*e2*e2 + c,    l_c*e2*e3 - s*e1}
-		//		{l_c*e1*e1 - s*e2, l_c*e1*e2 + s*e1, l_c*e1*e3 + c}
-		g(15*n+1) += a_fit*w_sqr*(2*
-			 (xh_ch[0]*(        (l_c*2*e1*e1da)*(xi[0]-u) +        (l_c*(e1da*e2+e1*e2da))*(xi[1]-v) + (l_c*e1da*e3+s*e2da)*(xi[2]-d)))
-			+(xh_ch[1]*((l_c*(e1da*e2+e1*e2da))*(xi[0]-u) +                (l_c*2*e2*e2da)*(xi[1]-v) + (l_c*e2da*e3-s*e1da)*(xi[2]-d)))
-			+(xh_ch[2]*( (l_c*2*e1*e1da-s*e2da)*x_g[0]    + (l_c*(e1da*e2+e1*e2da)+s*e1da)*x_g[1]    + (l_c*e1da*e3)*x_g[2]          )));
-		g(15*n+2) += a_fit*w_sqr*(2*
-			 (xh_ch[0]*(               (l_c*2*e1*e1db)*(xi[0]-u) + (l_c*(e1db*e2+e1*e2db)-s*e3db)*(xi[1]-v) + (l_c*(e1db*e3+e1*e3db)+s*e2db)*(xi[2]-d)))
-			+(xh_ch[1]*((l_c*(e1db*e2+e1*e2db)+s*e3db)*(xi[0]-u) +                (l_c*2*e2*e2db)*(xi[1]-v) + (l_c*(e2db*e3+e2*e3db)-s*e1db)*(xi[2]-d)))
-			+(xh_ch[2]*(        (l_c*2*e1*e1db-s*e2db)*x_g[0]    + (l_c*(e1db*e2+e1*e2db)+s*e1db)*x_g[1]    +        (l_c*(e1db*e3+e1*e3db))*x_g[2]          )));
-
-		g(15*n+3) += a_fit*w_sqr*(2*
-			 (xh_ch[0]*(   (s*e1*e1-s)*(xi[0]-u) + (s*e1*e2-c*e3)*(xi[1]-v) + (s*e1*e3+c*e2)*(xi[2]-d)))
-			+(xh_ch[1]*((s*e1*e2+c*e3)*(xi[0]-u) +    (s*e2*e2-s)*(xi[1]-v) + (s*e2*e3-c*e1)*(xi[2]-d)))
-			+(xh_ch[2]*((s*e1*e1-c*e2)*x_g[0]    + (s*e1*e2+c*e1)*x_g[1]    +    (s*e1*e3-s)*x_g[2]   )));
-		
-		g(15*n+6) += a_fit*w_sqr*2*xh_ch[2];
-
-// 		g(15*i+10) += a_fit*w_sqr*2*xh_ch[0];
-// 		g(15*i+11) += a_fit*w_sqr*2*xh_ch[1];
-// 		g(15*i+12) += a_fit*w_sqr*2*xh_ch[2];
-// 
-// 		g(15*i+13) -= a_fit*w_sqr*2*(xh_ch[0]*u_du + xh_ch[1]*v_du + xh_ch[2]*dp_du);
-// 		g(15*i+14) -= a_fit*w_sqr*2*(xh_ch[0]*u_dv + xh_ch[1]*v_dv + xh_ch[2]*dp_dv);
-// 		
-// 		g(15*i+15) += a_fit*2*x(15*i+15)*xh_ch_norm2;
-// 
-// 		//	R = {l_c*e1*e1 + c,    l_c*e1*e2 - s*e3, l_c*e1*e3 + s*e2}
-// 		//		{l_c*e1*e2 + s*e3, l_c*e2*e2 + c,    l_c*e2*e3 - s*e1}
-// 		//		{l_c*e1*e1 - s*e2, l_c*e1*e2 + s*e1, l_c*e1*e3 + c}
-// 		g(15*n+1) -= a_fit*w_sqr*(2* (xh_ch[0]*(c_g[0]*(l_c*2*e1*e1da)         + c_g[1]*(l_c*(e1da*e2+e1*e2da)) + c_g[2]*(l_c*e1da*e3+s*e2da)))
-// 									+(xh_ch[1]*(c_g[0]*(l_c*(e1da*e2+e1*e2da)) + c_g[1]*(l_c*2*e2*e2da)         + c_g[2]*(l_c*e2da*e3-s*e1da))));
-// 		g(15*n+2) -= a_fit*w_sqr*(2* (xh_ch[0]*(c_g[0]*(l_c*2*e1*e1db)                + c_g[1]*(l_c*(e1db*e2+e1*e2db)-s*e3db) + c_g[2]*(l_c*(e1db*e3+e1*e3db)+s*e2db)))
-// 									+(xh_ch[1]*(c_g[0]*(l_c*(e1db*e2+e1*e2db)+s*e3db) + c_g[1]*(l_c*2*e2*e2db)                + c_g[2]*(l_c*(e2db*e3+e2*e3db)-s*e1db))));
-// 		g(15*n+3) -= a_fit*w_sqr*(2* (xh_ch[0]*(c_g[0]*(s*e1*e1-s)    + c_g[1]*(s*e1*e2-c*e3) + c_g[2]*(s*e1*e3+c*e2)))
-// 									+(xh_ch[1]*(c_g[0]*(s*e1*e2+c*e3) + c_g[1]*(s*e2*e2-s)    + c_g[2]*(s*e2*e3-c*e1))));
-// 		g(15*n+4) -= a_fit*w_sqr*(2*xh_ch[0]);
-// 		g(15*n+5) -= a_fit*w_sqr*(2*xh_ch[1]);		
-
-// 		cout << "end"<<endl;
+		//////////////////////////////////////////////////////////////////////////
+		// E_conf
+		//////////////////////////////////////////////////////////////////////////
+		double conf_tem = 1-w_sqr;
+		E_conf += conf_tem*conf_tem;
+		g(15*i+15) -= a_conf*4*x(15*i+15)*conf_tem;
 	}
 
 	f = a_rigid*E_rigid + a_smooth*E_smooth + a_fit*E_fit + a_conf*E_conf;
@@ -1128,53 +939,18 @@ void lbfgsbminimize(const int& n,
 		cout<< "iter : " << iter << endl;
         iter = iter+1;
         lbfgsbnewiteration(x, f, g);
+
 		// update draw nodes
-
-
 		int n = graph.nodes.size();
-		// rotation axis
-		double e1 = cos(x(15*n+1))*cos(x(15*n+2));
-		double e2 = sin(x(15*n+1))*cos(x(15*n+2));
-		double e3 = sin(x(15*n+2));
-		// rotation angle
-		double angl = x(15*n+3);
-
-		// differential
-		double e1da = -sin(x(15*n+1))*cos(x(15*n+2));
-		double e1db = -cos(x(15*n+1))*sin(x(15*n+2));
-		double e2da = cos(x(15*n+1))*cos(x(15*n+2));
-		double e2db = -sin(x(15*n+1))*sin(x(15*n+2));
-		double e3db = cos(x(15*n+2));
-
-		double l_c = 1-cos(angl);
-		double s = sin(angl);
-		double c = cos(angl);
-
-		// row vectors of rotation matrix
-		double r1[3] = {l_c*e1*e1 + c,    l_c*e1*e2 - s*e3, l_c*e1*e3 + s*e2};
-		double r2[3] = {l_c*e1*e2 + s*e3, l_c*e2*e2 + c,    l_c*e2*e3 - s*e1};
-		double r3[3] = {l_c*e1*e1 - s*e2, l_c*e1*e2 + s*e1, l_c*e1*e3 + c};
-
 
 		int count = 0;
-		for (int k = 0; k<n; ++k)
-		{
-			// update graph nodes
-			// x_hat = R(x-g)+g+t+b
-			double x_g[3] = {graph.nodes[k][0]-mesh.cog[0], graph.nodes[k][1]-mesh.cog[1], graph.nodes[k][2]-mesh.cog[2]};	// xk-g
-			graph.draw_nodes[k][0] = r1[0]*x_g[0] + r1[1]*x_g[1] + r1[2]*x_g[2];											// R(xk-g)
-			graph.draw_nodes[k][1] = r2[0]*x_g[0] + r2[1]*x_g[1] + r2[2]*x_g[2];
-			graph.draw_nodes[k][2] = r3[0]*x_g[0] + r3[1]*x_g[1] + r3[2]*x_g[2];
-			graph.draw_nodes[k][0] += mesh.cog[0] + x(15*n+4) + x(15*k+10);												// R(xk-g) + g + t + b
-			graph.draw_nodes[k][1] += mesh.cog[1] + x(15*n+5) + x(15*k+11); 
-			graph.draw_nodes[k][2] += mesh.cog[2] + x(15*n+6) + x(15*k+12);
-		}
 
-// 		for (i = 0; i<graph.draw_nodes.size(); ++i)
-// 			graph.draw_nodes[i] = graph.nodes[i] + Vector3d(x(i*15+10),x(i*15+11),x(i*15+12));
-		cout<<endl<<endl<<endl;
-		cout<<x(13)<<","<<x(14)<<endl;
-		cout<<endl<<endl<<endl;
+		for (i = 0; i<graph.draw_nodes.size(); ++i)
+			graph.draw_nodes[i] = graph.nodes[i] + Vector3d(x(i*15+10),x(i*15+11),x(i*15+12));
+
+// 		cout<<endl<<endl<<endl;
+// 		cout<<x(13)<<","<<x(14)<<endl;
+// 		cout<<endl<<endl<<endl;
 		viewer->updateGL();
 // 		viewer->saveSnapshot();
 		
@@ -1192,7 +968,7 @@ void lbfgsbminimize(const int& n,
 		double tem_val = fabs(fold-f)/(1+f);
 		cout<< "tem_val : " << tem_val << endl;
 
-		if (tem_val < 0.0001)
+		if (tem_val < 0.001)
 		{
 			cout<< "|(F_k)-(F_k-1)|<10^(-5)" << endl;
 			cout<<alph[0]<<endl;
@@ -1215,9 +991,8 @@ void lbfgsbminimize(const int& n,
 				info = 6;
 				return;
 			}
-//			else if (tem_val < 0.000001)
-			else if (tem_val < 0.00001)
-
+			else if (tem_val < 0.0001)
+//			else if (tem_val < 0.00001)
 			{
 				cout<< "|(F_k)-(F_k-1)|<10^(-6)" << endl;
 				info = 7;
