@@ -14,7 +14,7 @@ using namespace std;
 Viewer::Viewer(QWidget *parent) : QGLViewer(parent)
 	, btn_pressed(Qt::NoButton)
 	, onDrag(false)
-	, onEmbededDeformation(false), is_hoa_initialized(false)
+	, onEmbededDeformation(false), is_hoa_initialized(false), is_geo(false)
 {
 }
 
@@ -54,6 +54,43 @@ void Viewer::draw()
 {
 	glTranslated(-templ.cog[0], -templ.cog[1], -templ.cog[2]);
 
+	// Draw Geodesic path
+	if(is_geo)
+	{
+		double r = templ.GetBoundingSphereRadius();
+
+		glColor4ub(255,100,190,200);
+		glPushMatrix();
+		glTranslatev(templ.point(templ.vertex_handle(source_vertex_index)).data());
+		DrawSphere(0.02*r);
+		glPopMatrix();
+
+		glColor4ub(100,190,255,200);
+		glPushMatrix();
+		glTranslatev(templ.point(templ.vertex_handle(target_vertex_index)).data());
+		DrawSphere(0.02*r);
+		glPopMatrix();
+
+		glColor3ub(255,0,0);
+		for (int i = 0; i<geodesic_path.size(); ++i)
+		{
+			glPushMatrix();
+			glTranslatev(geodesic_path[i].val);
+			DrawSphere(0.007*r);
+			glPopMatrix();
+		}
+		glEnable(GL_LINE_SMOOTH);
+		glBegin(GL_LINE_STRIP);
+		for (int i = 0; i<geodesic_path.size(); ++i)
+		{
+			glVertex3dv(geodesic_path[i].val);
+		}
+		glEnd();
+		glDisable(GL_LINE_SMOOTH);
+	}
+
+
+
 	// Draw Deformation graph
 // 	if(pParentDlg->ui.actionDeformationGraph->isChecked())
 // 	{
@@ -84,7 +121,8 @@ void Viewer::draw()
 		{
 			glPushMatrix();
 			glTranslatev(graph.draw_nodes[i].val);
-			DrawSphere(2);
+			if (i==100) DrawSphere(10);
+			else DrawSphere(2);
 			glPopMatrix();
 		}
 
@@ -155,8 +193,61 @@ void Viewer::draw()
 	if(pParentDlg->ui.actionTemplateVisible->isChecked())
 	{
 		// 	glColor4ub(255, 190, 100, 200);
-		glColor3ub(255, 190, 100);
-		templ.Render();
+		if (pParentDlg->ui.actionSmooth->isChecked())
+		{
+			if (is_geo)
+			{
+				glEnableClientState(GL_VERTEX_ARRAY);
+				glVertexPointer(3, GL_DOUBLE, 0, templ.points());
+
+				glEnableClientState(GL_NORMAL_ARRAY);
+				glNormalPointer(GL_DOUBLE, 0, templ.vertex_normals());	
+
+				glEnableClientState(GL_COLOR_ARRAY);
+// 				glColorPointer(3, GL_UNSIGNED_BYTE, 0, templ.vertex_colors());
+				glColorPointer(3, GL_DOUBLE, 0, templ.vertex_colors());
+
+				HCCLMesh::ConstFaceIter fIt(templ.faces_begin()), fEnd(templ.faces_end());
+				HCCLMesh::ConstFaceVertexIter fvIt;
+
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				glBegin(GL_TRIANGLES);
+				for (; fIt!=fEnd; ++fIt)
+				{
+					fvIt = templ.cfv_iter(fIt.handle());
+					glArrayElement(fvIt.handle().idx());
+					glArrayElement((++fvIt).handle().idx());
+					glArrayElement((++fvIt).handle().idx());
+				}
+				glEnd();
+
+				glDisableClientState(GL_VERTEX_ARRAY);
+				glDisableClientState(GL_NORMAL_ARRAY);
+				glDisableClientState(GL_COLOR_ARRAY);
+			}
+			else
+			{
+				glColor3ub(255, 190, 100);
+				templ.Render(CTriMesh::RENDER_SMOOTH);
+			}			
+		}
+
+		if (pParentDlg->ui.actionPoint->isChecked())
+		{
+			glColor3ub(0, 0, 0);
+			templ.Render(CTriMesh::RENDER_POINTS);
+		}			
+
+		if (pParentDlg->ui.actionWireframe->isChecked())
+		{
+			glColor3ub(0, 0, 0);
+			templ.Render(CTriMesh::RENDER_WIRE);
+		}
+			
+			
+
+// 		glColor3ub(0, 0, 0);
+// 		templ.Render(CTriMesh::RENDER_WIRE);
 	}
 
 	// Draw Target Mesh
@@ -184,7 +275,6 @@ void Viewer::draw()
 			glPopMatrix();
 		}
 	}
-
 }
 
 void Viewer::drawWithNames()
@@ -597,6 +687,7 @@ void Viewer::InitOptimization_HaoLi()
 	graph.SetMesh(&templ);
 	graph.BuildGraph(min(300.0/templ.n_vertices(), 1.0), 2);
 	n_node = graph.nodes.size();
+	cout<< "node size = "<<n_node << endl;
 
 	// the number of nodes which influence each vertex
 	nearest_k = 4;
@@ -631,7 +722,7 @@ void Viewer::InitOptimization_HaoLi()
 	epsg = 0.0;
 	epsf = 0.000000001; // 10^-9
 	epsx = 0.0;
-	maxits = 1000;	
+	maxits = 3000;	
 
 	x.setbounds(1, n_node*15);
 	nbd.setbounds(1, n_node*15);
@@ -646,13 +737,13 @@ void Viewer::InitOptimization_HaoLi()
 		{
 			nbd(i) = 2;
 			lbd(i) = 0;
-			ubd(i) = x_res-1;
+			ubd(i) = x_res-2;
 		}
 		else if (i%15 == 14)
 		{
 			nbd(i) = 2;
 			lbd(i) = 0;
-			ubd(i) = y_res-1;
+			ubd(i) = y_res-2;
 		}
 		else
 		{
@@ -678,14 +769,33 @@ void Viewer::InitOptimization_HaoLi()
 }
 void Viewer::RunOptimization_HaoLi()
 {
-	std::vector<double> alph(3);
+	std::vector<double> alph(10); // condition
 	bool not_converged = true;	
 	cout << "start!!" << endl<<endl<<endl;
 	while(not_converged)
 	{
-		alph[0] = 1000;
-		alph[1] = 100;
-		alph[2] = 100;
+// 		alph[0] = 1000;			// e_rigid
+// 		alph[1] = 100;			// e_smooth
+// 		alph[2] = 0.1;			// e_fit --> fixed!
+// 		alph[3] = 100;			// e_con
+// 
+// 		alph[4] = 1;			// e_rigid is halved
+// 		alph[5] = 0.1;			// e_smooth is halved
+// 		alph[6] = 1;			// e_con is halved
+		alph[0] = 0;			// e_rigid
+		alph[1] = 0;			// e_smooth
+		alph[2] = 1;			// e_fit --> fixed!
+		alph[3] = 0;			// e_con
+
+		alph[4] = 1;			// e_rigid is halved
+		alph[5] = 0.1;			// e_smooth is halved
+		alph[6] = 1;			// e_con is halved
+
+
+		alph[7] = 0.0000000000000000001;		// coefficient is halved condition! 10^-5
+		alph[8] = 0.000000000000000000001;		// iterative improvement condition! 10^-6
+		alph[9] = 0.000000000000000001;	// converge condition! 10^-8
+
 
 		int info = 0;
 		lbfgsbminimize(n_node*15, 5, x, graph, templ, alph, depth_map, pdx_map, pdy_map, coef_map, this, epsg, epsf, epsx, maxits, nbd, lbd, ubd, info);
@@ -757,23 +867,23 @@ void Viewer::RunOptimization_HaoLi()
 				x(15*i+13) = xx;
 				x(15*i+14) = yy;
 
-				if (xx>x_res-1 || yy>y_res-1)
-				{
-					cout<<"oh no"<<endl;
-					cout<<"oh no"<<endl;
-					cout<<"oh no"<<endl;
-				}
+// 				if (xx>x_res-1 || yy>y_res-1)
+// 				{
+// 					cout<<"oh no"<<endl;
+// 					cout<<"oh no"<<endl;
+// 					cout<<"oh no"<<endl;
+// 				}
+// 
+// 				cout<<i<<endl;
 
-				cout<<i<<endl;
-
-				cout<<"condition 1 : hole value"<<endl;
+// 				cout<<"condition 1 : hole value"<<endl;
 				if (correspond_pt[2] > hole_value*0.9)
 				{
 					x(15*i+15) = 0;
 					continue;
 				}
 
-				cout<<"condition 2 : distance > 2cm"<<endl;
+// 				cout<<"condition 2 : distance > 2cm"<<endl;
 				if (Norm(x_hat-correspond_pt) > 20.0)
 				{
 					x(15*i+15) = 0;
@@ -870,4 +980,114 @@ void Viewer::LoadC( const char* filename, std::vector<std::vector<std::vector<do
 	}
 	fin.close();
 
+}
+
+void Viewer::InitGeo()
+{
+	cout<< "init geodesic mesh...";
+	// load points and faces data
+	
+
+	//std::vector<double> points;
+	std::vector<double> points(&templ.points()[0][0], &templ.points()[templ.n_vertices()][0]);
+
+	std::vector<unsigned> faces;
+	faces.reserve(templ.n_faces()*3);
+
+	HCCLMesh::ConstFaceIter fIt(templ.faces_begin()), fEnd(templ.faces_end());
+	HCCLMesh::ConstFaceVertexIter fvIt;
+	for (; fIt!=fEnd; ++fIt)
+	{
+		fvIt = templ.cfv_iter(fIt.handle());
+		faces.push_back(fvIt.handle().idx());
+		faces.push_back((++fvIt).handle().idx());
+		faces.push_back((++fvIt).handle().idx());
+	}
+
+	// creat mesh data
+	mesh.initialize_mesh_data(points, faces);		//create internal mesh data structure including edges
+
+	cout<<"finished!"<<endl;
+}
+
+void Viewer::GeodesicTem()
+{
+	is_geo = true;
+	source_vertex_index = 0;
+	target_vertex_index = 5;
+	double g_length = GeodesicTem(mesh, source_vertex_index, target_vertex_index, geodesic_path);
+	updateGL();
+}
+
+double Viewer::GeodesicTem( geodesic::Mesh& mesh, const int src_indx, const int trgt_indx, std::vector<Vector3d>& path )
+{
+	path.clear();
+
+	// creat exact algorithm
+	geodesic::GeodesicAlgorithmExact algorithm(&mesh);	//create exact algorithm for the mesh
+
+	// creat source
+	geodesic::SurfacePoint source(&mesh.vertices()[src_indx]);
+	std::vector<geodesic::SurfacePoint> all_sources(1,source);	//in general, there could be multiple sources, but now we have only one
+
+	//create target
+	geodesic::SurfacePoint target(&mesh.vertices()[trgt_indx]);
+		
+	//find a single source-target path	
+	std::vector<geodesic::SurfacePoint> path_tem;	//geodesic path is a sequence of SurfacePoints
+	algorithm.geodesic(source, target, path_tem);
+// 	algorithm.print_statistics();
+
+	path.resize(path_tem.size());
+	for(unsigned i = 0; i<path.size(); ++i)
+		path[i] = Vector3d(path_tem[i].xyz());
+
+
+	//cover the whole mesh
+	vector<double> geo_distance(mesh.vertices().size());
+	algorithm.propagate(all_sources);
+// 	algorithm.print_statistics();
+
+	for(unsigned i=0; i<mesh.vertices().size(); ++i)
+	{
+		geodesic::SurfacePoint p(&mesh.vertices()[i]);
+		unsigned best_source = algorithm.best_source(p, geo_distance[i]);		//for a given surface point, find closets source and distance to this source
+	}
+	
+	double mx_dist = geo_distance[std::max_element(geo_distance.begin(), geo_distance.end())-geo_distance.begin()];
+	mx_dist = 5;
+
+	auto HSVtoRGB = [](double h, double s, double v, double *r, double *g, double *b)
+	{
+		if( s == 0 ) {
+			*r = *g = *b = v;
+			return;
+		}
+		h /= 60;
+		int i = (int)h;
+		double f = h - i;
+		double p = v*(1-s);
+		double q = v*(1-s*f);
+		double t = v*(1-s*(1-f));
+		switch(i) {
+		case 0: *r = v; *g = t; *b = p; break;
+		case 1: *r = q; *g = v; *b = p; break;
+		case 2: *r = p; *g = v; *b = t; break;
+		case 3: *r = p; *g = q; *b = v; break;
+		case 4: *r = t; *g = p; *b = v; break;
+		default:*r = v; *g = p; *b = q; break;
+		}
+	};
+
+	HCCLMesh::VertexIter vit(templ.vertices_begin()), vit_end(templ.vertices_end());
+	for (; vit!=vit_end; ++vit)
+	{
+		double h = geo_distance[vit.handle().idx()]/mx_dist*360;
+		double r,g,b;
+		HSVtoRGB(h,1,1, &r, &g, &b);
+		templ.set_color(vit,HCCLMesh::Color(r, g, b));		
+	}
+
+// 	print_info_about_path(path_tem);
+	return length(path_tem);
 }

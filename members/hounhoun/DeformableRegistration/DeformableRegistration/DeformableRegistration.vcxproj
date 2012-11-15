@@ -34,6 +34,8 @@
     <Import Project="D:\Libraries\OpenMesh_2.2.props" />
     <Import Project="Armadillo-3.2.4.props" />
     <Import Project="OpenNI.props" />
+    <Import Project="..\..\..\..\..\Library\Property Sheet\Boost-1.49.0.props" />
+    <Import Project="..\..\..\..\..\Library\Property Sheet\Geodesic.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -41,6 +43,8 @@
     <Import Project="D:\Libraries\OpenMesh_2.2.props" />
     <Import Project="Armadillo-3.2.4.props" />
     <Import Project="OpenNI.props" />
+    <Import Project="..\..\..\..\..\Library\Property Sheet\Boost-1.49.0.props" />
+    <Import Project="..\..\..\..\..\Library\Property Sheet\Geodesic.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>

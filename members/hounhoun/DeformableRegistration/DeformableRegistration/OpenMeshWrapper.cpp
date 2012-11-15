@@ -15,6 +15,15 @@
 #include <OpenMesh/Tools/Decimater/DecimaterT.hh>
 #include <OpenMesh/Tools/Decimater/ModQuadricT.hh>
 
+
+#ifndef min
+#define min(a, b) (((a) < (b))? (a) : (b))
+#endif
+#ifndef max
+#define max(a, b) (((a) > (b))? (a) : (b))
+#endif
+
+
 CTriMesh::CTriMesh(void)
 	: kdtree(NULL)
 {
@@ -114,6 +123,9 @@ void CTriMesh::RenderWireframe(GLuint nFlag/* = 0*/) const
 	HCCLMesh::ConstFaceIter fIt(faces_begin()), fEnd(faces_end());
 	HCCLMesh::ConstFaceVertexIter fvIt;
 
+	glEnable(GL_POINT_SMOOTH);
+	glEnable(GL_LINE_SMOOTH);
+				
 	glPolygonMode(GL_FRONT_AND_BACK,  GL_LINE);
 	glBegin(GL_TRIANGLES);
 	for (; fIt!=fEnd; ++fIt)
@@ -126,6 +138,10 @@ void CTriMesh::RenderWireframe(GLuint nFlag/* = 0*/) const
 		glVertex3dv( &point(fvIt)[0] );
 	}
 	glEnd();
+
+	glDisable(GL_POINT_SMOOTH);
+	glDisable(GL_LINE_SMOOTH);
+
 }
 
 void CTriMesh::RenderFlat(GLuint nFlag/* = 0*/) const
@@ -157,22 +173,21 @@ void CTriMesh::RenderSmooth(GLuint nFlag/* = 0*/) const
 {
 	if(n_vertices() <= 0)
 		return;
-
-	HCCLMesh::ConstFaceIter fIt(faces_begin()), fEnd(faces_end());
-
-	HCCLMesh::ConstFaceVertexIter fvIt;
-
+		
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(3, GL_DOUBLE, 0, points());
 	
 	glEnableClientState(GL_NORMAL_ARRAY);
-	glNormalPointer(GL_DOUBLE, 0, vertex_normals());
-	
+	glNormalPointer(GL_DOUBLE, 0, vertex_normals());	
+
+	HCCLMesh::ConstFaceIter fIt(faces_begin()), fEnd(faces_end());
+	HCCLMesh::ConstFaceVertexIter fvIt;
+
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glBegin(GL_TRIANGLES);
 	for (; fIt!=fEnd; ++fIt)
 	{
-		fvIt = cfv_iter(fIt.handle()); 
+		fvIt = cfv_iter(fIt.handle());
 		glArrayElement(fvIt.handle().idx());
 		glArrayElement((++fvIt).handle().idx());
 		glArrayElement((++fvIt).handle().idx());
@@ -241,7 +256,9 @@ void CTriMesh::UpdateCOG( void )
 	}
 
 	for(v_it = vertices_begin(); v_it != v_end; ++v_it)
+	{
 		cog += point(v_it);
+	}
 
 	cog /= n_vertices();
 }
@@ -315,22 +332,22 @@ void CTriMesh::Rotate( double angle, HCCLMesh::Point axis )
 
 void CTriMesh::Decimate(double p)
 {
-	typedef OpenMesh::Decimater::DecimaterT< HCCLMesh > Decimater;
-	typedef OpenMesh::Decimater::ModQuadricT< Decimater >::Handle HModQuadric;
-
-	Decimater   decimater(*this);  // a decimater object, connected to a mesh
-	HModQuadric hModQuadric;      // use a quadric module
-
-	decimater.add( hModQuadric ); // register module at the decimater
-
-	std::cout << decimater.module( hModQuadric ).name() << std::endl;
-
-	// the way to access the module 
-	decimater.initialize();       // let the decimater initialize the mesh and the modules
-
-	decimater.decimate_to(n_vertices()*p);
-
-	garbage_collection();
+// 	typedef OpenMesh::Decimater::DecimaterT< HCCLMesh > Decimater;
+// 	typedef OpenMesh::Decimater::ModQuadricT< HCCLMesh >::Handle HModQuadric;
+// 
+// 	Decimater   decimater(*this);  // a decimater object, connected to a mesh
+// 	HModQuadric hModQuadric;      // use a quadric module
+// 
+// 	decimater.add( hModQuadric ); // register module at the decimater
+// 
+// 	std::cout << decimater.module( hModQuadric ).name() << std::endl;
+// 
+// 	// the way to access the module 
+// 	decimater.initialize();       // let the decimater initialize the mesh and the modules
+// 
+// 	decimater.decimate_to(n_vertices()*p);
+// 
+// 	garbage_collection();
 }
 
 void CTriMesh::SampleRandom(int nSamples, std::vector<Vector3d>& samples) const

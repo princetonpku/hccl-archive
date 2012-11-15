@@ -69,6 +69,8 @@
     <addaction name="actionDecimate"/>
     <addaction name="menuSampling"/>
     <addaction name="actionEmbededDeformation"/>
+    <addaction name="actionInitGeo"/>
+    <addaction name="actionGeodesic"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -85,7 +87,7 @@
      <property name="title">
       <string>Template Mesh</string>
      </property>
-     <addaction name="actionSolid"/>
+     <addaction name="actionPoint"/>
      <addaction name="actionWireframe"/>
      <addaction name="actionFlat"/>
      <addaction name="actionSmooth"/>
@@ -98,7 +100,7 @@
      <property name="title">
       <string>Target Mesh</string>
      </property>
-     <addaction name="actionPoints"/>
+     <addaction name="actionPoints_2"/>
      <addaction name="actionWireframe_2"/>
      <addaction name="actionFlat_2"/>
      <addaction name="actionSmooth_2"/>
@@ -192,22 +194,37 @@
     <string>Orthogonal</string>
    </property>
   </action>
-  <action name="actionSolid">
+  <action name="actionPoint">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Points</string>
    </property>
   </action>
   <action name="actionWireframe">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Wireframe</string>
    </property>
   </action>
   <action name="actionFlat">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Flat</string>
    </property>
   </action>
   <action name="actionSmooth">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Smooth</string>
    </property>
@@ -233,7 +250,7 @@
     <string>Transparent...</string>
    </property>
   </action>
-  <action name="actionPoints">
+  <action name="actionPoints_2">
    <property name="text">
     <string>Points</string>
    </property>
@@ -343,6 +360,16 @@
   <action name="actionStart_HaoLi">
    <property name="text">
     <string>Start</string>
+   </property>
+  </action>
+  <action name="actionGeodesic">
+   <property name="text">
+    <string>Geodesic</string>
+   </property>
+  </action>
+  <action name="actionInitGeo">
+   <property name="text">
+    <string>InitGeo</string>
    </property>
   </action>
  </widget>

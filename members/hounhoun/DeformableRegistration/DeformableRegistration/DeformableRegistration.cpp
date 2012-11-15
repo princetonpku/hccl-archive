@@ -26,19 +26,8 @@ DeformableRegistration::DeformableRegistration(QWidget *parent, Qt::WFlags flags
 #ifdef HAO_LI
 	connect(ui.actionInitalize_HaoLi, SIGNAL(triggered()), this, SLOT(OnToolsInitHaoLi()));
 	connect(ui.actionStart_HaoLi, SIGNAL(triggered()), this, SLOT(OnToolsRunHaoLi()));
-
-
-	//
-// 	std::cout << "Hao Li start automatic!" << std::endl;
-// 
-// 	ui.view->templ.Clear();
-// 	ui.view->graph.Clear();
-// 	ui.view->templ.Read("cut1.off");	
-// 	ui.view->templ.UpdateBoundingSphere();
-// 	ui.view->target.Clear();
-// 	ui.view->target.Read("cut2.off");	
-// 	ui.view->target.UpdateBoundingSphere();	
-
+	connect(ui.actionGeodesic, SIGNAL(triggered()), this, SLOT(OnToolsGeodesic()));
+	connect(ui.actionInitGeo, SIGNAL(triggered()), this, SLOT(OnInitGeo()));
 #endif
 
 }
@@ -92,8 +81,8 @@ void DeformableRegistration::OnFileOpenTemplate()
 	ui.view->camera()->lookAt(qglviewer::Vec(0,0,1));	
 	ui.view->camera()->setUpVector(qglviewer::Vec(0,-1,0));
 
-	ui.view->camera()->setSceneRadius(r*0.2);
-	ui.view->camera()->showEntireScene();
+	ui.view->camera()->setSceneRadius(r/**0.2*/);
+	ui.view->camera()->showEntireScene();	
 
 	ui.view->updateGL();
 	setCursor(Qt::ArrowCursor);
@@ -198,7 +187,7 @@ void DeformableRegistration::OnToolsInitHaoLi()
 // 	ui.view->camera()->setSceneRadius(r*0.2);
 // 	ui.view->camera()->showEntireScene();
 // 	ui.view->updateGL();
-
+	ui.actionTemplateVisible->setCheckable(false);
 	ui.view->InitOptimization_HaoLi();
 	ui.actionDeformationGraph->setChecked(true);
 	ui.view->updateGL();
@@ -207,4 +196,14 @@ void DeformableRegistration::OnToolsInitHaoLi()
 void DeformableRegistration::OnToolsRunHaoLi()
 {
 	ui.view->RunOptimization_HaoLi();
+}
+
+void DeformableRegistration::OnToolsGeodesic()
+{
+	ui.view->GeodesicTem();
+}
+
+void DeformableRegistration::OnInitGeo()
+{
+	ui.view->InitGeo();
 }

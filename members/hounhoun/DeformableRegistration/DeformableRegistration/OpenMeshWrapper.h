@@ -8,19 +8,19 @@
 #include <OpenMesh/Core/IO/MeshIO.hh>
 #include <OpenMesh/Core/Mesh/TriMesh_ArrayKernelT.hh>
 
-#ifndef min
-#define min(a, b) (((a) < (b))? (a) : (b))
-#endif
-#ifndef max
-#define max(a, b) (((a) > (b))? (a) : (b))
-#endif
+// #ifndef min
+// #define min(a, b) (((a) < (b))? (a) : (b))
+// #endif
+// #ifndef max
+// #define max(a, b) (((a) > (b))? (a) : (b))
+// #endif
 
 
 struct HCCLTraits : public OpenMesh::DefaultTraits
 {
 	typedef OpenMesh::Vec3d Point;
 	typedef OpenMesh::Vec3d Normal;
-	//typedef OpenMesh::Vec4d Color;
+	typedef OpenMesh::Vec3d Color;
 
 	VertexAttributes (
 		OpenMesh::Attributes::Status |

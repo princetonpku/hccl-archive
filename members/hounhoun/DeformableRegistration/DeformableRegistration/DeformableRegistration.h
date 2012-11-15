@@ -39,6 +39,9 @@ private slots:
 	/////////////////
 	void OnToolsInitHaoLi();
 	void OnToolsRunHaoLi();
+
+	void OnInitGeo();
+	void OnToolsGeodesic();
 };
 
 #endif // DEFORMABLEREGISTRATION_H

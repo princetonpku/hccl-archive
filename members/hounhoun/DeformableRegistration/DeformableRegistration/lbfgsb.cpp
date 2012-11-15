@@ -63,10 +63,8 @@ void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g,
 	// weight values of energy
 	double a_rigid = alph[0];
 	double a_smooth = alph[1];
-	double a_conf = alph[2];
-	double a_fit = 0.1;
-//  	double a_fit = 20;
-
+	double a_fit = alph[2];
+	double a_conf = alph[3];
 
 	// the number of graph nodes
 	int n = (((x.gethighbound() - x.getlowbound() + 1))/15 == graph.nodes.size()) ? graph.nodes.size() : 0;
@@ -82,17 +80,17 @@ void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g,
 		double c1c3 = x(15*i+1)*x(15*i+7) + x(15*i+2)*x(15*i+8) + x(15*i+3)*x(15*i+9);
 		double c2c3 = x(15*i+4)*x(15*i+7) + x(15*i+5)*x(15*i+8) + x(15*i+6)*x(15*i+9);
 
-		E_rigid += c1c2*c1c2 + c1c3*c1c3 + c2c3*c2c3 + (c1c1-1)*(c1c1-1) + (c2c2-1)*(c2c2-1) + (c3c3-1)*(c3c3-1);
-
-		g(15*i+1) += a_rigid*(2*c1c2*x(15*i+4) + 2*c1c3*x(15*i+7) + 4*(c1c1-1)*x(15*i+1));
-		g(15*i+2) += a_rigid*(2*c1c2*x(15*i+5) + 2*c1c3*x(15*i+8) + 4*(c1c1-1)*x(15*i+2));
-		g(15*i+3) += a_rigid*(2*c1c2*x(15*i+6) + 2*c1c3*x(15*i+9) + 4*(c1c1-1)*x(15*i+3));
-		g(15*i+4) += a_rigid*(2*c1c2*x(15*i+1) + 2*c2c3*x(15*i+7) + 4*(c2c2-1)*x(15*i+4));
-		g(15*i+5) += a_rigid*(2*c1c2*x(15*i+2) + 2*c2c3*x(15*i+8) + 4*(c2c2-1)*x(15*i+5));
-		g(15*i+6) += a_rigid*(2*c1c2*x(15*i+3) + 2*c2c3*x(15*i+9) + 4*(c2c2-1)*x(15*i+6));
-		g(15*i+7) += a_rigid*(2*c1c3*x(15*i+1) + 2*c2c3*x(15*i+4) + 4*(c3c3-1)*x(15*i+7));
-		g(15*i+8) += a_rigid*(2*c1c3*x(15*i+2) + 2*c2c3*x(15*i+5) + 4*(c3c3-1)*x(15*i+8));
-		g(15*i+9) += a_rigid*(2*c1c3*x(15*i+3) + 2*c2c3*x(15*i+6) + 4*(c3c3-1)*x(15*i+9));
+// 		E_rigid += c1c2*c1c2 + c1c3*c1c3 + c2c3*c2c3 + (c1c1-1)*(c1c1-1) + (c2c2-1)*(c2c2-1) + (c3c3-1)*(c3c3-1);
+// 
+// 		g(15*i+1) += a_rigid*(2*c1c2*x(15*i+4) + 2*c1c3*x(15*i+7) + 4*(c1c1-1)*x(15*i+1));
+// 		g(15*i+2) += a_rigid*(2*c1c2*x(15*i+5) + 2*c1c3*x(15*i+8) + 4*(c1c1-1)*x(15*i+2));
+// 		g(15*i+3) += a_rigid*(2*c1c2*x(15*i+6) + 2*c1c3*x(15*i+9) + 4*(c1c1-1)*x(15*i+3));
+// 		g(15*i+4) += a_rigid*(2*c1c2*x(15*i+1) + 2*c2c3*x(15*i+7) + 4*(c2c2-1)*x(15*i+4));
+// 		g(15*i+5) += a_rigid*(2*c1c2*x(15*i+2) + 2*c2c3*x(15*i+8) + 4*(c2c2-1)*x(15*i+5));
+// 		g(15*i+6) += a_rigid*(2*c1c2*x(15*i+3) + 2*c2c3*x(15*i+9) + 4*(c2c2-1)*x(15*i+6));
+// 		g(15*i+7) += a_rigid*(2*c1c3*x(15*i+1) + 2*c2c3*x(15*i+4) + 4*(c3c3-1)*x(15*i+7));
+// 		g(15*i+8) += a_rigid*(2*c1c3*x(15*i+2) + 2*c2c3*x(15*i+5) + 4*(c3c3-1)*x(15*i+8));
+// 		g(15*i+9) += a_rigid*(2*c1c3*x(15*i+3) + 2*c2c3*x(15*i+6) + 4*(c3c3-1)*x(15*i+9));
 
 		//////////////////////////////////////////////////////////////////////////
 		// E_smooth
@@ -112,42 +110,41 @@ void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g,
 			sig_reg[1] += xi[1] + x(15*i+11) - xj[1] - x(15*nei[j]+11);
 			sig_reg[2] += xi[2] + x(15*i+12) - xj[2] - x(15*nei[j]+12);
 
-			E_smooth += sig_reg[0]*sig_reg[0] + sig_reg[1]*sig_reg[1] + sig_reg[2]*sig_reg[2];				// use alpha_jk = 1.0
-
-			g(15*i+1) += a_smooth*2*sig_reg[0]*(xj[0]-xi[0]);
-			g(15*i+2) += a_smooth*2*sig_reg[1]*(xj[0]-xi[0]);
-			g(15*i+3) += a_smooth*2*sig_reg[2]*(xj[0]-xi[0]);
-			g(15*i+4) += a_smooth*2*sig_reg[0]*(xj[1]-xi[1]);
-			g(15*i+5) += a_smooth*2*sig_reg[1]*(xj[1]-xi[1]);
-			g(15*i+6) += a_smooth*2*sig_reg[2]*(xj[1]-xi[1]);
-			g(15*i+7) += a_smooth*2*sig_reg[0]*(xj[2]-xi[2]);
-			g(15*i+8) += a_smooth*2*sig_reg[1]*(xj[2]-xi[2]);
-			g(15*i+9) += a_smooth*2*sig_reg[2]*(xj[2]-xi[2]);
-
-			g(15*i+10) += a_smooth*2*sig_reg[0];
-			g(15*i+11) += a_smooth*2*sig_reg[1];
-			g(15*i+12) += a_smooth*2*sig_reg[2];
-			g(15*nei[j]+10) -= a_smooth*2*sig_reg[0];
-			g(15*nei[j]+11) -= a_smooth*2*sig_reg[1];
-			g(15*nei[j]+12) -= a_smooth*2*sig_reg[2];
+// 			E_smooth += sig_reg[0]*sig_reg[0] + sig_reg[1]*sig_reg[1] + sig_reg[2]*sig_reg[2];				// use alpha_jk = 1.0
+// 
+// 			g(15*i+1) += a_smooth*2*sig_reg[0]*(xj[0]-xi[0]);
+// 			g(15*i+2) += a_smooth*2*sig_reg[1]*(xj[0]-xi[0]);
+// 			g(15*i+3) += a_smooth*2*sig_reg[2]*(xj[0]-xi[0]);
+// 			g(15*i+4) += a_smooth*2*sig_reg[0]*(xj[1]-xi[1]);
+// 			g(15*i+5) += a_smooth*2*sig_reg[1]*(xj[1]-xi[1]);
+// 			g(15*i+6) += a_smooth*2*sig_reg[2]*(xj[1]-xi[1]);
+// 			g(15*i+7) += a_smooth*2*sig_reg[0]*(xj[2]-xi[2]);
+// 			g(15*i+8) += a_smooth*2*sig_reg[1]*(xj[2]-xi[2]);
+// 			g(15*i+9) += a_smooth*2*sig_reg[2]*(xj[2]-xi[2]);
+// 
+// 			g(15*i+10) += a_smooth*2*sig_reg[0];
+// 			g(15*i+11) += a_smooth*2*sig_reg[1];
+// 			g(15*i+12) += a_smooth*2*sig_reg[2];
+// 			g(15*nei[j]+10) -= a_smooth*2*sig_reg[0];
+// 			g(15*nei[j]+11) -= a_smooth*2*sig_reg[1];
+// 			g(15*nei[j]+12) -= a_smooth*2*sig_reg[2];
 		}
 
 
 		//////////////////////////////////////////////////////////////////////////
 		// E_fit
 		//////////////////////////////////////////////////////////////////////////
-		double d1, d2, d, d_du, d_dv, dp, au, av;
-
 		double u = x(i*15+13);
 		double v = x(i*15+14);
 
 		// bilinear interpolation
 		//////////////////////////////////////////////////////////////////////////
+		double d1, d2, d, d_du, d_dv, dp, au, av;
 		au = u-int(u);
 		av = v-int(v);
 		if (u+1>=x_res-1 || v+1>=y_res-1)
 		{
-			cout<< "opps..";
+// 			cout<< "opps..";
 			d = target_dmap[v][u];
 			d_du = pdx[v][u];
 			d_dv = pdy[v][u];
@@ -166,7 +163,6 @@ void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g,
 			d2 = (1-au)*pdy[int(v)+1][int(u)] + au*pdy[int(v)+1][int(u)+1];
 			d_dv = (1-av)*d1+av*d2;
 		}
-		//////////////////////////////////////////////////////////////////////////
 		
 		double c_hat[3] = {u, v, d};
 
@@ -179,7 +175,8 @@ void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g,
 			xh_ch[j] = x_hat[j] - c_hat[j];
 
 		double xh_ch_norm2 = xh_ch[0]*xh_ch[0] + xh_ch[1]*xh_ch[1] + xh_ch[2]*xh_ch[2];	// ||x_hat - c_hat||^2
-		double w_sqr = x(15*i+15)*x(15*i+15);
+		//double w_sqr = x(15*i+15)*x(15*i+15);
+		double w_sqr = 1;
 
 		E_fit += w_sqr*xh_ch_norm2;
 
@@ -195,15 +192,20 @@ void funcgrad(const ap::real_1d_array& x, double& f, ap::real_1d_array& g,
 		g(15*i+13) -= a_fit*w_sqr*2*(xh_ch[0] + xh_ch[2]*d_du);
 		g(15*i+14) -= a_fit*w_sqr*2*(xh_ch[1] + xh_ch[2]*d_dv);
 
-		g(15*i+15) += a_fit*2*x(15*i+15)*xh_ch_norm2;
+		//g(15*i+15) += a_fit*2*x(15*i+15)*xh_ch_norm2;
 
 		//////////////////////////////////////////////////////////////////////////
 		// E_conf
 		//////////////////////////////////////////////////////////////////////////
 		double conf_tem = 1-w_sqr;
-		E_conf += conf_tem*conf_tem;
-		g(15*i+15) -= a_conf*4*x(15*i+15)*conf_tem;
+// 		E_conf += conf_tem*conf_tem;
+// 		g(15*i+15) -= a_conf*4*x(15*i+15)*conf_tem;
 	}
+
+	cout<<g(15*100+10)<<endl;
+	cout<<g(15*100+11)<<endl;
+	cout<<g(15*100+12)<<endl;
+
 
 	f = a_rigid*E_rigid + a_smooth*E_smooth + a_fit*E_fit + a_conf*E_conf;
 	cout<<endl<<endl;
@@ -943,8 +945,6 @@ void lbfgsbminimize(const int& n,
 		// update draw nodes
 		int n = graph.nodes.size();
 
-		int count = 0;
-
 		for (i = 0; i<graph.draw_nodes.size(); ++i)
 			graph.draw_nodes[i] = graph.nodes[i] + Vector3d(x(i*15+10),x(i*15+11),x(i*15+12));
 
@@ -958,8 +958,8 @@ void lbfgsbminimize(const int& n,
         //
         // Compute the infinity norm of the projected (-)gradient.
         //
-        lbfgsbprojgr(n, l, u, nbd, x, g, sbgnrm);
-        
+        lbfgsbprojgr(n, l, u, nbd, x, g, sbgnrm);  
+		
         //
         // Test for termination.
         //
@@ -968,37 +968,32 @@ void lbfgsbminimize(const int& n,
 		double tem_val = fabs(fold-f)/(1+f);
 		cout<< "tem_val : " << tem_val << endl;
 
-		if (tem_val < 0.001)
+		if (tem_val < alph[7])
 		{
-			cout<< "|(F_k)-(F_k-1)|<10^(-5)" << endl;
-			cout<<alph[0]<<endl;
-			cout<<alph[1]<<endl;
-			cout<<alph[2]<<endl;
-
-			if (alph[0] >= 1.0) alph[0] *= 0.5;
-			if (alph[1] >= 0.1) alph[1] *= 0.5;
-			if (alph[2] >= 1.0) alph[2] *= 0.5;
-// 			if (alph[0] >= 0.01) alph[0] *= 0.5;
-// 			if (alph[1] >= 0.001) alph[1] *= 0.5;
-// 			if (alph[2] >= 0.01) alph[2] *= 0.5;
+// 			cout<< "|(F_k)-(F_k-1)|<10^(-5)" << endl;
+// 			cout<<alph[0]<<endl;
+// 			cout<<alph[1]<<endl;
+// 			cout<<alph[2]<<endl;
+			if (alph[0] >= alph[4]) alph[0] *= 0.5;
+			if (alph[1] >= alph[5]) alph[1] *= 0.5;
+			if (alph[3] >= alph[6]) alph[2] *= 0.5;
 		}
 
-		if (alph[0] < 1.0 && alph[1] < 0.1 && alph[2] < 1.0)
-		{
-			if(tem_val < 0.00000001)
+// 		if (alph[0] < alph[4] && alph[1] < alph[5] && alph[3] < alph[6])
+// 		{
+			if(tem_val < alph[9]) // converged!!
 			{
 				cout<< "|(F_k)-(F_k-1)|<10^(-8)" << endl;
 				info = 6;
 				return;
 			}
-			else if (tem_val < 0.0001)
-//			else if (tem_val < 0.00001)
+			else if (tem_val < alph[8]) // iteration improvement!!
 			{
 				cout<< "|(F_k)-(F_k-1)|<10^(-6)" << endl;
 				info = 7;
 				return;			
 			}
-		}
+// 		}
 
 
         if( sbgnrm<=epsg )
