@@ -36,9 +36,7 @@ void Viewer::init()
 // 	//setMouseBinding(Qt::MidButton + Qt::CTRL, ALIGN_FRAME, true);
 
 	glClearColor(1.f, 1.f, 1.f, 1.f);
-
-	camera()->setType(qglviewer::Camera::ORTHOGRAPHIC);
-	
+	camera()->setType(qglviewer::Camera::ORTHOGRAPHIC);	
 	setSceneRadius(100.0);
 
 // 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -373,7 +371,6 @@ void Viewer::mouseMoveEvent(QMouseEvent *e)
 
 void Viewer::mouseReleaseEvent(QMouseEvent *e)
 {
-
 	if ((e->button() == Qt::LeftButton) && !onDrag && onEmbededDeformation)
 	{
 		QGLViewer::mousePressEvent(e);
@@ -471,7 +468,6 @@ void Viewer::mouseReleaseEvent(QMouseEvent *e)
 	QGLViewer::mouseReleaseEvent(e);
 }
 
-
 void Viewer::InitOptimization()
 {
 	// building graph
@@ -557,7 +553,6 @@ void Viewer::Deform( const CTriMesh& ori, CTriMesh& mesh, DeformationGraph& dgra
 	HCCLMesh::VertexIter vit = mesh.vertices_begin();
 
 	// mesh update
-// #pragma parallel for
 	for (; cvit!=ori.vertices_end(); ++cvit, ++vit)
 	{
 		int idx_vrtx = cvit.handle().idx();
@@ -600,57 +595,6 @@ void Viewer::Deform( const CTriMesh& ori, CTriMesh& mesh, DeformationGraph& dgra
 
 	// deformation graph update
 	std::transform(graph.nodes.begin(), graph.nodes.end(), result_translation.begin(), dgraph.draw_nodes.begin(), [](const Vector3d& a, const Vector3d& b){return a+b;});
-}
-
-void Viewer::Deform( CTriMesh& mesh, DeformationGraph& dgraph )
-{
-	HCCLMesh::ConstVertexIter cvit = mesh.vertices_begin();
-	HCCLMesh::VertexIter vit = mesh.vertices_begin();
-
-	// mesh update
-	for (; cvit!=mesh.vertices_end(); ++cvit, ++vit)
-	{
-		int idx_vrtx = cvit.handle().idx();
-
-		arma::vec  v_ = arma::vec().zeros(3);		
-		arma::vec  v(3);
-		HCCLMesh::Point tem = mesh.point(cvit);
-		v[0] = tem[0];
-		v[1] = tem[1];
-		v[2] = tem[2];
-
-		for (int j = 0; j<nearest_k; ++j)
-		{
-			int idx_node = k_nearest_idx[idx_vrtx][j];
-
-			double w = weight_value[idx_vrtx][j];
-			arma::vec g(dgraph.nodes[idx_node].val, 3);
-			g[0] = dgraph.nodes[idx_node][0];
-			g[1] = dgraph.nodes[idx_node][1];
-			g[2] = dgraph.nodes[idx_node][2];
-
-			arma::vec t(result_translation[idx_node].val, 3);
-			t[0] = result_translation [idx_node][0];
-			t[1] = result_translation[idx_node][1];
-			t[2] = result_translation[idx_node][2];
-
-			arma::mat R(result_rotation[idx_node].data(), 3, 3);
-
-			arma::vec d = v-g;
-			arma::vec rd;
-
-			rd = R*d;		
-			v_ += w*(rd+g+t);
-		}
-
-		mesh.set_point(*vit, HCCLMesh::Point(v_[0], v_[1], v_[2]));
-	}
-
-	mesh.update_normals();
-
-	// deformation graph update
-	std::transform(graph.nodes.begin(), graph.nodes.end(), result_translation.begin(), dgraph.draw_nodes.begin(), [](const Vector3d& a, const Vector3d& b){return a+b;});
-
 }
 
 /////////////////

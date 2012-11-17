@@ -30,21 +30,21 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="D:\Libraries\QGLViewer-2.3.17.props" />
-    <Import Project="D:\Libraries\OpenMesh_2.2.props" />
-    <Import Project="Armadillo-3.2.4.props" />
-    <Import Project="OpenNI.props" />
-    <Import Project="..\..\..\..\..\Library\Property Sheet\Boost-1.49.0.props" />
-    <Import Project="..\..\..\..\..\Library\Property Sheet\Geodesic.props" />
+    <Import Project="PropertySheets\OpenMesh-2.3.props" />
+    <Import Project="PropertySheets\QGLViewer-2.3.17.props" />
+    <Import Project="PropertySheets\Boost-1.49.0.props" />
+    <Import Project="PropertySheets\libKDTree.props" />
+    <Import Project="PropertySheets\Geodesic.props" />
+    <Import Project="PropertySheets\Armadillo-3.2.4.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="D:\Libraries\QGLViewer-2.3.17.props" />
-    <Import Project="D:\Libraries\OpenMesh_2.2.props" />
-    <Import Project="Armadillo-3.2.4.props" />
-    <Import Project="OpenNI.props" />
-    <Import Project="..\..\..\..\..\Library\Property Sheet\Boost-1.49.0.props" />
-    <Import Project="..\..\..\..\..\Library\Property Sheet\Geodesic.props" />
+    <Import Project="PropertySheets\OpenMesh-2.3.props" />
+    <Import Project="PropertySheets\QGLViewer-2.3.17.props" />
+    <Import Project="PropertySheets\Boost-1.49.0.props" />
+    <Import Project="PropertySheets\libKDTree.props" />
+    <Import Project="PropertySheets\Geodesic.props" />
+    <Import Project="PropertySheets\Armadillo-3.2.4.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
@@ -148,21 +148,14 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="allocator.hpp" />
     <ClInclude Include="ap.h" />
     <ClInclude Include="apvt.h" />
     <ClInclude Include="DeformationGraph.h" />
-    <ClInclude Include="function.hpp" />
     <ClInclude Include="GeneratedFiles\ui_Decimate.h" />
     <ClInclude Include="GeneratedFiles\ui_DeformableRegistration.h" />
     <ClInclude Include="glPrimitives.h" />
-    <ClInclude Include="iterator.hpp" />
-    <ClInclude Include="kdtree.hpp" />
-    <ClInclude Include="Kinect.h" />
     <ClInclude Include="lbfgsb.h" />
-    <ClInclude Include="node.hpp" />
     <ClInclude Include="OpenMeshWrapper.h" />
-    <ClInclude Include="region.hpp" />
     <ClInclude Include="VectorQuaternion.h" />
     <CustomBuild Include="Viewer.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
@@ -202,10 +195,14 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Armadillo-3.2.4.props" />
     <None Include="blas_win32_MT.dll" />
     <None Include="lapack_win32_MT.dll" />
-    <None Include="OpenNI.props" />
+    <None Include="PropertySheets\Armadillo-3.2.4.props" />
+    <None Include="PropertySheets\Boost-1.49.0.props" />
+    <None Include="PropertySheets\Geodesic.props" />
+    <None Include="PropertySheets\libKDTree.props" />
+    <None Include="PropertySheets\OpenMesh-2.3.props" />
+    <None Include="PropertySheets\QGLViewer-2.3.17.props" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

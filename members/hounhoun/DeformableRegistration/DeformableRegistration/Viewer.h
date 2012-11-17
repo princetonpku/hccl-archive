@@ -7,7 +7,6 @@
 
 #include "OpenMeshWrapper.h"
 #include "DeformationGraph.h"
-#include "Kinect.h"
 #include "lbfgsb.h"
 
 #include <geodesic_algorithm_exact.h>
@@ -61,7 +60,6 @@ public:
 	/////////////////
 	// Hoa Li part //
 	/////////////////
-	Kinect kinect;
 	int xpt, ypt, x_res, y_res;
 	std::vector<std::vector<int>> indx_source, indx_target;
 	std::vector<std::vector<double>> depth_map;
@@ -76,7 +74,6 @@ public:
 	void LoadDepthMapParameters(const char* filename, std::vector<std::vector<int>>& indx);
 	void LoadMat(const char* filename, std::vector<std::vector<double>>& dmap);
 	void LoadC(const char* filename, std::vector<std::vector<std::vector<double>>>& c);
-	void Deform(CTriMesh& mesh, DeformationGraph& dgraph);
 
 	int n_node;
 	ap::real_1d_array x;
